@@ -1009,6 +1009,12 @@ function GenesisX:CreateButton(parent, config)
     frame.ZIndex = 12
     frame.Parent = parent
 
+    -- padding pra não cortar nas laterais
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft  = UDim.new(0, self:S(4))
+    pad.PaddingRight = UDim.new(0, self:S(4))
+    pad.Parent = frame
+
     local btn = Instance.new("TextButton")
     btn.Name = "Button"
     btn.AutoButtonColor = false
@@ -1017,12 +1023,11 @@ function GenesisX:CreateButton(parent, config)
     btn.Font = Enum.Font.GothamBold
     btn.Text = text
     btn.TextSize = self:S(13)
-    btn.TextColor3 = Color3.new(1, 1, 1)  -- texto sempre branco
+    btn.TextColor3 = Color3.new(1, 1, 1)
     btn.ZIndex = 13
     btn.Parent = frame
     self:CreateCorner(btn)
 
-    -- Fundo escuro + borda colorida por estilo
     local bgColor, bgHover, strokeColor
     if style == "accent" then
         bgColor     = Color3.fromRGB(40, 20, 65)
@@ -1539,8 +1544,10 @@ function GenesisX:CreateDropdown(parent, config)
     listLayout.Parent = dropList
 
     local listPadding = Instance.new("UIPadding")
-    listPadding.PaddingTop = UDim.new(0, self:S(4))
+    listPadding.PaddingTop    = UDim.new(0, self:S(4))
     listPadding.PaddingBottom = UDim.new(0, self:S(4))
+    listPadding.PaddingLeft   = UDim.new(0, self:S(4))
+    listPadding.PaddingRight  = UDim.new(0, self:S(4))
     listPadding.Parent = dropList
 
     local function closeDropdown()
@@ -1549,7 +1556,9 @@ function GenesisX:CreateDropdown(parent, config)
         self:Tween(overlay, {BackgroundTransparency = 1}, 0.2)
         self:Tween(listContainer, {Size = UDim2.new(0, self:S(320), 0, 0)}, 0.2)
         self:Tween(arrow, {Rotation = 0}, 0.2)
-        if dropStroke then self:Tween(dropStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2) end
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2)
+        end
         task.wait(0.2)
         overlay.Visible = false
         listContainer.Visible = false
@@ -1559,8 +1568,10 @@ function GenesisX:CreateDropdown(parent, config)
         for _, child in ipairs(dropList:GetChildren()) do
             if child:IsA("Frame") then child:Destroy() end
         end
+
         for _, option in ipairs(options) do
             local isSelected = option == selected
+
             local row = Instance.new("Frame")
             row.BackgroundColor3 = isSelected and self.Theme.AccentDark or self.Theme.Input
             row.Size = UDim2.new(1, 0, 0, self:S(36))
@@ -1605,16 +1616,24 @@ function GenesisX:CreateDropdown(parent, config)
                 closeDropdown()
             end)
             rowBtn.MouseEnter:Connect(function()
-                if not isSelected then self:Tween(row, {BackgroundColor3 = self.Theme.CardHover}, 0.1) end
+                if not isSelected then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.CardHover}, 0.1)
+                end
             end)
             rowBtn.MouseLeave:Connect(function()
-                if not isSelected then self:Tween(row, {BackgroundColor3 = self.Theme.Input}, 0.1) end
+                if not isSelected then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.Input}, 0.1)
+                end
             end)
         end
     end
 
-    dropBtn.MouseEnter:Connect(function() self:Tween(dropBtn, {BackgroundColor3 = self.Theme.InputHover}, 0.15) end)
-    dropBtn.MouseLeave:Connect(function() self:Tween(dropBtn, {BackgroundColor3 = self.Theme.Input}, 0.15) end)
+    dropBtn.MouseEnter:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.InputHover}, 0.15)
+    end)
+    dropBtn.MouseLeave:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.Input}, 0.15)
+    end)
 
     dropBtn.MouseButton1Click:Connect(function()
         if isOpen then closeDropdown(); return end
@@ -1627,10 +1646,15 @@ function GenesisX:CreateDropdown(parent, config)
         overlay.BackgroundTransparency = 1
         listContainer.Size = UDim2.new(0, targetWidth, 0, 0)
         self:Tween(overlay, {BackgroundTransparency = 0.45}, 0.25)
-        self:Tween(listContainer, {Size = UDim2.new(0, targetWidth, 0, targetHeight)}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        self:Tween(listContainer, {
+            Size = UDim2.new(0, targetWidth, 0, targetHeight)
+        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
         self:Tween(arrow, {Rotation = 180}, 0.2)
-        if dropStroke then self:Tween(dropStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2) end
-        dropList.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + self:S(16))
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2)
+        end
+        dropList.CanvasSize = UDim2.new(0, 0, 0,
+            listLayout.AbsoluteContentSize.Y + self:S(16))
         isOpen = true
     end)
 
@@ -1640,14 +1664,14 @@ function GenesisX:CreateDropdown(parent, config)
             local pos = input.Position
             local listPos = listContainer.AbsolutePosition
             local listSize = listContainer.AbsoluteSize
-            local inList = pos.X >= listPos.X and pos.X <= listPos.X + listSize.X and
-                           pos.Y >= listPos.Y and pos.Y <= listPos.Y + listSize.Y
+            local inList = pos.X >= listPos.X and pos.X <= listPos.X + listSize.X
+                       and pos.Y >= listPos.Y and pos.Y <= listPos.Y + listSize.Y
             if not inList then closeDropdown() end
         end
     end)
 
     return {
-        Frame = frame,
+        Frame    = frame,
         GetValue = function() return selected end,
         SetValue = function(v)
             selected = v
@@ -1658,7 +1682,7 @@ function GenesisX:CreateDropdown(parent, config)
     }
 end
 
--- ─── CREATE MULTI DROPDOWN ────────────────────────────────────────────────────
+
 function GenesisX:CreateMultiDropdown(parent, config)
     config = config or {}
     local labelText = config.Label or "Multi Select"
@@ -1789,8 +1813,10 @@ function GenesisX:CreateMultiDropdown(parent, config)
     listLayout.Parent = dropList
 
     local listPadding = Instance.new("UIPadding")
-    listPadding.PaddingTop = UDim.new(0, self:S(4))
+    listPadding.PaddingTop    = UDim.new(0, self:S(4))
     listPadding.PaddingBottom = UDim.new(0, self:S(4))
+    listPadding.PaddingLeft   = UDim.new(0, self:S(4))
+    listPadding.PaddingRight  = UDim.new(0, self:S(4))
     listPadding.Parent = dropList
 
     local function updateText()
@@ -1813,20 +1839,27 @@ function GenesisX:CreateMultiDropdown(parent, config)
         self:Tween(overlay, {BackgroundTransparency = 1}, 0.2)
         self:Tween(listContainer, {Size = UDim2.new(0, self:S(320), 0, 0)}, 0.2)
         self:Tween(arrow, {Rotation = 0}, 0.2)
-        if dropStroke then self:Tween(dropStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2) end
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2)
+        end
         task.wait(0.2)
         overlay.Visible = false
         listContainer.Visible = false
     end
 
     local function isSelectedFn(name)
-        for _, v in ipairs(selected) do if v == name then return true end end
+        for _, v in ipairs(selected) do
+            if v == name then return true end
+        end
         return false
     end
 
     local function toggle(name)
         for i, v in ipairs(selected) do
-            if v == name then table.remove(selected, i); return false end
+            if v == name then
+                table.remove(selected, i)
+                return false
+            end
         end
         table.insert(selected, name)
         return true
@@ -1836,8 +1869,10 @@ function GenesisX:CreateMultiDropdown(parent, config)
         for _, child in ipairs(dropList:GetChildren()) do
             if child:IsA("Frame") then child:Destroy() end
         end
+
         for _, option in ipairs(options) do
             local sel = isSelectedFn(option)
+
             local row = Instance.new("Frame")
             row.BackgroundColor3 = sel and self.Theme.AccentDark or self.Theme.Input
             row.Size = UDim2.new(1, 0, 0, self:S(38))
@@ -1889,16 +1924,24 @@ function GenesisX:CreateMultiDropdown(parent, config)
                 populate()
             end)
             rowBtn.MouseEnter:Connect(function()
-                if not sel then self:Tween(row, {BackgroundColor3 = self.Theme.CardHover}, 0.1) end
+                if not sel then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.CardHover}, 0.1)
+                end
             end)
             rowBtn.MouseLeave:Connect(function()
-                if not sel then self:Tween(row, {BackgroundColor3 = self.Theme.Input}, 0.1) end
+                if not sel then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.Input}, 0.1)
+                end
             end)
         end
     end
 
-    dropBtn.MouseEnter:Connect(function() self:Tween(dropBtn, {BackgroundColor3 = self.Theme.InputHover}, 0.15) end)
-    dropBtn.MouseLeave:Connect(function() self:Tween(dropBtn, {BackgroundColor3 = self.Theme.Input}, 0.15) end)
+    dropBtn.MouseEnter:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.InputHover}, 0.15)
+    end)
+    dropBtn.MouseLeave:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.Input}, 0.15)
+    end)
 
     dropBtn.MouseButton1Click:Connect(function()
         if isOpen then closeDropdown(); return end
@@ -1911,10 +1954,15 @@ function GenesisX:CreateMultiDropdown(parent, config)
         overlay.BackgroundTransparency = 1
         listContainer.Size = UDim2.new(0, targetWidth, 0, 0)
         self:Tween(overlay, {BackgroundTransparency = 0.45}, 0.25)
-        self:Tween(listContainer, {Size = UDim2.new(0, targetWidth, 0, targetHeight)}, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        self:Tween(listContainer, {
+            Size = UDim2.new(0, targetWidth, 0, targetHeight)
+        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
         self:Tween(arrow, {Rotation = 180}, 0.2)
-        if dropStroke then self:Tween(dropStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2) end
-        dropList.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + self:S(16))
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2)
+        end
+        dropList.CanvasSize = UDim2.new(0, 0, 0,
+            listLayout.AbsoluteContentSize.Y + self:S(16))
         isOpen = true
     end)
 
@@ -1924,8 +1972,8 @@ function GenesisX:CreateMultiDropdown(parent, config)
             local pos = input.Position
             local listPos = listContainer.AbsolutePosition
             local listSize = listContainer.AbsoluteSize
-            local inList = pos.X >= listPos.X and pos.X <= listPos.X + listSize.X and
-                           pos.Y >= listPos.Y and pos.Y <= listPos.Y + listSize.Y
+            local inList = pos.X >= listPos.X and pos.X <= listPos.X + listSize.X
+                       and pos.Y >= listPos.Y and pos.Y <= listPos.Y + listSize.Y
             if not inList then closeDropdown() end
         end
     end)
@@ -1933,7 +1981,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     updateText()
 
     return {
-        Frame = frame,
+        Frame     = frame,
         GetValues = function() return selected end,
         SetValues = function(v)
             selected = {}
@@ -2024,34 +2072,35 @@ end
 -- ─── CREATE LABEL ─────────────────────────────────────────────────────────────
 function GenesisX:CreateLabel(parent, config)
     config = config or {}
-    local text     = config.Text    or "Label"
-    local color    = config.Color   or self.Theme.TextSecondary
-    local wrapped  = config.Wrapped ~= false
+    local text      = config.Text    or "Label"
+    local color     = config.Color   or self.Theme.TextSecondary
+    local wrapped   = config.Wrapped ~= false
+    local padV      = self:S(10)
+    local padH      = self:S(14)
     local minHeight = self:S(36)
-    local padH      = self:S(10)   -- padding vertical interno
 
     local frame = Instance.new("Frame")
     frame.Name = "Label_" .. text:sub(1, 10)
     frame.BackgroundColor3 = self.Theme.Card
     frame.Size = UDim2.new(1, 0, 0, minHeight)
+    frame.ClipsDescendants = false   -- não corta o conteúdo
     frame.ZIndex = 12
     frame.Parent = parent
     self:CreateCorner(frame)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.5)
 
-    -- padding interno pra não cortar nas laterais
     local pad = Instance.new("UIPadding")
-    pad.PaddingLeft   = UDim.new(0, self:S(14))
-    pad.PaddingRight  = UDim.new(0, self:S(14))
-    pad.PaddingTop    = UDim.new(0, padH)
-    pad.PaddingBottom = UDim.new(0, padH)
+    pad.PaddingLeft   = UDim.new(0, padH)
+    pad.PaddingRight  = UDim.new(0, padH)
+    pad.PaddingTop    = UDim.new(0, padV)
+    pad.PaddingBottom = UDim.new(0, padV)
     pad.Parent = frame
 
     local label = Instance.new("TextLabel")
     label.Name = "Text"
     label.BackgroundTransparency = 1
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.AutomaticSize = Enum.AutomaticSize.Y
+    label.Size = UDim2.new(1, 0, 0, 0)           -- altura começa 0
+    label.AutomaticSize = Enum.AutomaticSize.Y    -- cresce com o texto
     label.Font = Enum.Font.GothamSemibold
     label.Text = text
     label.TextColor3 = color
@@ -2062,22 +2111,25 @@ function GenesisX:CreateLabel(parent, config)
     label.ZIndex = 13
     label.Parent = frame
 
-    -- ajusta altura do frame conforme o texto
-    label:GetPropertyChangedSignal("TextBounds"):Connect(function()
-        local newH = math.max(minHeight, label.TextBounds.Y + padH * 2)
-        frame.Size = UDim2.new(1, 0, 0, newH)
-    end)
-    task.delay(0.05, function()
-        if label and label.Parent then
-            local newH = math.max(minHeight, label.TextBounds.Y + padH * 2)
-            frame.Size = UDim2.new(1, 0, 0, newH)
-        end
-    end)
+    -- frame acompanha o label com padding
+    local function updateHeight()
+        if not label or not label.Parent then return end
+        local textH = label.TextBounds.Y
+        if textH <= 0 then textH = self:S(16) end
+        frame.Size = UDim2.new(1, 0, 0, math.max(minHeight, textH + padV * 2))
+    end
+
+    label:GetPropertyChangedSignal("TextBounds"):Connect(updateHeight)
+    label:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateHeight)
+    task.delay(0.1, updateHeight)
 
     return {
         Frame    = frame,
         Label    = label,
-        SetText  = function(t) label.Text = t end,
+        SetText  = function(t)
+            label.Text = t
+            task.defer(updateHeight)
+        end,
         SetColor = function(c) label.TextColor3 = c end,
     }
 end
