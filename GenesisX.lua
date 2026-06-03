@@ -2638,7 +2638,6 @@ function GenesisX:Notify(config)
     iconImg.ZIndex              = 5002
     iconImg.Parent              = iconBg
 
-
     -- ── Texto ──────────────────────────────────────────────────────────────────
     local textX     = self:S(14) + iconSize + self:S(10)
     local textW     = W - textX - self:S(36)   -- 36 = espaço p/ botão fechar
