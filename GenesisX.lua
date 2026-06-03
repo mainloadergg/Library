@@ -997,10 +997,10 @@ end
 -- ─── CREATE BUTTON ────────────────────────────────────────────────────────────
 function GenesisX:CreateButton(parent, config)
     config = config or {}
-    local text = config.Text or "Button"
-    local style = config.Style or "default"
+    local text     = config.Text     or "Button"
+    local style    = config.Style    or "default"
     local callback = config.Callback or function() end
-    local height = self:S(40)
+    local height   = self:S(40)
 
     local frame = Instance.new("Frame")
     frame.Name = "Button_" .. text
@@ -1012,47 +1012,47 @@ function GenesisX:CreateButton(parent, config)
     local btn = Instance.new("TextButton")
     btn.Name = "Button"
     btn.AutoButtonColor = false
-    btn.BorderSizePixel = 0  -- SEM BORDA
+    btn.BorderSizePixel = 0
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.Font = Enum.Font.GothamBold
     btn.Text = text
     btn.TextSize = self:S(13)
+    btn.TextColor3 = Color3.new(1, 1, 1)  -- texto sempre branco
     btn.ZIndex = 13
     btn.Parent = frame
     self:CreateCorner(btn)
 
-    -- COR SÓLIDA SEM GRADIENTE
-    local bgColor, textColor, hoverColor
+    -- Fundo escuro + borda colorida por estilo
+    local bgColor, bgHover, strokeColor
     if style == "accent" then
-        bgColor    = self.Theme.Accent
-        hoverColor = self.Theme.AccentHover
-        textColor  = Color3.new(1, 1, 1)
+        bgColor     = Color3.fromRGB(40, 20, 65)
+        bgHover     = Color3.fromRGB(55, 30, 90)
+        strokeColor = self.Theme.Accent
     elseif style == "warning" then
-        bgColor    = Color3.fromRGB(120, 70, 0)
-        hoverColor = Color3.fromRGB(150, 90, 0)
-        textColor  = Color3.new(1, 1, 1)
+        bgColor     = Color3.fromRGB(40, 25, 5)
+        bgHover     = Color3.fromRGB(55, 35, 8)
+        strokeColor = Color3.fromRGB(200, 130, 30)
     elseif style == "info" then
-        bgColor    = Color3.fromRGB(30, 60, 120)
-        hoverColor = Color3.fromRGB(40, 80, 150)
-        textColor  = Color3.new(1, 1, 1)
+        bgColor     = Color3.fromRGB(10, 20, 45)
+        bgHover     = Color3.fromRGB(15, 28, 60)
+        strokeColor = Color3.fromRGB(80, 140, 230)
     elseif style == "danger" then
-        bgColor    = Color3.fromRGB(120, 30, 30)
-        hoverColor = Color3.fromRGB(150, 40, 40)
-        textColor  = Color3.new(1, 1, 1)
+        bgColor     = Color3.fromRGB(45, 10, 10)
+        bgHover     = Color3.fromRGB(60, 15, 15)
+        strokeColor = Color3.fromRGB(210, 60, 60)
     elseif style == "success" then
-        bgColor    = Color3.fromRGB(30, 100, 50)
-        hoverColor = Color3.fromRGB(40, 130, 65)
-        textColor  = Color3.new(1, 1, 1)
+        bgColor     = Color3.fromRGB(10, 40, 20)
+        bgHover     = Color3.fromRGB(15, 55, 28)
+        strokeColor = Color3.fromRGB(60, 200, 100)
     else
-        bgColor    = self.Theme.Card
-        hoverColor = self.Theme.CardHover
-        textColor  = self.Theme.Text
+        bgColor     = Color3.fromRGB(22, 22, 22)
+        bgHover     = Color3.fromRGB(32, 32, 32)
+        strokeColor = self.Theme.BorderBright
     end
 
     btn.BackgroundColor3 = bgColor
-    btn.TextColor3 = textColor
+    self:CreateStroke(btn, strokeColor, 1.2, 0.2)
 
-    -- Ripple holder (mantém o efeito de clique)
     local rippleHolder = Instance.new("Frame")
     rippleHolder.Name = "RippleHolder"
     rippleHolder.BackgroundTransparency = 1
@@ -1064,7 +1064,7 @@ function GenesisX:CreateButton(parent, config)
     self:CreateCorner(rippleHolder)
 
     btn.MouseEnter:Connect(function()
-        self:Tween(btn, {BackgroundColor3 = hoverColor}, 0.15)
+        self:Tween(btn, {BackgroundColor3 = bgHover}, 0.15)
     end)
     btn.MouseLeave:Connect(function()
         self:Tween(btn, {BackgroundColor3 = bgColor}, 0.15)
@@ -1075,10 +1075,10 @@ function GenesisX:CreateButton(parent, config)
     end)
 
     return {
-        Frame = frame,
+        Frame  = frame,
         Button = btn,
-        SetText = function(t) btn.Text = t end,
-        SetCallback = function(cb) callback = cb end,
+        SetText     = function(t)  btn.Text = t end,
+        SetCallback = function(cb) callback  = cb end,
     }
 end
 
@@ -1224,12 +1224,13 @@ end
 -- ─── CREATE SLIDER ────────────────────────────────────────────────────────────
 function GenesisX:CreateSlider(parent, config)
     config = config or {}
-    local text = config.Text or "Slider"
-    local min = config.Min or 0
-    local max = config.Max or 100
-    local default = config.Default or min
-    local callback = config.Callback or function() end
-    local height = self:S(62)
+    local text     = config.Text      or "Slider"
+    local min      = config.Min       or 0
+    local max      = config.Max       or 100
+    local default  = config.Default   or min
+    local increment = config.Increment or nil
+    local callback = config.Callback  or function() end
+    local height   = self:S(62)
 
     local frame = Instance.new("Frame")
     frame.Name = "Slider_" .. text
@@ -1253,6 +1254,7 @@ function GenesisX:CreateSlider(parent, config)
     label.ZIndex = 13
     label.Parent = frame
 
+    -- ── Valor clicável (vira TextBox ao clicar) ────────────────────────────
     local valueBg = Instance.new("Frame")
     valueBg.Name = "ValueBg"
     valueBg.BackgroundColor3 = self.Theme.Accent
@@ -1262,17 +1264,35 @@ function GenesisX:CreateSlider(parent, config)
     valueBg.Parent = frame
     self:CreateCorner(valueBg, UDim.new(0, 5))
 
-    local valueLabel = Instance.new("TextLabel")
-    valueLabel.Name = "Value"
+    -- Label de display (visível normalmente)
+    local valueLabel = Instance.new("TextButton")
+    valueLabel.Name = "ValueLabel"
     valueLabel.BackgroundTransparency = 1
     valueLabel.Size = UDim2.new(1, 0, 1, 0)
     valueLabel.Font = Enum.Font.GothamBold
     valueLabel.Text = tostring(default)
     valueLabel.TextColor3 = Color3.new(1, 1, 1)
     valueLabel.TextSize = self:S(11)
-    valueLabel.ZIndex = 15
+    valueLabel.AutoButtonColor = false
+    valueLabel.ZIndex = 16
     valueLabel.Parent = valueBg
 
+    -- TextBox de input (invisível por padrão)
+    local valueInput = Instance.new("TextBox")
+    valueInput.Name = "ValueInput"
+    valueInput.BackgroundTransparency = 1
+    valueInput.Size = UDim2.new(1, 0, 1, 0)
+    valueInput.Font = Enum.Font.GothamBold
+    valueInput.Text = ""
+    valueInput.PlaceholderText = ""
+    valueInput.TextColor3 = Color3.new(1, 1, 1)
+    valueInput.TextSize = self:S(11)
+    valueInput.ClearTextOnFocus = true
+    valueInput.Visible = false
+    valueInput.ZIndex = 17
+    valueInput.Parent = valueBg
+
+    -- ── Track ──────────────────────────────────────────────────────────────
     local trackHeight = self:S(6)
     local trackBg = Instance.new("Frame")
     trackBg.Name = "TrackBg"
@@ -1290,7 +1310,6 @@ function GenesisX:CreateSlider(parent, config)
     fill.ZIndex = 14
     fill.Parent = trackBg
     self:CreateCorner(fill, UDim.new(1, 0))
-    self:CreateGradient(fill, self.Theme.Accent, self.Theme.AccentDark, 0)
 
     local knobSize = self:S(16)
     local knob = Instance.new("Frame")
@@ -1306,23 +1325,34 @@ function GenesisX:CreateSlider(parent, config)
     local dragging = false
     local currentValue = default
 
-    local function update(input)
+    local function snapValue(v)
+        if increment then
+            v = math.floor((v - min) / increment + 0.5) * increment + min
+        end
+        return math.floor(math.clamp(v, min, max) * 100) / 100
+    end
+
+    local function applyValue(v)
+        currentValue = snapValue(v)
+        local percent = (currentValue - min) / (max - min)
+        fill.Size = UDim2.new(percent, 0, 1, 0)
+        knob.Position = UDim2.new(percent, -knobSize/2, 0.5, -knobSize/2)
+        valueLabel.Text = tostring(currentValue)
+        callback(currentValue)
+    end
+
+    local function updateFromDrag(input)
         local percent = math.clamp(
             (input.Position.X - trackBg.AbsolutePosition.X) / trackBg.AbsoluteSize.X, 0, 1
         )
-        local value = math.floor((min + (max - min) * percent) * 100) / 100
-        currentValue = value
-        fill.Size = UDim2.new(percent, 0, 1, 0)
-        knob.Position = UDim2.new(percent, -knobSize/2, 0.5, -knobSize/2)
-        valueLabel.Text = tostring(value)
-        callback(value)
+        applyValue(min + (max - min) * percent)
     end
 
     trackBg.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or
            input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            update(input)
+            updateFromDrag(input)
         end
     end)
     knob.InputBegan:Connect(function(input)
@@ -1334,7 +1364,7 @@ function GenesisX:CreateSlider(parent, config)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or
            input.UserInputType == Enum.UserInputType.Touch) then
-            update(input)
+            updateFromDrag(input)
         end
     end)
     UserInputService.InputEnded:Connect(function(input)
@@ -1344,17 +1374,36 @@ function GenesisX:CreateSlider(parent, config)
         end
     end)
 
+    -- ── Clique no valor → vira input ───────────────────────────────────────
+    valueLabel.MouseButton1Click:Connect(function()
+        valueLabel.Visible = false
+        valueInput.Visible = true
+        valueInput.Text = tostring(currentValue)
+        valueInput:CaptureFocus()
+    end)
+
+    valueInput.FocusLost:Connect(function(enterPressed)
+        local typed = tonumber(valueInput.Text)
+        if typed then
+            applyValue(typed)
+        end
+        valueInput.Visible = false
+        valueLabel.Visible = true
+        valueLabel.Text = tostring(currentValue)
+    end)
+
+    -- highlight ao hover no valor
+    valueBg.MouseEnter:Connect(function()
+        self:Tween(valueBg, {BackgroundColor3 = self.Theme.AccentHover}, 0.15)
+    end)
+    valueBg.MouseLeave:Connect(function()
+        self:Tween(valueBg, {BackgroundColor3 = self.Theme.Accent}, 0.15)
+    end)
+
     return {
-        Frame = frame,
+        Frame    = frame,
         GetValue = function() return currentValue end,
-        SetValue = function(v)
-            v = math.clamp(v, min, max)
-            currentValue = v
-            local percent = (v - min) / (max - min)
-            fill.Size = UDim2.new(percent, 0, 1, 0)
-            knob.Position = UDim2.new(percent, -knobSize/2, 0.5, -knobSize/2)
-            valueLabel.Text = tostring(v)
-        end,
+        SetValue = function(v) applyValue(v) end,
     }
 end
 
@@ -1975,12 +2024,11 @@ end
 -- ─── CREATE LABEL ─────────────────────────────────────────────────────────────
 function GenesisX:CreateLabel(parent, config)
     config = config or {}
-    local text = config.Text or "Label"
-    local color = config.Color or self.Theme.TextSecondary
-    local autoSize = config.AutoSize ~= false
-    local wrapped = config.Wrapped ~= false
+    local text     = config.Text    or "Label"
+    local color    = config.Color   or self.Theme.TextSecondary
+    local wrapped  = config.Wrapped ~= false
     local minHeight = self:S(36)
-    local padding = self:S(20)
+    local padH      = self:S(10)   -- padding vertical interno
 
     local frame = Instance.new("Frame")
     frame.Name = "Label_" .. text:sub(1, 10)
@@ -1989,41 +2037,47 @@ function GenesisX:CreateLabel(parent, config)
     frame.ZIndex = 12
     frame.Parent = parent
     self:CreateCorner(frame)
-    self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
+    self:CreateStroke(frame, self.Theme.Border, 1, 0.5)
+
+    -- padding interno pra não cortar nas laterais
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft   = UDim.new(0, self:S(14))
+    pad.PaddingRight  = UDim.new(0, self:S(14))
+    pad.PaddingTop    = UDim.new(0, padH)
+    pad.PaddingBottom = UDim.new(0, padH)
+    pad.Parent = frame
 
     local label = Instance.new("TextLabel")
     label.Name = "Text"
     label.BackgroundTransparency = 1
-    label.Position = UDim2.new(0, self:S(14), 0, 0)
-    label.Size = UDim2.new(1, -self:S(28), 1, 0)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.AutomaticSize = Enum.AutomaticSize.Y
     label.Font = Enum.Font.GothamSemibold
     label.Text = text
     label.TextColor3 = color
     label.TextSize = self:S(12)
     label.TextXAlignment = Enum.TextXAlignment.Left
-    label.TextYAlignment = Enum.TextYAlignment.Center
+    label.TextYAlignment = Enum.TextYAlignment.Top
     label.TextWrapped = wrapped
-    if autoSize then label.AutomaticSize = Enum.AutomaticSize.Y end
     label.ZIndex = 13
     label.Parent = frame
 
-    if autoSize then
-        label:GetPropertyChangedSignal("TextBounds"):Connect(function()
-            local newHeight = math.max(minHeight, label.TextBounds.Y + padding)
-            frame.Size = UDim2.new(1, 0, 0, newHeight)
-        end)
-        task.delay(0.1, function()
-            if label and label.Parent then
-                local newHeight = math.max(minHeight, label.TextBounds.Y + padding)
-                frame.Size = UDim2.new(1, 0, 0, newHeight)
-            end
-        end)
-    end
+    -- ajusta altura do frame conforme o texto
+    label:GetPropertyChangedSignal("TextBounds"):Connect(function()
+        local newH = math.max(minHeight, label.TextBounds.Y + padH * 2)
+        frame.Size = UDim2.new(1, 0, 0, newH)
+    end)
+    task.delay(0.05, function()
+        if label and label.Parent then
+            local newH = math.max(minHeight, label.TextBounds.Y + padH * 2)
+            frame.Size = UDim2.new(1, 0, 0, newH)
+        end
+    end)
 
     return {
-        Frame = frame,
-        Label = label,
-        SetText = function(t) label.Text = t end,
+        Frame    = frame,
+        Label    = label,
+        SetText  = function(t) label.Text = t end,
         SetColor = function(c) label.TextColor3 = c end,
     }
 end
