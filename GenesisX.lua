@@ -1475,17 +1475,16 @@ function GenesisX:CreateDropdown(parent, config)
     self:CreateCorner(dropBtn, UDim.new(0, 6))
     local dropStroke = self:CreateStroke(dropBtn, self.Theme.Border, 1, 0.4)
 
-    local arrow = Instance.new("TextLabel")
-    arrow.Name = "Arrow"
-    arrow.BackgroundTransparency = 1
-    arrow.Position = UDim2.new(1, -self:S(28), 0, 0)
-    arrow.Size = UDim2.new(0, self:S(26), 1, 0)
-    arrow.Font = Enum.Font.GothamBold
-    arrow.Text = "▾"
-    arrow.TextColor3 = self.Theme.Accent
-    arrow.TextSize = self:S(14)
-    arrow.ZIndex = 15
-    arrow.Parent = dropBtn
+local arrow = Instance.new("ImageLabel")
+arrow.Name = "Arrow"
+arrow.BackgroundTransparency = 1
+arrow.Position = UDim2.new(1, -self:S(28), 0, 0)
+arrow.Size = UDim2.new(0, self:S(26), 1, 0)
+arrow.Image = self:FormatAssetId("lucide-chevron-down") or ""
+arrow.ImageColor3 = self.Theme.Accent
+arrow.ZIndex = 15
+arrow.Parent = dropBtn
+
 
     local selected = default
     local isOpen = false
@@ -1730,17 +1729,16 @@ function GenesisX:CreateMultiDropdown(parent, config)
     self:CreateCorner(dropBtn, UDim.new(0, 6))
     local dropStroke = self:CreateStroke(dropBtn, self.Theme.Border, 1, 0.4)
 
-    local arrow = Instance.new("TextLabel")
-    arrow.Name = "Arrow"
-    arrow.BackgroundTransparency = 1
-    arrow.Position = UDim2.new(1, -self:S(28), 0, 0)
-    arrow.Size = UDim2.new(0, self:S(26), 1, 0)
-    arrow.Font = Enum.Font.GothamBold
-    arrow.Text = "▾"
-    arrow.TextColor3 = self.Theme.Accent
-    arrow.TextSize = self:S(14)
-    arrow.ZIndex = 15
-    arrow.Parent = dropBtn
+local arrow = Instance.new("ImageLabel")
+arrow.Name = "Arrow"
+arrow.BackgroundTransparency = 1
+arrow.Position = UDim2.new(1, -self:S(28), 0, 0)
+arrow.Size = UDim2.new(0, self:S(26), 1, 0)
+arrow.Image = self:FormatAssetId("lucide-chevron-down") or ""
+arrow.ImageColor3 = self.Theme.Accent
+arrow.ZIndex = 15
+arrow.Parent = dropBtn
+
 
     local selected = {}
     for _, v in ipairs(default) do table.insert(selected, v) end
