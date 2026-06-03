@@ -14,7 +14,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local LucideAssets = {}
 pcall(function()
     local raw = loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/spectrumxx/Library/refs/heads/main/Icons.lua"
+        "https://raw.githubusercontent.com/mainloadergg/Library/refs/heads/main/Icons.lua"
     ))()
     if raw and raw.assets then
         LucideAssets = raw.assets
@@ -2565,6 +2565,7 @@ function GenesisX:Notify(config)
         info    = self.Theme.Info,
     }
         local typeIcons = {
+        genesis = "lucide-genesis-hub",
         success = "lucide-check-circle",
         warning = "lucide-alert-triangle",
         error   = "lucide-x-circle",
@@ -2691,27 +2692,27 @@ function GenesisX:Notify(config)
         msgLbl.Parent               = notif
     end
 
-    -- ── Botão fechar ───────────────────────────────────────────────────────────
+        -- ── Botão fechar ───────────────────────────────────────────────────────────
     local closeSize = self:S(20)
-    local closeBtn = Instance.new("TextButton")
+    local closeBtn = Instance.new("ImageButton")
     closeBtn.Name               = "CloseBtn"
     closeBtn.BackgroundTransparency = 1
     closeBtn.Position           = UDim2.new(1, -self:S(28), 0, self:S(8))
     closeBtn.Size               = UDim2.fromOffset(closeSize, closeSize)
-    closeBtn.Font               = Enum.Font.GothamBold
-    closeBtn.Text               = "✕"
-    closeBtn.TextColor3         = self.Theme.TextMuted
-    closeBtn.TextSize           = self:S(11)
+    closeBtn.Image              = self:FormatAssetId("lucide-x") or ""
+    closeBtn.ImageColor3        = self.Theme.TextMuted
+    closeBtn.ImageTransparency  = 0
     closeBtn.ZIndex             = 5003
     closeBtn.AutoButtonColor    = false
     closeBtn.Parent             = notif
 
     closeBtn.MouseEnter:Connect(function()
-        self:Tween(closeBtn, {TextColor3 = Color3.new(1, 1, 1)}, 0.1)
+        self:Tween(closeBtn, {ImageColor3 = Color3.new(1, 1, 1)}, 0.1)
     end)
     closeBtn.MouseLeave:Connect(function()
-        self:Tween(closeBtn, {TextColor3 = self.Theme.TextMuted}, 0.1)
+        self:Tween(closeBtn, {ImageColor3 = self.Theme.TextMuted}, 0.1)
     end)
+
 
     -- ── Barra de timer (na base, dentro de ClipsDescendants) ─────────────────
     local timerBg = Instance.new("Frame")
