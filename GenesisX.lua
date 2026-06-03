@@ -2564,11 +2564,11 @@ function GenesisX:Notify(config)
         error   = self.Theme.Error,
         info    = self.Theme.Info,
     }
-    local typeIcons = {
-        success = "✓",
-        warning = "⚠",
-        error   = "✕",
-        info    = "ℹ",
+        local typeIcons = {
+        success = "lucide-check-circle",
+        warning = "lucide-alert-triangle",
+        error   = "lucide-x-circle",
+        info    = "lucide-info",
     }
     local accentColor = typeColors[ntype] or self.Theme.Info
     local iconChar    = typeIcons[ntype]  or "ℹ"
@@ -2626,15 +2626,17 @@ function GenesisX:Notify(config)
     iconBg.Parent           = notif
     self:CreateCorner(iconBg, UDim.new(1, 0))
 
-    local iconLabel = Instance.new("TextLabel")
-    iconLabel.BackgroundTransparency = 1
-    iconLabel.Size          = UDim2.new(1, 0, 1, 0)
-    iconLabel.Font          = Enum.Font.GothamBlack
-    iconLabel.Text          = iconChar
-    iconLabel.TextColor3    = accentColor
-    iconLabel.TextSize      = self:S(14)
-    iconLabel.ZIndex        = 5002
-    iconLabel.Parent        = iconBg
+    -- Ícone Lucide como ImageLabel
+    local iconImg = Instance.new("ImageLabel")
+    iconImg.Name                = "Icon"
+    iconImg.BackgroundTransparency = 1
+    iconImg.Size                = UDim2.new(0.6, 0, 0.6, 0)
+    iconImg.Position            = UDim2.new(0.2, 0, 0.2, 0)
+    iconImg.Image               = self:FormatAssetId(iconChar) or ""
+    iconImg.ImageColor3         = accentColor
+    iconImg.ZIndex              = 5002
+    iconImg.Parent              = iconBg
+
 
     -- ── Texto ──────────────────────────────────────────────────────────────────
     local textX     = self:S(14) + iconSize + self:S(10)
