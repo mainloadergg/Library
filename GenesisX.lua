@@ -2527,176 +2527,217 @@ function GenesisX:CreateStatusCard(parent, config)
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- ─── NOTIFICATIONS — REESCRITO DO ZERO ───────────────────────────────────────
+-- ─── NOTIFICATIONS — REDESIGN GENESISX ───────────────────────────────────────
 -- ═══════════════════════════════════════════════════════════════════════════════
---[[
-    Layout de cada notificação (w=340, h=72):
-    ┌──────────────────────────────────────┐
-    │ [ICON 40x40]  TITLE        [X btn]   │
-    │               message text           │
-    │▓▓▓▓▓▓▓▓░░░░░░░░░░░░░ (timer bar)    │
-    └──────────────────────────────────────┘
-    • Entrada: desliza da direita
-    • Saída: desliza para a direita
-    • Múltiplas notificações empilham de baixo para cima
-    • Clique no X ou no corpo descarta
-]]
 function GenesisX:Notify(config)
     config = config or {}
     local message   = config.Text     or "Notificação"
-    local title     = config.Title    or nil          -- opcional
+    local title     = config.Title    or nil
+    local subtitle  = config.Subtitle or nil
+    local subtitles = config.Subtitles or nil
     local ntype     = config.Type     or "info"
     local duration  = config.Duration or 4
 
     self:UpdateScale()
 
     -- ── Dimensões ──────────────────────────────────────────────────────────────
-    local W  = self:S(ScaleData.IsMobile and 290 or 320)
-    local H  = self:S(72)
-    local PAD_RIGHT  = self:S(14)
-    local PAD_BOTTOM = self:S(14)
-    local GAP        = self:S(8)
+    local W  = self:S(ScaleData.IsMobile and 320 or 380)
+    local PAD_RIGHT  = self:S(16)
+    local PAD_BOTTOM = self:S(16)
+    local GAP        = self:S(10)
 
-    -- ── Cor do tipo ────────────────────────────────────────────────────────────
+    -- ── Cores do tipo ─────────────────────────────────────────────────────────
     local typeColors = {
         success = self.Theme.Success,
         warning = self.Theme.Warning,
         error   = self.Theme.Error,
         info    = self.Theme.Info,
+        genesis = self.Theme.Accent,
     }
-        local typeIcons = {
-        genesis = "lucide-genesis-hub",
+    local typeIcons = {
         success = "lucide-check-circle",
         warning = "lucide-alert-triangle",
         error   = "lucide-x-circle",
         info    = "lucide-info",
+        genesis = "lucide-genesis-hub",
     }
     local accentColor = typeColors[ntype] or self.Theme.Info
-    local iconChar    = typeIcons[ntype]  or "ℹ"
+    local iconName    = typeIcons[ntype]  or "lucide-info"
 
-    -- ── Viewport helper ────────────────────────────────────────────────────────
+    -- ── Viewport helper ───────────────────────────────────────────────────────
     local function viewport()
         local ok, cam = pcall(function() return workspace.CurrentCamera end)
         return (ok and cam) and cam.ViewportSize or Vector2.new(1366, 768)
     end
 
-    -- ── Posição inicial (fora da tela à direita) ───────────────────────────────
-    local function targetX()
-        return viewport().X - W - PAD_RIGHT
-    end
-    local function offscreenX()
-        return viewport().X + W + 40
-    end
-    local function bottomY(index)
-        -- index 1 = mais próximo do fundo, 2 = acima, etc.
-        return viewport().Y - (H + PAD_BOTTOM) * index - GAP * (index - 1)
+    -- ── Calcular altura dinâmica ──────────────────────────────────────────────
+    local iconAreaW = self:S(70)
+    local contentX = iconAreaW + self:S(12)
+    local contentW = W - contentX - self:S(36) -- espaço pro X
+    local baseH = self:S(72)
+    local totalH = baseH
+
+    -- Se tiver subtitles array, calcular altura extra
+    if subtitles and #subtitles > 0 then
+        totalH = baseH + (#subtitles * self:S(18))
+    elseif subtitle then
+        totalH = baseH + self:S(18)
     end
 
     -- ── Criar frame principal ─────────────────────────────────────────────────
     local notif = Instance.new("Frame")
-    notif.Name          = "GX_Notification"
-    notif.BackgroundColor3  = Color3.fromRGB(18, 16, 22)   -- fundo levemente roxo escuro
-    notif.BorderSizePixel   = 0
-    notif.Size          = UDim2.fromOffset(W, H)
-    notif.ClipsDescendants  = true
-    notif.ZIndex        = 5000
-    notif.Parent        = self.ScreenGui
-    self:CreateCorner(notif, UDim.new(0, self:S(10)))
-    -- borda fina na cor do tipo
-    self:CreateStroke(notif, accentColor, 1, 0.45)
+    notif.Name               = "GX_Notification"
+    notif.BackgroundColor3   = Color3.fromRGB(12, 10, 16)
+    notif.BorderSizePixel    = 0
+    notif.Size               = UDim2.fromOffset(W, totalH)
+    notif.ClipsDescendants   = true
+    notif.ZIndex             = 5000
+    notif.Parent             = self.ScreenGui
+    self:CreateCorner(notif, UDim.new(0, self:S(14)))
+    self:CreateStroke(notif, accentColor, 1.5, 0.3)
 
-    -- Faixa lateral colorida (3px)
-    local sideBar = Instance.new("Frame")
-    sideBar.Name            = "SideBar"
-    sideBar.BackgroundColor3 = accentColor
-    sideBar.BorderSizePixel  = 0
-    sideBar.Size            = UDim2.new(0, self:S(3), 1, 0)
-    sideBar.ZIndex          = 5001
-    sideBar.Parent          = notif
+    -- ── Área do ícone (esquerda) ──────────────────────────────────────────────
+    local iconArea = Instance.new("Frame")
+    iconArea.Name             = "IconArea"
+    iconArea.BackgroundTransparency = 1
+    iconArea.Size             = UDim2.new(0, iconAreaW, 1, -self:S(4))
+    iconArea.Position         = UDim2.new(0, 0, 0, 0)
+    iconArea.ZIndex           = 5001
+    iconArea.Parent           = notif
 
-    -- ── Ícone (círculo) ────────────────────────────────────────────────────────
-    local iconSize = self:S(30)
+    -- Background do ícone com glow sutil
     local iconBg = Instance.new("Frame")
     iconBg.Name             = "IconBg"
     iconBg.BackgroundColor3 = accentColor
-    iconBg.BackgroundTransparency = 0.75
+    iconBg.BackgroundTransparency = 0.85
     iconBg.BorderSizePixel  = 0
-    iconBg.Size             = UDim2.fromOffset(iconSize, iconSize)
-    iconBg.Position         = UDim2.new(0, self:S(14), 0.5, -iconSize/2)
+    iconBg.Size             = UDim2.fromOffset(self:S(46), self:S(46))
+    iconBg.Position         = UDim2.new(0.5, 0, 0.5, 0)
+    iconBg.AnchorPoint      = Vector2.new(0.5, 0.5)
     iconBg.ZIndex           = 5001
-    iconBg.Parent           = notif
+    iconBg.Parent           = iconArea
     self:CreateCorner(iconBg, UDim.new(1, 0))
 
-    -- Ícone Lucide como ImageLabel
+    -- Glow mais forte atrás
+    local iconGlow = Instance.new("Frame")
+    iconGlow.Name             = "IconGlow"
+    iconGlow.BackgroundColor3 = accentColor
+    iconGlow.BackgroundTransparency = 0.92
+    iconGlow.BorderSizePixel  = 0
+    iconGlow.Size             = UDim2.fromOffset(self:S(56), self:S(56))
+    iconGlow.Position         = UDim2.new(0.5, 0, 0.5, 0)
+    iconGlow.AnchorPoint      = Vector2.new(0.5, 0.5)
+    iconGlow.ZIndex           = 5000
+    iconGlow.Parent           = iconArea
+    self:CreateCorner(iconGlow, UDim.new(1, 0))
+
+    -- Ícone Lucide
     local iconImg = Instance.new("ImageLabel")
     iconImg.Name                = "Icon"
     iconImg.BackgroundTransparency = 1
-    iconImg.Size                = UDim2.new(0.6, 0, 0.6, 0)
-    iconImg.Position            = UDim2.new(0.2, 0, 0.2, 0)
-    iconImg.Image               = self:FormatAssetId(iconChar) or ""
+    iconImg.Size                = UDim2.new(0.55, 0, 0.55, 0)
+    iconImg.Position            = UDim2.new(0.225, 0, 0.225, 0)
+    iconImg.Image               = self:FormatAssetId(iconName) or ""
     iconImg.ImageColor3         = accentColor
     iconImg.ZIndex              = 5002
     iconImg.Parent              = iconBg
 
-    -- ── Texto ──────────────────────────────────────────────────────────────────
-    local textX     = self:S(14) + iconSize + self:S(10)
-    local textW     = W - textX - self:S(36)   -- 36 = espaço p/ botão fechar
-    local textAreaH = H - self:S(10)           -- margem vertical
+    -- ── Separador vertical ───────────────────────────────────────────────────
+    local separator = Instance.new("Frame")
+    separator.Name             = "Separator"
+    separator.BackgroundColor3 = accentColor
+    separator.BackgroundTransparency = 0.4
+    separator.BorderSizePixel  = 0
+    separator.Size             = UDim2.new(0, self:S(2), 0.7, 0)
+    separator.Position         = UDim2.new(0, iconAreaW, 0.5, 0)
+    separator.AnchorPoint      = Vector2.new(0, 0.5)
+    separator.ZIndex           = 5001
+    separator.Parent           = notif
 
-    -- Se houver título, dividir em título + mensagem
-    if title then
-        local titleLbl = Instance.new("TextLabel")
-        titleLbl.Name               = "NotifTitle"
-        titleLbl.BackgroundTransparency = 1
-        titleLbl.Position           = UDim2.new(0, textX, 0, self:S(12))
-        titleLbl.Size               = UDim2.new(0, textW, 0, self:S(18))
-        titleLbl.Font               = Enum.Font.GothamBold
-        titleLbl.Text               = title
-        titleLbl.TextColor3         = self.Theme.Text
-        titleLbl.TextSize           = self:S(12)
-        titleLbl.TextXAlignment     = Enum.TextXAlignment.Left
-        titleLbl.TextTruncate       = Enum.TextTruncate.AtEnd
-        titleLbl.ZIndex             = 5002
-        titleLbl.Parent             = notif
+    -- ── Área de conteúdo (texto) ─────────────────────────────────────────────
+    local contentArea = Instance.new("Frame")
+    contentArea.Name             = "ContentArea"
+    contentArea.BackgroundTransparency = 1
+    contentArea.Position         = UDim2.new(0, contentX, 0, self:S(10))
+    contentArea.Size             = UDim2.new(0, contentW, 1, -self:S(14))
+    contentArea.ZIndex           = 5001
+    contentArea.Parent           = notif
 
-        local msgLbl = Instance.new("TextLabel")
-        msgLbl.Name                 = "NotifMsg"
-        msgLbl.BackgroundTransparency = 1
-        msgLbl.Position             = UDim2.new(0, textX, 0, self:S(32))
-        msgLbl.Size                 = UDim2.new(0, textW, 0, self:S(26))
-        msgLbl.Font                 = Enum.Font.Gotham
-        msgLbl.Text                 = message
-        msgLbl.TextColor3           = self.Theme.TextSecondary
-        msgLbl.TextSize             = self:S(11)
-        msgLbl.TextXAlignment       = Enum.TextXAlignment.Left
-        msgLbl.TextWrapped          = true
-        msgLbl.TextTruncate         = Enum.TextTruncate.AtEnd
-        msgLbl.ZIndex               = 5002
-        msgLbl.Parent               = notif
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name             = "Title"
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Size             = UDim2.new(1, 0, 0, self:S(20))
+    titleLabel.Font             = Enum.Font.GothamBold
+    titleLabel.Text             = title or message
+    titleLabel.TextColor3       = accentColor
+    titleLabel.TextSize         = self:S(13)
+    titleLabel.TextXAlignment   = Enum.TextXAlignment.Left
+    titleLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+    titleLabel.ZIndex           = 5002
+    titleLabel.Parent           = contentArea
+
+    -- Subtitles container
+    local subtitleY = self:S(22)
+    local subtitleTexts = {}
+
+    if subtitles and #subtitles > 0 then
+        for i, subText in ipairs(subtitles) do
+            local subLabel = Instance.new("TextLabel")
+            subLabel.Name             = "Subtitle_" .. i
+            subLabel.BackgroundTransparency = 1
+            subLabel.Position         = UDim2.new(0, 0, 0, subtitleY + ((i-1) * self:S(18)))
+            subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
+            subLabel.Font             = Enum.Font.Gotham
+            subLabel.Text             = subText
+            subLabel.TextColor3       = self.Theme.TextSecondary
+            subLabel.TextSize         = self:S(11)
+            subLabel.TextXAlignment   = Enum.TextXAlignment.Left
+            subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+            subLabel.ZIndex           = 5002
+            subLabel.Parent           = contentArea
+            table.insert(subtitleTexts, subLabel)
+        end
+    elseif subtitle then
+        local subLabel = Instance.new("TextLabel")
+        subLabel.Name             = "Subtitle"
+        subLabel.BackgroundTransparency = 1
+        subLabel.Position         = UDim2.new(0, 0, 0, subtitleY)
+        subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
+        subLabel.Font             = Enum.Font.Gotham
+        subLabel.Text             = subtitle
+        subLabel.TextColor3       = self.Theme.TextSecondary
+        subLabel.TextSize         = self:S(11)
+        subLabel.TextXAlignment   = Enum.TextXAlignment.Left
+        subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+        subLabel.ZIndex           = 5002
+        subLabel.Parent           = contentArea
+    elseif not title then
+        -- Se não tiver title, a mensagem é o title (já setado acima)
+        -- e não precisa de subtitle
     else
-        -- Só mensagem, centralizada verticalmente
-        local msgLbl = Instance.new("TextLabel")
-        msgLbl.Name                 = "NotifMsg"
-        msgLbl.BackgroundTransparency = 1
-        msgLbl.Position             = UDim2.new(0, textX, 0, 0)
-        msgLbl.Size                 = UDim2.new(0, textW, 1, -self:S(4))
-        msgLbl.Font                 = Enum.Font.GothamSemibold
-        msgLbl.Text                 = message
-        msgLbl.TextColor3           = self.Theme.Text
-        msgLbl.TextSize             = self:S(12)
-        msgLbl.TextXAlignment       = Enum.TextXAlignment.Left
-        msgLbl.TextYAlignment       = Enum.TextYAlignment.Center
-        msgLbl.TextWrapped          = true
-        msgLbl.ZIndex               = 5002
-        msgLbl.Parent               = notif
+        -- Se tiver title mas não subtitle, usar message como subtitle
+        local subLabel = Instance.new("TextLabel")
+        subLabel.Name             = "Subtitle"
+        subLabel.BackgroundTransparency = 1
+        subLabel.Position         = UDim2.new(0, 0, 0, subtitleY)
+        subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
+        subLabel.Font             = Enum.Font.Gotham
+        subLabel.Text             = message
+        subLabel.TextColor3       = self.Theme.TextSecondary
+        subLabel.TextSize         = self:S(11)
+        subLabel.TextXAlignment   = Enum.TextXAlignment.Left
+        subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+        subLabel.ZIndex           = 5002
+        subLabel.Parent           = contentArea
     end
 
-        -- ── Botão fechar ───────────────────────────────────────────────────────────
-    local closeSize = self:S(20)
+    -- ── Botão fechar (X) ───────────────────────────────────────────────────────
+    local closeSize = self:S(18)
     local closeBtn = Instance.new("ImageButton")
     closeBtn.Name               = "CloseBtn"
     closeBtn.BackgroundTransparency = 1
-    closeBtn.Position           = UDim2.new(1, -self:S(28), 0, self:S(8))
+    closeBtn.Position           = UDim2.new(1, -self:S(26), 0, self:S(10))
     closeBtn.Size               = UDim2.fromOffset(closeSize, closeSize)
     closeBtn.Image              = self:FormatAssetId("lucide-x") or ""
     closeBtn.ImageColor3        = self.Theme.TextMuted
@@ -2712,11 +2753,10 @@ function GenesisX:Notify(config)
         self:Tween(closeBtn, {ImageColor3 = self.Theme.TextMuted}, 0.1)
     end)
 
-
-    -- ── Barra de timer (na base, dentro de ClipsDescendants) ─────────────────
+    -- ── Barra de progresso (timer) na base ───────────────────────────────────
     local timerBg = Instance.new("Frame")
     timerBg.Name                = "TimerBg"
-    timerBg.BackgroundColor3    = Color3.fromRGB(30, 28, 36)
+    timerBg.BackgroundColor3    = Color3.fromRGB(25, 22, 30)
     timerBg.BorderSizePixel     = 0
     timerBg.Size                = UDim2.new(1, 0, 0, self:S(3))
     timerBg.Position            = UDim2.new(0, 0, 1, -self:S(3))
@@ -2731,14 +2771,22 @@ function GenesisX:Notify(config)
     timerBar.ZIndex             = 5002
     timerBar.Parent             = timerBg
 
-    -- ── Registrar na lista e posicionar ───────────────────────────────────────
+    -- ── Registrar e posicionar ───────────────────────────────────────────────
     table.insert(self._notifications, notif)
-    local myIndex = #self._notifications  -- posição na pilha (1 = baixo)
+    local myIndex = #self._notifications
 
-    -- Função de reposicionamento de todas as notificações ativas
+    local function targetX()
+        return viewport().X - W - PAD_RIGHT
+    end
+    local function offscreenX()
+        return viewport().X + W + 60
+    end
+    local function bottomY(index)
+        return viewport().Y - (totalH + PAD_BOTTOM) * index - GAP * (index - 1)
+    end
+
     local function restack(animated)
         local count = 0
-        -- contar da frente para trás p/ índice correto
         for i = 1, #self._notifications do
             if self._notifications[i] and self._notifications[i].Parent then
                 count = count + 1
@@ -2746,7 +2794,7 @@ function GenesisX:Notify(config)
                 local yPos = bottomY(idx)
                 local xPos = targetX()
                 if animated then
-                    self:Tween(self._notifications[i], {Position = UDim2.fromOffset(xPos, yPos)}, 0.25)
+                    self:Tween(self._notifications[i], {Position = UDim2.fromOffset(xPos, yPos)}, 0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
                 else
                     self._notifications[i].Position = UDim2.fromOffset(xPos, yPos)
                 end
@@ -2754,7 +2802,7 @@ function GenesisX:Notify(config)
         end
     end
 
-    -- Posição inicial (fora da tela à direita, na posição Y correta)
+    -- Posição inicial (fora da tela à direita)
     do
         local yPos = bottomY(#self._notifications)
         notif.Position = UDim2.fromOffset(offscreenX(), yPos)
@@ -2767,7 +2815,7 @@ function GenesisX:Notify(config)
 
     restack(true)
 
-    -- ── Timer bar shrink ──────────────────────────────────────────────────────
+    -- ── Timer bar shrink ─────────────────────────────────────────────────────
     self:Tween(timerBar, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
 
     -- ── Dismiss ───────────────────────────────────────────────────────────────
@@ -2776,7 +2824,6 @@ function GenesisX:Notify(config)
         if dismissed then return end
         dismissed = true
 
-        -- Remover da lista de notificações
         for i = #self._notifications, 1, -1 do
             if self._notifications[i] == notif then
                 table.remove(self._notifications, i)
@@ -2784,25 +2831,49 @@ function GenesisX:Notify(config)
             end
         end
 
-        -- Deslizar para a direita
         self:Tween(notif, {
             Position = UDim2.fromOffset(offscreenX(), notif.AbsolutePosition.Y),
         }, 0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 
-        -- Reposicionar as que ficaram
         task.delay(0.05, function() restack(true) end)
 
-        task.delay(0.3, function()
+        task.delay(0.32, function()
             if notif and notif.Parent then notif:Destroy() end
         end)
     end
 
     closeBtn.MouseButton1Click:Connect(dismiss)
 
+    -- Click no corpo também descarta
+    notif.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or
+           input.UserInputType == Enum.UserInputType.Touch then
+            if not dismissed then dismiss() end
+        end
+    end)
+
     -- Auto-dismiss
     task.delay(duration, function()
         if not dismissed then dismiss() end
     end)
+
+    -- API de retorno
+    return {
+        Destroy = dismiss,
+        SetTitle = function(t)
+            if titleLabel then titleLabel.Text = t end
+        end,
+        SetSubtitle = function(index, text)
+            if subtitleTexts[index] then
+                subtitleTexts[index].Text = text
+            end
+        end,
+        SetSubtitles = function(newSubs)
+            for i, lbl in ipairs(subtitleTexts) do
+                lbl.Text = newSubs[i] or ""
+            end
+        end,
+    }
 end
 
 -- ─── DESTROY ──────────────────────────────────────────────────────────────────
