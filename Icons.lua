@@ -823,6 +823,6 @@ return {
 		["lucide-dog-dente"] = "rbxassetid://86545657821911",
 		["lucide-dog-chupetao"] = "rbxassetid://111009574293053",
 		["lucide-spectrumx"] = "rbxassetid://132158481306586",
-		["lucide-genesis-hub"] = "rbxassetid://116593038762530",
+		["lucide-genesis-hub"] = "rbxassetid://134769377797538",
 	},
 }
