@@ -657,7 +657,6 @@ return {
 		["lucide-send"] = "rbxassetid://10734943902",
 		["lucide-separator-horizontal"] = "rbxassetid://10734944115",
 		["lucide-separator-vertical"] = "rbxassetid://10734944326",
-		["lucide-spectrumx"] = "rbxassetid://132158481306586",
 		["lucide-server"] = "rbxassetid://10734949856",
 		["lucide-server-cog"] = "rbxassetid://10734944444",
 		["lucide-server-crash"] = "rbxassetid://10734944554",
@@ -823,5 +822,7 @@ return {
 		["lucide-dog-nerd"] = "rbxassetid://137941939602314",
 		["lucide-dog-dente"] = "rbxassetid://86545657821911",
 		["lucide-dog-chupetao"] = "rbxassetid://111009574293053",
+		["lucide-spectrumx"] = "rbxassetid://132158481306586",
+		["lucide-genesis-hub"] = "rbxassetid://116593038762530",
 	},
 }
