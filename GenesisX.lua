@@ -818,36 +818,79 @@ function GenesisX:SelectTab(tabId)
 end
 
 -- ─── CREATE SECTION ───────────────────────────────────────────────────────────
-function GenesisX:CreateSection(parent, text, color)
+function GenesisX:CreateSection(parent, text, color, icon)
+    -- icon: nome Lucide opcional, ex: "lucide-sword"
+    color = color or self.Theme.Accent
+    local iconSize = self:S(16)
+    local height   = self:S(28)
+
     local wrap = Instance.new("Frame")
     wrap.Name = "Section_" .. text
     wrap.BackgroundTransparency = 1
-    wrap.Size = UDim2.new(1, 0, 0, self:S(26))
+    wrap.Size = UDim2.new(1, 0, 0, height)
     wrap.ZIndex = 12
     wrap.Parent = parent
 
+    -- Linha de fundo
     local line = Instance.new("Frame")
     line.Name = "Line"
-    line.BackgroundColor3 = color or self.Theme.Accent
+    line.BackgroundColor3 = color
+    line.BackgroundTransparency = 0.7
     line.BorderSizePixel = 0
     line.Position = UDim2.new(0, 0, 0.5, 0)
     line.Size = UDim2.new(1, 0, 0, 1)
     line.ZIndex = 11
     line.Parent = wrap
 
+    -- Container do label (ícone + texto, fundo igual ao pai p/ "cortar" a linha)
+    local labelBg = Instance.new("Frame")
+    labelBg.Name = "LabelBg"
+    labelBg.BackgroundColor3 = self.Theme.Background
+    labelBg.BorderSizePixel = 0
+    labelBg.AutomaticSize = Enum.AutomaticSize.X
+    labelBg.Position = UDim2.new(0, self:S(6), 0, 0)
+    labelBg.Size = UDim2.new(0, 0, 1, 0)
+    labelBg.ZIndex = 13
+    labelBg.Parent = wrap
+
+    local layout = Instance.new("UIListLayout")
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.Padding = UDim.new(0, self:S(5))
+    layout.Parent = labelBg
+
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft  = UDim.new(0, self:S(4))
+    pad.PaddingRight = UDim.new(0, self:S(6))
+    pad.Parent = labelBg
+
+    -- Ícone (se fornecido)
+    if icon then
+        local assetId = self:FormatAssetId(icon)
+        if assetId then
+            local img = Instance.new("ImageLabel")
+            img.Name = "Icon"
+            img.BackgroundTransparency = 1
+            img.Size = UDim2.fromOffset(iconSize, iconSize)
+            img.Image = assetId
+            img.ImageColor3 = color
+            img.ZIndex = 14
+            img.Parent = labelBg
+        end
+    end
+
+    -- Texto
     local label = Instance.new("TextLabel")
     label.Name = "Label"
-    label.BackgroundColor3 = self.Theme.Background
-    label.BorderSizePixel = 0
+    label.BackgroundTransparency = 1
     label.AutomaticSize = Enum.AutomaticSize.X
-    label.Position = UDim2.new(0, self:S(6), 0, 0)
     label.Size = UDim2.new(0, 0, 1, 0)
     label.Font = Enum.Font.GothamBold
-    label.Text = "  " .. text .. "  "
-    label.TextColor3 = color or self.Theme.Accent
+    label.Text = text
+    label.TextColor3 = color
     label.TextSize = self:S(11)
-    label.ZIndex = 13
-    label.Parent = wrap
+    label.ZIndex = 14
+    label.Parent = labelBg
 
     return wrap
 end
@@ -969,6 +1012,7 @@ function GenesisX:CreateButton(parent, config)
     local btn = Instance.new("TextButton")
     btn.Name = "Button"
     btn.AutoButtonColor = false
+    btn.BorderSizePixel = 0  -- SEM BORDA
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.Font = Enum.Font.GothamBold
     btn.Text = text
@@ -977,35 +1021,38 @@ function GenesisX:CreateButton(parent, config)
     btn.Parent = frame
     self:CreateCorner(btn)
 
-    local color, textColor
+    -- COR SÓLIDA SEM GRADIENTE
+    local bgColor, textColor, hoverColor
     if style == "accent" then
-        btn.BackgroundColor3 = self.Theme.Accent
-        textColor = Color3.new(1, 1, 1)
-        color = self.Theme.Accent
+        bgColor    = self.Theme.Accent
+        hoverColor = self.Theme.AccentHover
+        textColor  = Color3.new(1, 1, 1)
     elseif style == "warning" then
-        btn.BackgroundColor3 = Color3.fromRGB(40, 25, 0)
-        textColor = self.Theme.Warning
-        color = self.Theme.Warning
+        bgColor    = Color3.fromRGB(120, 70, 0)
+        hoverColor = Color3.fromRGB(150, 90, 0)
+        textColor  = Color3.new(1, 1, 1)
     elseif style == "info" then
-        btn.BackgroundColor3 = Color3.fromRGB(10, 20, 40)
-        textColor = self.Theme.Info
-        color = self.Theme.Info
+        bgColor    = Color3.fromRGB(30, 60, 120)
+        hoverColor = Color3.fromRGB(40, 80, 150)
+        textColor  = Color3.new(1, 1, 1)
     elseif style == "danger" then
-        btn.BackgroundColor3 = Color3.fromRGB(40, 10, 10)
-        textColor = self.Theme.Error
-        color = self.Theme.Error
+        bgColor    = Color3.fromRGB(120, 30, 30)
+        hoverColor = Color3.fromRGB(150, 40, 40)
+        textColor  = Color3.new(1, 1, 1)
+    elseif style == "success" then
+        bgColor    = Color3.fromRGB(30, 100, 50)
+        hoverColor = Color3.fromRGB(40, 130, 65)
+        textColor  = Color3.new(1, 1, 1)
     else
-        btn.BackgroundColor3 = self.Theme.Card
-        textColor = self.Theme.Text
-        color = self.Theme.Border
+        bgColor    = self.Theme.Card
+        hoverColor = self.Theme.CardHover
+        textColor  = self.Theme.Text
     end
+
+    btn.BackgroundColor3 = bgColor
     btn.TextColor3 = textColor
 
-    local stroke = self:CreateStroke(btn, color, 1.2, style == "accent" and 1 or 0.4)
-    if style == "accent" then
-        self:CreateGradient(btn, self.Theme.Accent, self.Theme.AccentDark, 90)
-    end
-
+    -- Ripple holder (mantém o efeito de clique)
     local rippleHolder = Instance.new("Frame")
     rippleHolder.Name = "RippleHolder"
     rippleHolder.BackgroundTransparency = 1
@@ -1017,20 +1064,10 @@ function GenesisX:CreateButton(parent, config)
     self:CreateCorner(rippleHolder)
 
     btn.MouseEnter:Connect(function()
-        if style == "accent" then
-            self:Tween(btn, {BackgroundColor3 = self.Theme.AccentHover}, 0.15)
-        else
-            self:Tween(btn, {BackgroundColor3 = self.Theme.CardHover}, 0.15)
-            if stroke then self:Tween(stroke, {Transparency = 0.1}, 0.15) end
-        end
+        self:Tween(btn, {BackgroundColor3 = hoverColor}, 0.15)
     end)
     btn.MouseLeave:Connect(function()
-        if style == "accent" then
-            self:Tween(btn, {BackgroundColor3 = self.Theme.Accent}, 0.15)
-        else
-            self:Tween(btn, {BackgroundColor3 = self.Theme.Card}, 0.15)
-            if stroke then self:Tween(stroke, {Transparency = style == "accent" and 1 or 0.4}, 0.15) end
-        end
+        self:Tween(btn, {BackgroundColor3 = bgColor}, 0.15)
     end)
     btn.MouseButton1Click:Connect(function()
         self:CreateRipple(btn, UserInputService:GetMouseLocation())
@@ -2040,7 +2077,6 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
     contentLayout.Padding = UDim.new(0, self:S(6))
     contentLayout.Parent = contentFrame
 
-    -- Guarda referências dos subtitles pra atualização
     local subtitleLabels = {}
     for i, subText in ipairs(subtitles) do
         local subLabel = Instance.new("TextLabel")
@@ -2057,12 +2093,11 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         table.insert(subtitleLabels, subLabel)
     end
 
-    -- Guarda referências dos botões pra atualização
     local buttonObjects = {}
     for i, btnConfig in ipairs(buttons) do
-        local btnText = btnConfig.Text or "Button"
+        local btnText     = btnConfig.Text     or "Button"
         local btnCallback = btnConfig.Callback or function() end
-        local btnStyle = btnConfig.Style or "default"
+        local btnStyle    = btnConfig.Style    or "default"
 
         local btnFrame = Instance.new("Frame")
         btnFrame.Name = "ButtonFrame_" .. i
@@ -2074,6 +2109,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         local btn = Instance.new("TextButton")
         btn.Name = "Button"
         btn.AutoButtonColor = false
+        btn.BorderSizePixel = 0
         btn.Size = UDim2.new(1, 0, 1, 0)
         btn.Font = Enum.Font.GothamBold
         btn.Text = btnText
@@ -2082,31 +2118,32 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         btn.Parent = btnFrame
         self:CreateCorner(btn, UDim.new(0, 6))
 
-        local color, textColor
+        -- Cor sólida, sem borda, sem gradiente
+        local bgColor, hoverColor, textColor
         if btnStyle == "accent" then
-            btn.BackgroundColor3 = self.Theme.Accent
-            textColor = Color3.new(1, 1, 1)
-            color = self.Theme.Accent
+            bgColor    = self.Theme.Accent
+            hoverColor = self.Theme.AccentHover
+            textColor  = Color3.new(1, 1, 1)
         elseif btnStyle == "danger" then
-            btn.BackgroundColor3 = Color3.fromRGB(30, 15, 40)
-            textColor = self.Theme.Error
-            color = self.Theme.Error
+            bgColor    = Color3.fromRGB(120, 30, 30)
+            hoverColor = Color3.fromRGB(150, 40, 40)
+            textColor  = Color3.new(1, 1, 1)
         elseif btnStyle == "warning" then
-            btn.BackgroundColor3 = Color3.fromRGB(30, 20, 10)
-            textColor = self.Theme.Warning
-            color = self.Theme.Warning
+            bgColor    = Color3.fromRGB(120, 70, 0)
+            hoverColor = Color3.fromRGB(150, 90, 0)
+            textColor  = Color3.new(1, 1, 1)
         elseif btnStyle == "info" then
-            btn.BackgroundColor3 = Color3.fromRGB(20, 15, 30)
-            textColor = self.Theme.Info
-            color = self.Theme.Info
+            bgColor    = Color3.fromRGB(30, 60, 120)
+            hoverColor = Color3.fromRGB(40, 80, 150)
+            textColor  = Color3.new(1, 1, 1)
         else
-            btn.BackgroundColor3 = self.Theme.Input
-            textColor = self.Theme.Text
-            color = self.Theme.Border
+            bgColor    = self.Theme.Card
+            hoverColor = self.Theme.CardHover
+            textColor  = self.Theme.Text
         end
+
+        btn.BackgroundColor3 = bgColor
         btn.TextColor3 = textColor
-        local stroke = self:CreateStroke(btn, color, 1, btnStyle == "accent" and 1 or 0.4)
-        if btnStyle == "accent" then self:CreateGradient(btn, self.Theme.Accent, self.Theme.AccentDark, 90) end
 
         local rippleHolder = Instance.new("Frame")
         rippleHolder.Name = "RippleHolder"
@@ -2118,36 +2155,21 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         rippleHolder.Parent = btn
         self:CreateCorner(rippleHolder, UDim.new(0, 6))
 
-        -- Guarda referências pra poder atualizar depois
         local btnData = {
-            Button = btn,
-            Frame = btnFrame,
-            Stroke = stroke,
+            Button          = btn,
+            Frame           = btnFrame,
             CurrentCallback = btnCallback,
-            CurrentStyle = btnStyle,
-            CurrentColor = color,
-            CurrentTextColor = textColor,
+            CurrentStyle    = btnStyle,
+            CurrentBg       = bgColor,
+            CurrentHover    = hoverColor,
+            CurrentText     = textColor,
         }
 
         btn.MouseEnter:Connect(function()
-            if btnData.CurrentStyle == "accent" then
-                self:Tween(btn, {BackgroundColor3 = self.Theme.AccentHover}, 0.15)
-            else
-                self:Tween(btn, {BackgroundColor3 = self.Theme.InputHover}, 0.15)
-                if stroke then self:Tween(stroke, {Transparency = 0.1}, 0.15) end
-            end
+            self:Tween(btn, {BackgroundColor3 = btnData.CurrentHover}, 0.15)
         end)
         btn.MouseLeave:Connect(function()
-            if btnData.CurrentStyle == "accent" then
-                self:Tween(btn, {BackgroundColor3 = self.Theme.Accent}, 0.15)
-            else
-                local bgColor = btnData.CurrentStyle == "danger" and Color3.fromRGB(30, 15, 40)
-                    or btnData.CurrentStyle == "warning" and Color3.fromRGB(30, 20, 10)
-                    or btnData.CurrentStyle == "info" and Color3.fromRGB(20, 15, 30)
-                    or self.Theme.Input
-                self:Tween(btn, {BackgroundColor3 = bgColor}, 0.15)
-                if stroke then self:Tween(stroke, {Transparency = 0.4}, 0.15) end
-            end
+            self:Tween(btn, {BackgroundColor3 = btnData.CurrentBg}, 0.15)
         end)
         btn.MouseButton1Click:Connect(function()
             self:CreateRipple(btn, UserInputService:GetMouseLocation())
@@ -2157,99 +2179,77 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         table.insert(buttonObjects, btnData)
     end
 
-    -- ─── MÉTODOS DE ATUALIZAÇÃO ─────────────────────────────────────────────
     return {
         Frame = frame,
         Title = titleLabel,
-        
-        -- Métodos existentes
+
         SetTitle = function(t) titleLabel.Text = t end,
         SetTitleColor = function(c) titleLabel.TextColor3 = c end,
-        
-        -- NOVOS MÉTODOS DE ATUALIZAÇÃO
+
         SetSubtitles = function(newSubtitles)
-            -- Atualiza textos dos subtitles existentes
             for i, subLabel in ipairs(subtitleLabels) do
-                if newSubtitles[i] then
-                    subLabel.Text = newSubtitles[i]
-                else
-                    subLabel.Text = ""
-                end
+                subLabel.Text = newSubtitles[i] or ""
             end
         end,
-        
+
         SetSubtitle = function(index, text)
-            -- Atualiza um subtitle específico
             if subtitleLabels[index] then
                 subtitleLabels[index].Text = text or ""
             end
         end,
-        
+
         SetButtonText = function(index, text)
-            -- Atualiza texto de um botão específico
-            local btnData = buttonObjects[index]
-            if btnData then
-                btnData.Button.Text = text or ""
-            end
+            local bd = buttonObjects[index]
+            if bd then bd.Button.Text = text or "" end
         end,
-        
+
         SetButtonCallback = function(index, callback)
-            -- Atualiza callback de um botão específico
-            local btnData = buttonObjects[index]
-            if btnData then
-                btnData.CurrentCallback = callback or function() end
-            end
+            local bd = buttonObjects[index]
+            if bd then bd.CurrentCallback = callback or function() end end
         end,
-        
+
         SetButtonStyle = function(index, style)
-            -- Atualiza estilo visual de um botão
-            local btnData = buttonObjects[index]
-            if not btnData then return end
-            
-            local newColor, newTextColor, newBg
+            local bd = buttonObjects[index]
+            if not bd then return end
+
+            local newBg, newHover, newText
             if style == "accent" then
-                newBg = self.Theme.Accent
-                newTextColor = Color3.new(1, 1, 1)
-                newColor = self.Theme.Accent
+                newBg    = self.Theme.Accent
+                newHover = self.Theme.AccentHover
+                newText  = Color3.new(1, 1, 1)
             elseif style == "danger" then
-                newBg = Color3.fromRGB(30, 15, 40)
-                newTextColor = self.Theme.Error
-                newColor = self.Theme.Error
+                newBg    = Color3.fromRGB(120, 30, 30)
+                newHover = Color3.fromRGB(150, 40, 40)
+                newText  = Color3.new(1, 1, 1)
             elseif style == "warning" then
-                newBg = Color3.fromRGB(30, 20, 10)
-                newTextColor = self.Theme.Warning
-                newColor = self.Theme.Warning
+                newBg    = Color3.fromRGB(120, 70, 0)
+                newHover = Color3.fromRGB(150, 90, 0)
+                newText  = Color3.new(1, 1, 1)
             elseif style == "info" then
-                newBg = Color3.fromRGB(20, 15, 30)
-                newTextColor = self.Theme.Info
-                newColor = self.Theme.Info
+                newBg    = Color3.fromRGB(30, 60, 120)
+                newHover = Color3.fromRGB(40, 80, 150)
+                newText  = Color3.new(1, 1, 1)
             else
-                newBg = self.Theme.Input
-                newTextColor = self.Theme.Text
-                newColor = self.Theme.Border
+                newBg    = self.Theme.Card
+                newHover = self.Theme.CardHover
+                newText  = self.Theme.Text
             end
-            
-            btnData.CurrentStyle = style
-            btnData.CurrentColor = newColor
-            btnData.CurrentTextColor = newTextColor
-            
-            btnData.Button.BackgroundColor3 = newBg
-            btnData.Button.TextColor3 = newTextColor
-            
-            if btnData.Stroke then
-                btnData.Stroke.Color = newColor
-                btnData.Stroke.Transparency = style == "accent" and 1 or 0.4
-            end
+
+            bd.CurrentStyle = style
+            bd.CurrentBg    = newBg
+            bd.CurrentHover = newHover
+            bd.CurrentText  = newText
+
+            bd.Button.BackgroundColor3 = newBg
+            bd.Button.TextColor3       = newText
         end,
-        
+
         SetVisible = function(visible)
-            -- Mostra/esconde o card inteiro
             frame.Visible = visible
         end,
-        
-        -- Referências diretas (read-only)
+
         Subtitles = subtitleLabels,
-        Buttons = buttonObjects,
+        Buttons   = buttonObjects,
     }
 end
 
