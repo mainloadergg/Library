@@ -2527,11 +2527,11 @@ function GenesisX:CreateStatusCard(parent, config)
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- ─── NOTIFICATIONS — REDESIGN GENESISX ───────────────────────────────────────
+-- ─── NOTIFICATIONS — REDESIGN GENESISX v2 ────────────────────────────────────
 -- ═══════════════════════════════════════════════════════════════════════════════
 function GenesisX:Notify(config)
     config = config or {}
-    local message   = config.Text     or "Notificação"
+    local message   = config.Text     or ""
     local title     = config.Title    or nil
     local subtitle  = config.Subtitle or nil
     local subtitles = config.Subtitles or nil
@@ -2570,17 +2570,23 @@ function GenesisX:Notify(config)
         return (ok and cam) and cam.ViewportSize or Vector2.new(1366, 768)
     end
 
+    -- ── Determinar layout: com ou sem subtítulo ───────────────────────────────
+    local hasSubtitle = (subtitle and subtitle ~= "") or (subtitles and #subtitles > 0) or (not title and message ~= "")
+    local hasTitleOnly = title and not hasSubtitle and message == "" and not subtitle and (not subtitles or #subtitles == 0)
+
+    -- Se só tiver title (ou text sozinho), texto maior
+    local isSingleLine = not hasSubtitle
+
     -- ── Calcular altura dinâmica ──────────────────────────────────────────────
     local iconAreaW = self:S(70)
     local contentX = iconAreaW + self:S(12)
-    local contentW = W - contentX - self:S(36) -- espaço pro X
-    local baseH = self:S(72)
+    local contentW = W - contentX - self:S(36)
+    local baseH = isSingleLine and self:S(56) or self:S(72)
     local totalH = baseH
 
-    -- Se tiver subtitles array, calcular altura extra
     if subtitles and #subtitles > 0 then
         totalH = baseH + (#subtitles * self:S(18))
-    elseif subtitle then
+    elseif subtitle and subtitle ~= "" then
         totalH = baseH + self:S(18)
     end
 
@@ -2593,8 +2599,13 @@ function GenesisX:Notify(config)
     notif.ClipsDescendants   = true
     notif.ZIndex             = 5000
     notif.Parent             = self.ScreenGui
-    self:CreateCorner(notif, UDim.new(0, self:S(14)))
-    self:CreateStroke(notif, accentColor, 1.5, 0.3)
+
+    -- Corner radius com padding interno pra evitar pontas escapando
+    local cornerRadius = self:S(14)
+    self:CreateCorner(notif, UDim.new(0, cornerRadius))
+
+    -- Borda fina
+    local borderStroke = self:CreateStroke(notif, accentColor, 1.5, 0.3)
 
     -- ── Área do ícone (esquerda) ──────────────────────────────────────────────
     local iconArea = Instance.new("Frame")
@@ -2605,20 +2616,7 @@ function GenesisX:Notify(config)
     iconArea.ZIndex           = 5001
     iconArea.Parent           = notif
 
-    -- Background do ícone com glow sutil
-    local iconBg = Instance.new("Frame")
-    iconBg.Name             = "IconBg"
-    iconBg.BackgroundColor3 = accentColor
-    iconBg.BackgroundTransparency = 0.85
-    iconBg.BorderSizePixel  = 0
-    iconBg.Size             = UDim2.fromOffset(self:S(46), self:S(46))
-    iconBg.Position         = UDim2.new(0.5, 0, 0.5, 0)
-    iconBg.AnchorPoint      = Vector2.new(0.5, 0.5)
-    iconBg.ZIndex           = 5001
-    iconBg.Parent           = iconArea
-    self:CreateCorner(iconBg, UDim.new(1, 0))
-
-    -- Glow mais forte atrás
+    -- Glow atrás do ícone
     local iconGlow = Instance.new("Frame")
     iconGlow.Name             = "IconGlow"
     iconGlow.BackgroundColor3 = accentColor
@@ -2630,6 +2628,19 @@ function GenesisX:Notify(config)
     iconGlow.ZIndex           = 5000
     iconGlow.Parent           = iconArea
     self:CreateCorner(iconGlow, UDim.new(1, 0))
+
+    -- Background do ícone
+    local iconBg = Instance.new("Frame")
+    iconBg.Name             = "IconBg"
+    iconBg.BackgroundColor3 = accentColor
+    iconBg.BackgroundTransparency = 0.85
+    iconBg.BorderSizePixel  = 0
+    iconBg.Size             = UDim2.fromOffset(self:S(46), self:S(46))
+    iconBg.Position         = UDim2.new(0.5, 0, 0.5, 0)
+    iconBg.AnchorPoint      = Vector2.new(0.5, 0.5)
+    iconBg.ZIndex           = 5001
+    iconBg.Parent           = iconArea
+    self:CreateCorner(iconBg, UDim.new(1, 0))
 
     -- Ícone Lucide
     local iconImg = Instance.new("ImageLabel")
@@ -2658,28 +2669,39 @@ function GenesisX:Notify(config)
     local contentArea = Instance.new("Frame")
     contentArea.Name             = "ContentArea"
     contentArea.BackgroundTransparency = 1
-    contentArea.Position         = UDim2.new(0, contentX, 0, self:S(10))
-    contentArea.Size             = UDim2.new(0, contentW, 1, -self:S(14))
+    contentArea.Position         = UDim2.new(0, contentX, 0, 0)
+    contentArea.Size             = UDim2.new(0, contentW, 1, -self:S(6))
     contentArea.ZIndex           = 5001
     contentArea.Parent           = notif
+
+    -- Padding interno pro content não colar no separador
+    local contentPad = Instance.new("UIPadding")
+    contentPad.PaddingTop    = UDim.new(0, isSingleLine and self:S(14) or self:S(10))
+    contentPad.PaddingBottom = UDim.new(0, isSingleLine and self:S(14) or self:S(10))
+    contentPad.Parent        = contentArea
+
+    -- Determinar texto final
+    local displayTitle = title or (not subtitle and not subtitles and message ~= "" and message) or "Notificação"
+    local displaySubtitle = subtitle or (title and message ~= "" and message) or nil
 
     -- Title
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name             = "Title"
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Size             = UDim2.new(1, 0, 0, self:S(20))
-    titleLabel.Font             = Enum.Font.GothamBold
-    titleLabel.Text             = title or message
-    titleLabel.TextColor3       = accentColor
-    titleLabel.TextSize         = self:S(13)
+    titleLabel.Size             = UDim2.new(1, 0, 0, isSingleLine and self:S(28) or self:S(20))
+    titleLabel.Font             = isSingleLine and Enum.Font.GothamBold or Enum.Font.GothamBold
+    titleLabel.Text             = displayTitle
+    titleLabel.TextColor3       = isSingleLine and self.Theme.Text or accentColor
+    titleLabel.TextSize         = isSingleLine and self:S(15) or self:S(13)
     titleLabel.TextXAlignment   = Enum.TextXAlignment.Left
+    titleLabel.TextYAlignment   = isSingleLine and Enum.TextYAlignment.Center or Enum.TextYAlignment.Top
     titleLabel.TextTruncate     = Enum.TextTruncate.AtEnd
     titleLabel.ZIndex           = 5002
     titleLabel.Parent           = contentArea
 
-    -- Subtitles container
-    local subtitleY = self:S(22)
+    -- Subtitles
     local subtitleTexts = {}
+    local subtitleY = self:S(24)
 
     if subtitles and #subtitles > 0 then
         for i, subText in ipairs(subtitles) do
@@ -2698,32 +2720,14 @@ function GenesisX:Notify(config)
             subLabel.Parent           = contentArea
             table.insert(subtitleTexts, subLabel)
         end
-    elseif subtitle then
+    elseif displaySubtitle and displaySubtitle ~= "" then
         local subLabel = Instance.new("TextLabel")
         subLabel.Name             = "Subtitle"
         subLabel.BackgroundTransparency = 1
         subLabel.Position         = UDim2.new(0, 0, 0, subtitleY)
         subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
         subLabel.Font             = Enum.Font.Gotham
-        subLabel.Text             = subtitle
-        subLabel.TextColor3       = self.Theme.TextSecondary
-        subLabel.TextSize         = self:S(11)
-        subLabel.TextXAlignment   = Enum.TextXAlignment.Left
-        subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
-        subLabel.ZIndex           = 5002
-        subLabel.Parent           = contentArea
-    elseif not title then
-        -- Se não tiver title, a mensagem é o title (já setado acima)
-        -- e não precisa de subtitle
-    else
-        -- Se tiver title mas não subtitle, usar message como subtitle
-        local subLabel = Instance.new("TextLabel")
-        subLabel.Name             = "Subtitle"
-        subLabel.BackgroundTransparency = 1
-        subLabel.Position         = UDim2.new(0, 0, 0, subtitleY)
-        subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
-        subLabel.Font             = Enum.Font.Gotham
-        subLabel.Text             = message
+        subLabel.Text             = displaySubtitle
         subLabel.TextColor3       = self.Theme.TextSecondary
         subLabel.TextSize         = self:S(11)
         subLabel.TextXAlignment   = Enum.TextXAlignment.Left
@@ -2732,7 +2736,7 @@ function GenesisX:Notify(config)
         subLabel.Parent           = contentArea
     end
 
-    -- ── Botão fechar (X) ───────────────────────────────────────────────────────
+    -- ── Botão fechar (X) ─────────────────────────────────────────────────────
     local closeSize = self:S(18)
     local closeBtn = Instance.new("ImageButton")
     closeBtn.Name               = "CloseBtn"
@@ -2754,15 +2758,27 @@ function GenesisX:Notify(config)
     end)
 
     -- ── Barra de progresso (timer) na base ───────────────────────────────────
+    -- Container do timer com clip pra não vazar pontas
+    local timerContainer = Instance.new("Frame")
+    timerContainer.Name             = "TimerContainer"
+    timerContainer.BackgroundTransparency = 1
+    timerContainer.BorderSizePixel  = 0
+    timerContainer.Size             = UDim2.new(1, 0, 0, self:S(3))
+    timerContainer.Position         = UDim2.new(0, 0, 1, -self:S(3))
+    timerContainer.ClipsDescendants = true
+    timerContainer.ZIndex           = 5001
+    timerContainer.Parent           = notif
+
+    -- Background escuro do timer
     local timerBg = Instance.new("Frame")
     timerBg.Name                = "TimerBg"
     timerBg.BackgroundColor3    = Color3.fromRGB(25, 22, 30)
     timerBg.BorderSizePixel     = 0
-    timerBg.Size                = UDim2.new(1, 0, 0, self:S(3))
-    timerBg.Position            = UDim2.new(0, 0, 1, -self:S(3))
+    timerBg.Size                = UDim2.new(1, 0, 1, 0)
     timerBg.ZIndex              = 5001
-    timerBg.Parent              = notif
+    timerBg.Parent              = timerContainer
 
+    -- Barra de progresso colorida
     local timerBar = Instance.new("Frame")
     timerBar.Name               = "TimerBar"
     timerBar.BackgroundColor3   = accentColor
@@ -2770,6 +2786,17 @@ function GenesisX:Notify(config)
     timerBar.Size               = UDim2.new(1, 0, 1, 0)
     timerBar.ZIndex             = 5002
     timerBar.Parent             = timerBg
+
+    -- ── Máscara de cantos arredondados pro timer ─────────────────────────────
+    -- Isso garante que o timer não vaze pontas quadradas
+    local timerMask = Instance.new("Frame")
+    timerMask.Name               = "TimerMask"
+    timerMask.BackgroundTransparency = 1
+    timerMask.Size               = UDim2.new(1, 0, 0, self:S(3))
+    timerMask.Position           = UDim2.new(0, 0, 1, -self:S(3))
+    timerMask.ClipsDescendants   = true
+    timerMask.ZIndex             = 5003
+    timerMask.Parent             = notif
 
     -- ── Registrar e posicionar ───────────────────────────────────────────────
     table.insert(self._notifications, notif)
@@ -2844,7 +2871,7 @@ function GenesisX:Notify(config)
 
     closeBtn.MouseButton1Click:Connect(dismiss)
 
-    -- Click no corpo também descarta
+    -- Click no corpo também descarta (exceto no botão X)
     notif.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or
            input.UserInputType == Enum.UserInputType.Touch then
@@ -2875,6 +2902,7 @@ function GenesisX:Notify(config)
         end,
     }
 end
+
 
 -- ─── DESTROY ──────────────────────────────────────────────────────────────────
 function GenesisX:Destroy()
