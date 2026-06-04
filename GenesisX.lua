@@ -3,6 +3,7 @@ GenesisX.__index = GenesisX
 
 -- ─── SERVIÇOS ─────────────────────────────────────────────────────────────────
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")        -- ← ADICIONAR ISSO
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -333,11 +334,20 @@ function GenesisX:CreateWindow(config)
 
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "GenesisX"
-    self.ScreenGui.Parent = PlayerGui
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
     self.ScreenGui.IgnoreGuiInset = true
     self.ScreenGui.DisplayOrder = 999999
+
+    -- Parent no CoreGui se possível (fica por cima da UI do Roblox)
+    local parentSuccess = pcall(function()
+        self.ScreenGui.Parent = CoreGui
+    end)
+
+    -- Se falhar (executor não permite), usa PlayerGui
+    if not parentSuccess then
+        self.ScreenGui.Parent = PlayerGui
+    end
 
     self._notifications = {}
     self.Dropdowns = {}
