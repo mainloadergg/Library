@@ -1475,6 +1475,7 @@ function GenesisX:CreateDropdown(parent, config)
     self:CreateCorner(dropBtn, UDim.new(0, 6))
     local dropStroke = self:CreateStroke(dropBtn, self.Theme.Border, 1, 0.4)
 
+    -- SETA LUCIDE (chevron-down)
     local arrow = Instance.new("ImageLabel")
     arrow.Name = "Arrow"
     arrow.BackgroundTransparency = 1
@@ -1579,14 +1580,14 @@ function GenesisX:CreateDropdown(parent, config)
 
             if isSelected then
                 self:CreateStroke(row, self.Theme.Accent, 1, 0.2)
-                local check = Instance.new("TextLabel")
+                -- CHECKMARK LUCIDE (check)
+                local check = Instance.new("ImageLabel")
+                check.Name = "Check"
                 check.BackgroundTransparency = 1
                 check.Position = UDim2.new(0, self:S(10), 0, 0)
                 check.Size = UDim2.new(0, self:S(24), 1, 0)
-                check.Font = Enum.Font.GothamBold
-                check.Text = "✓"
-                check.TextColor3 = self.Theme.AccentSecondary
-                check.TextSize = self:S(14)
+                check.Image = self:FormatAssetId("lucide-check") or ""
+                check.ImageColor3 = self.Theme.AccentSecondary
                 check.ZIndex = 504
                 check.Parent = row
             end
@@ -1680,7 +1681,6 @@ function GenesisX:CreateDropdown(parent, config)
     }
 end
 
-
 function GenesisX:CreateMultiDropdown(parent, config)
     config = config or {}
     local labelText = config.Label or "Multi Select"
@@ -1728,6 +1728,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     self:CreateCorner(dropBtn, UDim.new(0, 6))
     local dropStroke = self:CreateStroke(dropBtn, self.Theme.Border, 1, 0.4)
 
+    -- SETA LUCIDE (chevron-down)
     local arrow = Instance.new("ImageLabel")
     arrow.Name = "Arrow"
     arrow.BackgroundTransparency = 1
@@ -1887,13 +1888,13 @@ function GenesisX:CreateMultiDropdown(parent, config)
             self:CreateCorner(checkbox, UDim.new(0, 4))
 
             if sel then
-                local check = Instance.new("TextLabel")
+                -- CHECKMARK LUCIDE (check)
+                local check = Instance.new("ImageLabel")
+                check.Name = "Check"
                 check.BackgroundTransparency = 1
                 check.Size = UDim2.new(1, 0, 1, 0)
-                check.Font = Enum.Font.GothamBold
-                check.Text = "✓"
-                check.TextColor3 = Color3.new(1, 1, 1)
-                check.TextSize = self:S(12)
+                check.Image = self:FormatAssetId("lucide-check") or ""
+                check.ImageColor3 = Color3.new(1, 1, 1)
                 check.ZIndex = 505
                 check.Parent = checkbox
             end
@@ -2006,16 +2007,14 @@ function GenesisX:CreateCheckbox(parent, config)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
     local cbSize = self:S(20)
-    local checkbox = Instance.new("TextButton")
+    local checkbox = Instance.new("ImageButton")
     checkbox.Name = "Checkbox"
     checkbox.BackgroundColor3 = default and self.Theme.Accent or self.Theme.Input
     checkbox.AutoButtonColor = false
     checkbox.Position = UDim2.new(0, self:S(14), 0.5, -cbSize/2)
     checkbox.Size = UDim2.new(0, cbSize, 0, cbSize)
-    checkbox.Font = Enum.Font.GothamBold
-    checkbox.Text = default and "✓" or ""
-    checkbox.TextColor3 = Color3.new(1, 1, 1)
-    checkbox.TextSize = self:S(13)
+    checkbox.Image = default and (self:FormatAssetId("lucide-check") or "") or ""
+    checkbox.ImageColor3 = Color3.new(1, 1, 1)
     checkbox.ZIndex = 14
     checkbox.Parent = frame
     self:CreateCorner(checkbox, UDim.new(0, 5))
@@ -2045,11 +2044,11 @@ function GenesisX:CreateCheckbox(parent, config)
         if state then
             self:Tween(checkbox, {BackgroundColor3 = self.Theme.Accent}, 0.2)
             if cbStroke then self:Tween(cbStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2) end
-            checkbox.Text = "✓"
+            checkbox.Image = self:FormatAssetId("lucide-check") or ""
         else
             self:Tween(checkbox, {BackgroundColor3 = self.Theme.Input}, 0.2)
             if cbStroke then self:Tween(cbStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2) end
-            checkbox.Text = ""
+            checkbox.Image = ""
         end
     end)
 
@@ -2060,10 +2059,11 @@ function GenesisX:CreateCheckbox(parent, config)
             state = s
             callback(state)
             self:Tween(checkbox, {BackgroundColor3 = state and self.Theme.Accent or self.Theme.Input}, 0.2)
-            checkbox.Text = state and "✓" or ""
+            checkbox.Image = state and (self:FormatAssetId("lucide-check") or "") or ""
         end,
     }
 end
+
 
 -- ─── CREATE LABEL ─────────────────────────────────────────────────────────────
 function GenesisX:CreateLabel(parent, config)
