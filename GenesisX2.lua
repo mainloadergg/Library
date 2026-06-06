@@ -3031,6 +3031,29 @@ end
 
 function GenesisX:SetFont(fontName)
     self.Font = fontName or "Gotham"
+    local newFont = self:GetFont()
+    local newBold = self:GetFontBold()
+    local newSemi = self:GetFontSemibold()
+    local newBlack = self:GetFontBlack()
+
+    -- Update all text elements in the UI
+    if self.ScreenGui then
+        for _, obj in ipairs(self.ScreenGui:GetDescendants()) do
+            if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                -- Determine which font weight to use based on current font
+                local current = obj.Font
+                if current == Enum.Font.GothamBold or current == Enum.Font.Arcade or current == Enum.Font.Fantasy or current == Enum.Font.GothamBlack then
+                    obj.Font = newBold
+                elseif current == Enum.Font.GothamSemibold then
+                    obj.Font = newSemi
+                elseif current == Enum.Font.GothamBlack then
+                    obj.Font = newBlack
+                else
+                    obj.Font = newFont
+                end
+            end
+        end
+    end
 end
 
 -- ─── ALIASES / COMPATIBILIDADE ────────────────────────────────────────────────
