@@ -492,16 +492,7 @@ function GenesisX:CreateWindow(config)
         self.ScreenGui.Parent = PlayerGui
     end
 
-    -- Blur overlay para fade effects
-    self.BlurOverlay = Instance.new("Frame")
-    self.BlurOverlay.Name = "BlurOverlay"
-    self.BlurOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
-    self.BlurOverlay.BackgroundTransparency = 1
-    self.BlurOverlay.BorderSizePixel = 0
-    self.BlurOverlay.Size = UDim2.new(1, 0, 1, 0)
-    self.BlurOverlay.ZIndex = 9998
-    self.BlurOverlay.Visible = false
-    self.BlurOverlay.Parent = self.ScreenGui
+
 
     self._notifications = {}
     self.Dropdowns = {}
@@ -839,11 +830,18 @@ function GenesisX:_CreateFloatingButton(config)
 
     self.FloatBtn.MouseButton1Click:Connect(function()
         if not dragging then
-            local visible = not self.MainFrame.Visible
-            if visible then
-                self:FadeIn(self.MainFrame, 0.3, true)
+            if not self.MainFrame.Visible then
+                self.MainFrame.Visible = true
+                self.MainFrame.BackgroundTransparency = 0.3
+                self:Tween(self.MainFrame, {BackgroundTransparency = 0}, 0.2)
             else
-                self:FadeOut(self.MainFrame, 0.25, nil, true)
+                self:Tween(self.MainFrame, {BackgroundTransparency = 1}, 0.2)
+                task.delay(0.2, function()
+                    if self.MainFrame then
+                        self.MainFrame.Visible = false
+                        self.MainFrame.BackgroundTransparency = 0
+                    end
+                end)
             end
         end
     end)
@@ -962,54 +960,11 @@ function GenesisX:CreateTab(config)
         -- Heavy scroll feel for mobile
         scrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
         scrollFrame.ElasticBehavior = Enum.ElasticBehavior.Always
-        scrollFrame.ScrollingEnabled = true
 
-        -- Custom touch scrolling with heavier feel
+        -- Mobile: slightly thicker scrollbar, slower scrolling feel
         if ScaleData.IsMobile then
-            scrollFrame.ScrollBarThickness = 6
-            scrollFrame.TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
-            scrollFrame.BottomImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
-            scrollFrame.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
-
-            -- Add custom touch inertia
-            local touchStart = nil
-            local scrollStart = nil
-            local velocity = 0
-            local lastPos = 0
-            local damping = 0.92
-            local minVelocity = 0.5
-
-            scrollFrame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch then
-                    touchStart = input.Position.Y
-                    scrollStart = scrollFrame.CanvasPosition.Y
-                    lastPos = touchStart
-                    velocity = 0
-                end
-            end)
-
-            scrollFrame.InputChanged:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch and touchStart then
-                    local delta = input.Position.Y - lastPos
-                    lastPos = input.Position.Y
-                    velocity = delta * 0.3
-                    scrollFrame.CanvasPosition = Vector2.new(0, scrollStart - (input.Position.Y - touchStart))
-                end
-            end)
-
-            scrollFrame.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch then
-                    touchStart = nil
-                    -- Inertia decay
-                    task.spawn(function()
-                        while math.abs(velocity) > minVelocity do
-                            velocity = velocity * damping
-                            scrollFrame.CanvasPosition = Vector2.new(0, scrollFrame.CanvasPosition.Y - velocity)
-                            task.wait(0.016)
-                        end
-                    end)
-                end
-            end)
+            scrollFrame.ScrollBarThickness = 5
+            scrollFrame.ScrollingEnabled = true
         end
         self:CreateCorner(scrollFrame, UDim.new(0, 8))
 
@@ -1056,25 +1011,15 @@ function GenesisX:SelectTab(tabId)
     local newTab = self.Tabs[tabId]
     if not newTab then return end
 
-    -- Fade out old tab container
+    -- Hide old tab instantly
     if oldTab and oldTab.Container then
-        self:Tween(oldTab.Container, {BackgroundTransparency = 1}, 0.15)
+        oldTab.Container.Visible = false
     end
 
-    task.delay(0.15, function()
-        -- Hide old tab
-        if oldTab and oldTab.Container then
-            oldTab.Container.Visible = false
-            oldTab.Container.BackgroundTransparency = 0
-        end
+    -- Show new tab instantly
+    newTab.Container.Visible = true
 
-        -- Show new tab with fade
-        newTab.Container.Visible = true
-        newTab.Container.BackgroundTransparency = 1
-        self:Tween(newTab.Container, {BackgroundTransparency = 0}, 0.2)
-    end)
-
-    -- Update sidebar buttons
+    -- Update sidebar buttons with smooth tween
     for id, data in pairs(self.Tabs) do
         local icon = data.Button:FindFirstChild("Icon")
         if id == tabId then
