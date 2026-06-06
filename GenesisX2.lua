@@ -32,7 +32,7 @@ local FontMap = {
     SourceSansSemibold = Enum.Font.SourceSansSemibold, SourceSansLight = Enum.Font.SourceSansLight,
     Bodoni = Enum.Font.Bodoni, Garamond = Enum.Font.Garamond, Cartoon = Enum.Font.Cartoon,
     Code = Enum.Font.Code, Fantasy = Enum.Font.Fantasy, Antique = Enum.Font.Antique,
-    Arcade = Enum.Font.Arcade, SciFi = Enum.Font.SciFi, ArcadeLegacy = Enum.Font.ArcadeLegacy,
+    Arcade = Enum.Font.Arcade, SciFi = Enum.Font.SciFi,
     Gotham = Enum.Font.Gotham, GothamMedium = Enum.Font.GothamMedium, GothamBold = Enum.Font.GothamBold,
     GothamBlack = Enum.Font.GothamBlack, GothamSemibold = Enum.Font.GothamSemibold,
     BuilderSans = Enum.Font.BuilderSans, BuilderSansBold = Enum.Font.BuilderSansBold,
