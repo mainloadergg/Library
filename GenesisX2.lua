@@ -760,6 +760,7 @@ function GenesisX:_CreateFloatingButton(config)
     self.FloatBtn.ZIndex = 100
     self.FloatBtn.Parent = self.ScreenGui
     self:CreateCorner(self.FloatBtn, UDim.new(0, 14))
+    self:CreateStroke(self.FloatBtn, self.Theme.Accent, 2, 0.4)
 
     -- FIX: Detectar asset ID para icone do botao flutuante (agora suporta nomes Lucide)
     local floatIconRaw = config.FloatIconAssetId or config.FloatIcon or config.IconAssetId or config.Icon or "S"
@@ -773,7 +774,7 @@ function GenesisX:_CreateFloatingButton(config)
         iconImg.Position = UDim2.new(0.15, 0, 0.15, 0)
         iconImg.Image = floatIconAsset
         iconImg.ScaleType = Enum.ScaleType.Stretch
-        iconImg.ZIndex = 102
+        iconImg.ZIndex = 99  -- Below the button's rounded corners
         iconImg.Parent = self.FloatBtn
     else
         local iconLabel = Instance.new("TextLabel")
@@ -784,7 +785,7 @@ function GenesisX:_CreateFloatingButton(config)
         iconLabel.Text = tostring(floatIconRaw)
         iconLabel.TextColor3 = Color3.new(1, 1, 1)
         iconLabel.TextSize = self:S(22)
-        iconLabel.ZIndex = 102
+        iconLabel.ZIndex = 99  -- Below the button's rounded corners
         iconLabel.Parent = self.FloatBtn
     end
 
@@ -799,6 +800,9 @@ function GenesisX:_CreateFloatingButton(config)
     local dragInput = nil
     local dragStart = nil
     local startPos = nil
+    local lastDelta = Vector2.new(0, 0)
+    local velocity = Vector2.new(0, 0)
+    local damping = 0.7  -- Heavy feel
 
     self.FloatBtn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or
@@ -806,6 +810,7 @@ function GenesisX:_CreateFloatingButton(config)
             dragging = true
             dragStart = input.Position
             startPos = self.FloatBtn.Position
+            velocity = Vector2.new(0, 0)
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -822,6 +827,8 @@ function GenesisX:_CreateFloatingButton(config)
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
+            lastDelta = delta
+            velocity = Vector2.new(delta.X - lastDelta.X, delta.Y - lastDelta.Y) * damping
             self.FloatBtn.Position = UDim2.new(
                 startPos.X.Scale, startPos.X.Offset + delta.X,
                 startPos.Y.Scale, startPos.Y.Offset + delta.Y
@@ -959,13 +966,33 @@ function GenesisX:CreateTab(config)
 
         -- Heavy scroll feel for mobile
         scrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-        scrollFrame.ElasticBehavior = Enum.ElasticBehavior.Always
+        scrollFrame.ElasticBehavior = Enum.ElasticBehavior.Never
+        scrollFrame.ScrollingEnabled = true
 
-        -- Mobile: slightly thicker scrollbar, slower scrolling feel
-        if ScaleData.IsMobile then
-            scrollFrame.ScrollBarThickness = 5
-            scrollFrame.ScrollingEnabled = true
-        end
+        -- Heavy scroll feel (desktop + mobile)
+        scrollFrame.ScrollBarThickness = 4
+
+        -- Add weight/inertia to scrolling
+        local lastScrollPos = 0
+        local scrollVelocity = 0
+        local isScrolling = false
+
+        scrollFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+            local currentPos = scrollFrame.CanvasPosition.Y
+            scrollVelocity = currentPos - lastScrollPos
+            lastScrollPos = currentPos
+            isScrolling = true
+        end)
+
+        RunService.Heartbeat:Connect(function()
+            if not isScrolling then return end
+            if math.abs(scrollVelocity) < 0.5 then
+                isScrolling = false
+                return
+            end
+            -- Heavy damping - slows down faster
+            scrollVelocity = scrollVelocity * 0.85
+        end)
         self:CreateCorner(scrollFrame, UDim.new(0, 8))
 
         local layout = Instance.new("UIListLayout")
@@ -1319,7 +1346,6 @@ function GenesisX:CreateButton(parent, config)
         self:Tween(btn, {BackgroundColor3 = targetBg}, 0.15)
     end)
     btn.MouseButton1Click:Connect(function()
-        self:CreateRipple(btn, UserInputService:GetMouseLocation())
         callback()
     end)
 
@@ -1846,8 +1872,8 @@ function GenesisX:CreateDropdown(parent, config)
                 local check = Instance.new("ImageLabel")
                 check.Name = "Check"
                 check.BackgroundTransparency = 1
-                check.Position = UDim2.new(0, self:S(10), 0, 0)
-                check.Size = UDim2.new(0, self:S(24), 1, 0)
+                check.Position = UDim2.new(0, self:S(10), 0.5, -self:S(8))
+                check.Size = UDim2.new(0, self:S(16), 0, self:S(16))
                 check.Image = self:FormatAssetId("lucide-check") or ""
                 check.ImageColor3 = Color3.new(1, 1, 1)
                 check.ZIndex = 504
@@ -2959,7 +2985,8 @@ function GenesisX:Notify(config)
             subLabel.TextColor3       = self.Theme.TextSecondary
             subLabel.TextSize         = self:S(11)
             subLabel.TextXAlignment   = Enum.TextXAlignment.Left
-            subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+            subLabel.TextWrapped      = true
+            subLabel.TextTruncate     = Enum.TextTruncate.None
             subLabel.ZIndex           = 5002
             subLabel.Parent           = contentArea
             table.insert(subtitleTexts, subLabel)
@@ -2975,7 +3002,8 @@ function GenesisX:Notify(config)
         subLabel.TextColor3       = self.Theme.TextSecondary
         subLabel.TextSize         = self:S(11)
         subLabel.TextXAlignment   = Enum.TextXAlignment.Left
-        subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+        subLabel.TextWrapped      = true
+        subLabel.TextTruncate     = Enum.TextTruncate.None
         subLabel.ZIndex           = 5002
         subLabel.Parent           = contentArea
     elseif not title then
@@ -3018,24 +3046,6 @@ function GenesisX:Notify(config)
     closeBtn.MouseLeave:Connect(function()
         self:Tween(closeBtn, {ImageColor3 = self.Theme.TextMuted}, 0.1)
     end)
-
-    -- -- Barra de progresso (timer) na base -----------------------------------
-    local timerBg = Instance.new("Frame")
-    timerBg.Name                = "TimerBg"
-    timerBg.BackgroundColor3    = self.Theme.Card
-    timerBg.BorderSizePixel     = 0
-    timerBg.Size                = UDim2.new(1, 0, 0, self:S(3))
-    timerBg.Position            = UDim2.new(0, 0, 1, -self:S(3))
-    timerBg.ZIndex              = 5001
-    timerBg.Parent              = notif
-
-    local timerBar = Instance.new("Frame")
-    timerBar.Name               = "TimerBar"
-    timerBar.BackgroundColor3   = accentColor
-    timerBar.BorderSizePixel    = 0
-    timerBar.Size               = UDim2.new(1, 0, 1, 0)
-    timerBar.ZIndex             = 5002
-    timerBar.Parent             = timerBg
 
     -- -- Registrar e posicionar -----------------------------------------------
     table.insert(self._notifications, notif)
@@ -3082,7 +3092,7 @@ function GenesisX:Notify(config)
     restack(true)
 
     -- -- Timer bar shrink -----------------------------------------------------
-    self:Tween(timerBar, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
+    self:Tween(, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
 
     -- -- Dismiss ---------------------------------------------------------------
     local dismissed = false
