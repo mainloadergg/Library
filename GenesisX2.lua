@@ -130,7 +130,7 @@ end
 function GenesisX:GetFontSemibold()
     local base = self.Font or "Gotham"
     local semiMap = {
-        Gotham = "GothamSemibold", SourceSans = "SourceSansSemibold", BuilderSans = "BuilderSansSemibold",
+        Gotham = "GothamSemibold", SourceSans = "SourceSansSemibold",
         Montserrat = "MontserratSemibold", Inter = "InterSemibold", Ubuntu = "UbuntuMedium",
         Roboto = "RobotoMedium", RobotoMono = "RobotoMonoMedium", Merriweather = "Merriweather",
         Cinzel = "Cinzel", Sarpanch = "SarpanchSemibold", Saira = "SairaSemibold",
