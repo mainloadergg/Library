@@ -3,7 +3,7 @@ GenesisX.__index = GenesisX
 
 -- ─── SERVIÇOS ─────────────────────────────────────────────────────────────────
 local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")        -- ← ADICIONAR ISSO
+local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -24,29 +24,56 @@ end)
 GenesisX.Icons = LucideAssets
 
 -- ─── THEME ────────────────────────────────────────────────────────────────────
-GenesisX.Theme = {
-    Background = Color3.fromRGB(8, 8, 8),
-    Header = Color3.fromRGB(12, 12, 12),
-    Sidebar = Color3.fromRGB(10, 10, 10),
-    Card = Color3.fromRGB(16, 16, 16),
-    CardHover = Color3.fromRGB(24, 24, 24),
-    Input = Color3.fromRGB(22, 22, 22),
-    InputHover = Color3.fromRGB(30, 30, 30),
-    Accent = Color3.fromRGB(150, 80, 230),
-    AccentHover = Color3.fromRGB(180, 110, 255),
-    AccentSecondary = Color3.fromRGB(210, 160, 255),
-    AccentDark = Color3.fromRGB(90, 40, 160),
-    Text = Color3.fromRGB(255, 255, 255),
-    TextSecondary = Color3.fromRGB(190, 190, 190),
-    TextMuted = Color3.fromRGB(120, 120, 120),
-    Success = Color3.fromRGB(220, 190, 255),
-    Warning = Color3.fromRGB(190, 130, 255),
-    Info = Color3.fromRGB(140, 90, 220),
-    Error = Color3.fromRGB(80, 40, 140),
-    Border = Color3.fromRGB(40, 35, 50),
-    BorderBright = Color3.fromRGB(75, 65, 90),
-    ToggleOff = Color3.fromRGB(35, 30, 45),
-    ToggleOn = Color3.fromRGB(150, 80, 230),
+-- ══════════ TEMAS ══════════
+GenesisX.Themes = {
+    Dark = {  -- seu tema atual, mantido igual
+        Background      = Color3.fromRGB(8, 8, 8),
+        Header          = Color3.fromRGB(12, 12, 12),
+        Sidebar         = Color3.fromRGB(10, 10, 10),
+        Card            = Color3.fromRGB(16, 16, 16),
+        CardHover       = Color3.fromRGB(24, 24, 24),
+        Input           = Color3.fromRGB(22, 22, 22),
+        InputHover      = Color3.fromRGB(30, 30, 30),
+        Accent          = Color3.fromRGB(150, 80, 230),
+        AccentHover     = Color3.fromRGB(180, 110, 255),
+        AccentSecondary = Color3.fromRGB(210, 160, 255),
+        AccentDark      = Color3.fromRGB(90, 40, 160),
+        Text            = Color3.fromRGB(255, 255, 255),
+        TextSecondary   = Color3.fromRGB(190, 190, 190),
+        TextMuted       = Color3.fromRGB(120, 120, 120),
+        Success         = Color3.fromRGB(220, 190, 255),
+        Warning         = Color3.fromRGB(190, 130, 255),
+        Info            = Color3.fromRGB(140, 90, 220),
+        Error           = Color3.fromRGB(80, 40, 140),
+        Border          = Color3.fromRGB(40, 35, 50),
+        BorderBright    = Color3.fromRGB(75, 65, 90),
+        ToggleOff       = Color3.fromRGB(35, 30, 45),
+        ToggleOn        = Color3.fromRGB(150, 80, 230),
+    },
+    Light = {
+        Background      = Color3.fromRGB(248, 246, 252),
+        Header          = Color3.fromRGB(238, 236, 245),
+        Sidebar         = Color3.fromRGB(242, 240, 250),
+        Card            = Color3.fromRGB(255, 255, 255),
+        CardHover       = Color3.fromRGB(245, 243, 250),
+        Input           = Color3.fromRGB(240, 238, 246),
+        InputHover      = Color3.fromRGB(235, 232, 242),
+        Accent          = Color3.fromRGB(130, 60, 210),
+        AccentHover     = Color3.fromRGB(150, 85, 230),
+        AccentSecondary = Color3.fromRGB(170, 120, 240),
+        AccentDark      = Color3.fromRGB(100, 40, 180),
+        Text            = Color3.fromRGB(25, 25, 40),
+        TextSecondary   = Color3.fromRGB(70, 70, 90),
+        TextMuted       = Color3.fromRGB(130, 130, 150),
+        Success         = Color3.fromRGB(140, 100, 210),
+        Warning         = Color3.fromRGB(160, 110, 220),
+        Info            = Color3.fromRGB(120, 70, 200),
+        Error           = Color3.fromRGB(180, 60, 110),
+        Border          = Color3.fromRGB(200, 196, 215),
+        BorderBright    = Color3.fromRGB(180, 176, 200),
+        ToggleOff       = Color3.fromRGB(210, 206, 230),
+        ToggleOn        = Color3.fromRGB(130, 60, 210),
+    }
 }
 
 -- ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
@@ -286,7 +313,7 @@ function GenesisX:CreateIcon(parent, iconData, size, color)
         lbl.Name = "Icon"
         lbl.BackgroundTransparency = 1
         lbl.Size = size
-        lbl.Font = Enum.Font.GothamBold
+        lbl.Font = self.Font
         lbl.Text = tostring(iconData):sub(1, 2)
         lbl.TextColor3 = color
         lbl.TextSize = size.Y.Offset or 16
@@ -370,6 +397,19 @@ function GenesisX:CreateWindow(config)
     self.MainFrame.Parent = self.ScreenGui
     self:CreateCorner(self.MainFrame, UDim.new(0, 12))
     self:CreateStroke(self.MainFrame, self.Theme.Accent, 1.5, 0)
+    
+    -- ─── TEMA ────────────────────────────────────────────────
+    local themeName = config.Theme or "Dark"
+    local baseTheme = self.Themes[themeName] or self.Themes.Dark
+    window.Theme = {}
+    for k, v in pairs(baseTheme) do window.Theme[k] = v end   -- cópia rasa
+
+    -- ─── FONTE ───────────────────────────────────────────────
+    local font = config.Font or Enum.Font.GothamBold
+    if type(font) == "string" then
+    font = Enum.Font[font] or Enum.Font.GothamBold
+    end
+    window.Font = font
 
     -- ─── HEADER ─────────────────────────────────────────────────────────────────
     local headerHeight = self:S(56)
@@ -426,7 +466,7 @@ function GenesisX:CreateWindow(config)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Position = UDim2.new(0, titleX, 0, 0)
     titleLabel.Size = UDim2.new(0, self:S(300), 1, 0)
-    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Font = self.Font
     titleLabel.Text = config.Title or "GenesisX"
     titleLabel.TextColor3 = self.Theme.Text
     titleLabel.TextSize = self:S(18)
@@ -457,7 +497,7 @@ function GenesisX:CreateWindow(config)
     minBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     minBtn.Position = UDim2.new(1, -self:S(42), 0.5, -self:S(12))
     minBtn.Size = UDim2.new(0, self:S(28), 0, self:S(24))
-    minBtn.Font = Enum.Font.GothamBold
+    minBtn.Font = self.Font
     minBtn.Text = "—"
     minBtn.TextColor3 = self.Theme.TextMuted
     minBtn.TextSize = self:S(13)
@@ -695,7 +735,7 @@ function GenesisX:CreateTab(config)
         iconLabel.Name = "Icon"
         iconLabel.BackgroundTransparency = 1
         iconLabel.Size = UDim2.new(1, 0, 1, 0)
-        iconLabel.Font = Enum.Font.GothamBold
+        iconLabel.Font = self.Font
         iconLabel.Text = tostring(fallback)
         iconLabel.TextColor3 = self.Theme.TextMuted
         iconLabel.TextSize = self:S(16)
@@ -895,7 +935,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     label.BackgroundTransparency = 1
     label.AutomaticSize = Enum.AutomaticSize.X
     label.Size = UDim2.new(0, 0, 1, 0)
-    label.Font = Enum.Font.GothamBold
+    label.Font = self.Font
     label.Text = text
     label.TextColor3 = color
     label.TextSize = self:S(11)
@@ -1030,7 +1070,7 @@ function GenesisX:CreateButton(parent, config)
     btn.AutoButtonColor = false
     btn.BorderSizePixel = 0
     btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.Font = Enum.Font.GothamBold
+    btn.Font = self.Font
     btn.Text = text
     btn.TextSize = self:S(13)
     btn.TextColor3 = Color3.new(1, 1, 1)
@@ -1199,7 +1239,7 @@ function GenesisX:CreateNumberInput(parent, config)
     textBox.BackgroundColor3 = self.Theme.Input
     textBox.Position = UDim2.new(0, self:S(12), 0, self:S(28))
     textBox.Size = UDim2.new(1, -self:S(24), 0, self:S(26))
-    textBox.Font = Enum.Font.GothamBold
+    textBox.Font = self.Font
     textBox.Text = tostring(default)
     textBox.TextColor3 = self.Theme.Text
     textBox.TextSize = self:S(13)
@@ -1284,7 +1324,7 @@ function GenesisX:CreateSlider(parent, config)
     valueLabel.Name = "ValueLabel"
     valueLabel.BackgroundTransparency = 1
     valueLabel.Size = UDim2.new(1, 0, 1, 0)
-    valueLabel.Font = Enum.Font.GothamBold
+    valueLabel.Font = self.Font
     valueLabel.Text = tostring(default)
     valueLabel.TextColor3 = Color3.new(1, 1, 1)
     valueLabel.TextSize = self:S(11)
@@ -1297,7 +1337,7 @@ function GenesisX:CreateSlider(parent, config)
     valueInput.Name = "ValueInput"
     valueInput.BackgroundTransparency = 1
     valueInput.Size = UDim2.new(1, 0, 1, 0)
-    valueInput.Font = Enum.Font.GothamBold
+    valueInput.Font = self.Font
     valueInput.Text = ""
     valueInput.PlaceholderText = ""
     valueInput.TextColor3 = Color3.new(1, 1, 1)
@@ -1527,7 +1567,7 @@ function GenesisX:CreateDropdown(parent, config)
     listTitle.BackgroundTransparency = 1
     listTitle.Position = UDim2.new(0, self:S(16), 0, self:S(12))
     listTitle.Size = UDim2.new(1, -self:S(32), 0, self:S(22))
-    listTitle.Font = Enum.Font.GothamBold
+    listTitle.Font = self.Font
     listTitle.Text = labelText
     listTitle.TextColor3 = self.Theme.Text
     listTitle.TextSize = self:S(14)
@@ -1781,7 +1821,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     listTitle.BackgroundTransparency = 1
     listTitle.Position = UDim2.new(0, self:S(16), 0, self:S(12))
     listTitle.Size = UDim2.new(0.6, 0, 0, self:S(22))
-    listTitle.Font = Enum.Font.GothamBold
+    listTitle.Font = self.Font
     listTitle.Text = labelText
     listTitle.TextColor3 = self.Theme.Text
     listTitle.TextSize = self:S(14)
@@ -1794,7 +1834,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     countBadge.BackgroundColor3 = self.Theme.Accent
     countBadge.Position = UDim2.new(1, -self:S(48), 0, self:S(10))
     countBadge.Size = UDim2.new(0, self:S(36), 0, self:S(22))
-    countBadge.Font = Enum.Font.GothamBold
+    countBadge.Font = self.Font
     countBadge.Text = "0"
     countBadge.TextColor3 = Color3.new(1, 1, 1)
     countBadge.TextSize = self:S(11)
@@ -2168,7 +2208,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     titleLabel.Size = UDim2.new(1, -self:S(28), 0, self:S(20))
-    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Font = self.Font
     titleLabel.Text = titleText
     titleLabel.TextColor3 = titleColor
     titleLabel.TextSize = self:S(13)
@@ -2223,7 +2263,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         btn.AutoButtonColor = false
         btn.BorderSizePixel = 0
         btn.Size = UDim2.new(1, 0, 1, 0)
-        btn.Font = Enum.Font.GothamBold
+        btn.Font = self.Font
         btn.Text = btnText
         btn.TextSize = self:S(12)
         btn.ZIndex = 15
@@ -2444,7 +2484,7 @@ function GenesisX:CreateStatusCard(parent, config)
     headerTitle.BackgroundTransparency = 1
     headerTitle.Position = UDim2.new(0, self:S(16), 0, 0)
     headerTitle.Size = UDim2.new(1, -self:S(16), 1, 0)
-    headerTitle.Font = Enum.Font.GothamBold
+    headerTitle.Font = self.Font
     headerTitle.Text = title
     headerTitle.TextColor3 = self.Theme.Text
     headerTitle.TextSize = self:S(12)
@@ -2674,7 +2714,7 @@ function GenesisX:Notify(config)
     titleLabel.Name             = "Title"
     titleLabel.BackgroundTransparency = 1
     titleLabel.Size             = UDim2.new(1, 0, 0, self:S(20))
-    titleLabel.Font             = Enum.Font.GothamBold
+    titleLabel.Font             = self.Font
     titleLabel.Text             = title or message
     titleLabel.TextColor3       = accentColor
     titleLabel.TextSize         = self:S(13)
