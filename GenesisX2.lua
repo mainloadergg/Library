@@ -560,18 +560,18 @@ function GenesisX:CreateWindow(config)
         subtitleLabel.Parent = self.Header
     end
 
-    local minBtn = Instance.new("TextButton")
-        minBtn.Name = "MinimizeBtn"
+    local minBtn = Instance.new("ImageButton")
+    minBtn.Name = "MinimizeBtn"
     minBtn.BackgroundColor3 = self.Theme.Input
-    minBtn.Position = UDim2.new(1, -self:S(48), 0.5, -self:S(14))
-    minBtn.Size = UDim2.new(0, self:S(32), 0, self:S(28))
+    minBtn.Position = UDim2.new(1, -self:S(52), 0.5, -self:S(16))
+    minBtn.Size = UDim2.new(0, self:S(34), 0, self:S(32))
     minBtn.Image = self:FormatAssetId("lucide-minus") or ""
     minBtn.ImageColor3 = self.Theme.TextMuted
     minBtn.AutoButtonColor = false
     minBtn.ZIndex = 14
     minBtn.Parent = self.Header
-    self:CreateCorner(minBtn, UDim.new(0, 8))
-    self:CreateStroke(minBtn, self.Theme.Border, 1, 0.5)
+    self:CreateCorner(minBtn, UDim.new(0, 10))
+    self:CreateStroke(minBtn, self.Theme.Accent, 1.5, 0.3)
 
     minBtn.MouseEnter:Connect(function()
         self:Tween(minBtn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
@@ -581,7 +581,7 @@ function GenesisX:CreateWindow(config)
     end)
     minBtn.MouseButton1Click:Connect(function()
         self.MainFrame.Visible = false
-    end))
+    end)
 
     -- --- SIDEBAR ----------------------------------------------------------------
     local sidebarWidth = self:S(64)
@@ -938,6 +938,7 @@ end
 function GenesisX:CreateSection(parent, text, color, icon)
     -- icon: nome Lucide opcional, ex: "lucide-sword"
     color = self.Theme.Accent  -- Always use accent purple, ignore passed color
+    local sectionTextColor = Color3.fromRGB(255, 255, 255)  -- white text on selected
     local iconSize = self:S(16)
     local height   = self:S(28)
 
@@ -951,7 +952,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     -- Linha de fundo
     local line = Instance.new("Frame")
     line.Name = "Line"
-    line.BackgroundColor3 = color
+    line.BackgroundColor3 = self.Theme.Accent
     line.BackgroundTransparency = 0.7
     line.BorderSizePixel = 0
     line.Position = UDim2.new(0, 0, 0.5, 0)
@@ -1004,7 +1005,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     label.Size = UDim2.new(0, 0, 1, 0)
     label.Font = self:GetFontBold()
     label.Text = text
-    label.TextColor3 = color
+    label.TextColor3 = self.Theme.Accent
     label.TextSize = self:S(11)
     label.ZIndex = 14
     label.Parent = labelBg
@@ -1172,11 +1173,11 @@ function GenesisX:CreateButton(parent, config)
         strokeColor = Color3.fromRGB(60, 200, 100)
         textColor   = Color3.new(1, 1, 1)
     else
-        -- Default: theme-aware (white bg in Light, dark in Dark)
-        bgColor     = self.Theme.Card
-        bgHover     = self.Theme.CardHover
+        -- Default: white fill, purple border, black text (as requested)
+        bgColor     = Color3.fromRGB(255, 255, 255)
+        bgHover     = Color3.fromRGB(245, 245, 245)
         strokeColor = self.Theme.Accent
-        textColor   = self.Theme.Text
+        textColor   = Color3.fromRGB(30, 30, 30)
     end
 
     btn.BackgroundColor3 = bgColor
@@ -1721,7 +1722,7 @@ function GenesisX:CreateDropdown(parent, config)
             rowBtn.Size = UDim2.new(1, 0, 1, 0)
             rowBtn.Font = self:GetFontSemibold()
             rowBtn.Text = (isSelected and "    " or "  ") .. option
-            rowBtn.TextColor3 = isSelected and Color3.new(1, 1, 1) or self.Theme.Text
+            rowBtn.TextColor3 = isSelected and Color3.new(1, 1, 1) or self.Theme.TextSecondary
             rowBtn.TextSize = self:S(12)
             rowBtn.TextXAlignment = Enum.TextXAlignment.Left
             rowBtn.ZIndex = 504
@@ -2028,7 +2029,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
             rowBtn.Size = UDim2.new(1, 0, 1, 0)
             rowBtn.Font = self:GetFontSemibold()
             rowBtn.Text = "      " .. option
-            rowBtn.TextColor3 = sel and Color3.new(1, 1, 1) or self.Theme.Text
+            rowBtn.TextColor3 = sel and Color3.new(1, 1, 1) or self.Theme.TextSecondary
             rowBtn.TextSize = self:S(12)
             rowBtn.TextXAlignment = Enum.TextXAlignment.Left
             rowBtn.ZIndex = 504
