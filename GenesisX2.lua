@@ -2226,7 +2226,16 @@ function GenesisX:CreateLabel(parent, config)
     config = config or {}
     local text      = config.Text    or "Label"
     local color     = config.Color   or self.Theme.TextSecondary
-    local wrapped   = config.Wrapped ~= false
+    -- Se o texto contem quebra de linha manual (\n) e Wrapped nao foi explicitamente definido,
+    -- desabilita TextWrapped para que as quebras manuais funcionem corretamente.
+    local hasNewline = text:find("
+") ~= nil
+    local wrapped
+    if config.Wrapped == nil then
+        wrapped = not hasNewline
+    else
+        wrapped = config.Wrapped
+    end
     local padV      = self:S(10)
     local padH      = self:S(14)
     local minHeight = self:S(36)
