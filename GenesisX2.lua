@@ -1056,50 +1056,22 @@ function GenesisX:SelectTab(tabId)
     local newTab = self.Tabs[tabId]
     if not newTab then return end
 
-    -- Fade out old tab content
+    -- Fade out old tab container
     if oldTab and oldTab.Container then
-        for _, child in ipairs(oldTab.Container:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                if child.BackgroundTransparency < 1 then
-                    self:Tween(child, {BackgroundTransparency = 1}, 0.15)
-                end
-                if (child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox")) and child.TextTransparency < 1 then
-                    self:Tween(child, {TextTransparency = 1}, 0.15)
-                end
-                if (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency < 1 then
-                    self:Tween(child, {ImageTransparency = 1}, 0.15)
-                end
-            end
-        end
+        self:Tween(oldTab.Container, {BackgroundTransparency = 1}, 0.15)
     end
 
     task.delay(0.15, function()
         -- Hide old tab
         if oldTab and oldTab.Container then
             oldTab.Container.Visible = false
+            oldTab.Container.BackgroundTransparency = 0
         end
 
-        -- Show new tab
+        -- Show new tab with fade
         newTab.Container.Visible = true
-        newTab.Container.BackgroundTransparency = 0
-
-        -- Fade in new tab content
-        for _, child in ipairs(newTab.Container:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                if child.BackgroundTransparency < 1 then
-                    child.BackgroundTransparency = 1
-                    self:Tween(child, {BackgroundTransparency = 0}, 0.2)
-                end
-                if (child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox")) and child.TextTransparency < 1 then
-                    child.TextTransparency = 1
-                    self:Tween(child, {TextTransparency = 0}, 0.2)
-                end
-                if (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency < 1 then
-                    child.ImageTransparency = 1
-                    self:Tween(child, {ImageTransparency = 0}, 0.2)
-                end
-            end
-        end
+        newTab.Container.BackgroundTransparency = 1
+        self:Tween(newTab.Container, {BackgroundTransparency = 0}, 0.2)
     end)
 
     -- Update sidebar buttons
