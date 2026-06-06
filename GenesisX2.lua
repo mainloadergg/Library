@@ -7,6 +7,7 @@ local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -148,6 +149,34 @@ GenesisX.Config = {
     ShadowEnabled = true,
     ShadowIntensity = 0.7,
 }
+
+-- --- INTERNAL SAVE/LOAD FOR THEME & FONT ------------------------------------
+GenesisX._configFolder = "GenesisX/Config"
+
+function GenesisX:_SaveConfigFile(filename, value)
+    if not (writefile and isfolder and makefolder and HttpService) then return end
+    pcall(function()
+        if not isfolder("GenesisX") then makefolder("GenesisX") end
+        if not isfolder(self._configFolder) then makefolder(self._configFolder) end
+        local path = self._configFolder .. "/" .. filename
+        writefile(path, HttpService:JSONEncode({value = value}))
+    end)
+end
+
+function GenesisX:_LoadConfigFile(filename, defaultValue)
+    if not (readfile and isfile and HttpService) then return defaultValue end
+    local ok, data = pcall(function()
+        local path = self._configFolder .. "/" .. filename
+        if not isfile(path) then return nil end
+        return HttpService:JSONDecode(readfile(path))
+    end)
+    if ok and data and data.value ~= nil then
+        return data.value
+    end
+    -- Se nao existe, cria com o default
+    self:_SaveConfigFile(filename, defaultValue)
+    return defaultValue
+end
 
 -- --- ESCALA RESPONSIVA --------------------------------------------------------
 local ScaleData = {
@@ -427,13 +456,19 @@ function GenesisX:CreateWindow(config)
     if not self.Theme then
         self.Theme = self.Themes.Dark
     end
-    local themeName = config.Theme or "Dark"
+    -- Load saved theme/font or use config defaults (and save them)
+    local configTheme = config.Theme or "Dark"
+    local configFont  = config.Font  or "Gotham"
+    local savedTheme  = self:_LoadConfigFile("theme.json", configTheme)
+    local savedFont   = self:_LoadConfigFile("font.json", configFont)
+
+    local themeName = savedTheme
     if themeName == "Light" then
         self.Theme = self.Themes.Light
     else
         self.Theme = self.Themes.Dark
     end
-    self.Font = config.Font or self.Font or "Gotham"
+    self.Font = savedFont
 
 
     if PlayerGui:FindFirstChild("GenesisX") then
@@ -3064,18 +3099,22 @@ end
 function GenesisX:SetTheme(newTheme)
     local oldTheme = self.Theme
     local targetTheme
+    local themeString = "Dark"
 
     if type(newTheme) == "string" then
         if newTheme == "Light" and self.Themes and self.Themes.Light then
             targetTheme = self.Themes.Light
+            themeString = "Light"
         elseif self.Themes and self.Themes.Dark then
             targetTheme = self.Themes.Dark
+            themeString = "Dark"
         end
     elseif type(newTheme) == "table" then
         targetTheme = newTheme
     end
 
     if not targetTheme or not oldTheme then return end
+    self:_SaveConfigFile("theme.json", themeString)
 
     -- Mapa: cor antiga (string) -> cor nova
     local colorMap = {}
@@ -3133,6 +3172,7 @@ end
 
 function GenesisX:SetFont(fontName)
     self.Font = fontName or "Gotham"
+    self:_SaveConfigFile("font.json", self.Font)
     local newFont = self:GetFont()
     local newBold = self:GetFontBold()
     local newSemi = self:GetFontSemibold()
