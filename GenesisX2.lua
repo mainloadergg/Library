@@ -831,27 +831,17 @@ function GenesisX:_CreateFloatingButton(config)
     self.FloatBtn.MouseButton1Click:Connect(function()
         if not dragging then
             if not self.MainFrame.Visible then
-                -- Show: slide up from below + fade in
+                -- Show: fade in
                 self.MainFrame.Visible = true
-                local startPos = self.MainFrame.Position
-                self.MainFrame.Position = startPos + UDim2.new(0, 0, 0, self:S(40))
                 self.MainFrame.BackgroundTransparency = 0.5
-                self:Tween(self.MainFrame, {
-                    Position = startPos,
-                    BackgroundTransparency = 0
-                }, 0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                self:Tween(self.MainFrame, {BackgroundTransparency = 0}, 0.25)
             else
-                -- Hide: slide down + fade out
-                local startPos = self.MainFrame.Position
-                self:Tween(self.MainFrame, {
-                    Position = startPos + UDim2.new(0, 0, 0, self:S(40)),
-                    BackgroundTransparency = 0.5
-                }, 0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-                task.delay(0.25, function()
+                -- Hide: fade out
+                self:Tween(self.MainFrame, {BackgroundTransparency = 0.5}, 0.2)
+                task.delay(0.2, function()
                     if self.MainFrame then
                         self.MainFrame.Visible = false
                         self.MainFrame.BackgroundTransparency = 0
-                        self.MainFrame.Position = startPos
                     end
                 end)
             end
@@ -1024,32 +1014,22 @@ function GenesisX:SelectTab(tabId)
     local newTab = self.Tabs[tabId]
     if not newTab then return end
 
-    local slideOffset = self:S(20)
-
-    -- Slide out old tab (down + fade)
+    -- Fade out old tab
     if oldTab and oldTab.Container then
-        self:Tween(oldTab.Container, {
-            Position = UDim2.new(0, 0, 0, slideOffset),
-            BackgroundTransparency = 0.3
-        }, 0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        self:Tween(oldTab.Container, {BackgroundTransparency = 0.3}, 0.12)
     end
 
-    task.delay(0.15, function()
+    task.delay(0.12, function()
         -- Hide old tab
         if oldTab and oldTab.Container then
             oldTab.Container.Visible = false
             oldTab.Container.BackgroundTransparency = 0
-            oldTab.Container.Position = UDim2.new(0, 0, 0, 0)
         end
 
-        -- Show new tab: slide up from below + fade in
+        -- Show new tab with fade
         newTab.Container.Visible = true
-        newTab.Container.Position = UDim2.new(0, 0, 0, slideOffset)
         newTab.Container.BackgroundTransparency = 0.3
-        self:Tween(newTab.Container, {
-            Position = UDim2.new(0, 0, 0, 0),
-            BackgroundTransparency = 0
-        }, 0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        self:Tween(newTab.Container, {BackgroundTransparency = 0}, 0.18)
     end)
 
     -- Update sidebar buttons with smooth tween
@@ -1377,6 +1357,7 @@ function GenesisX:CreateInput(parent, config)
     frame.Name = "Input_" .. labelText
     frame.BackgroundColor3 = self.Theme.Card
     frame.Size = UDim2.new(1, 0, 0, height)
+    frame.ClipsDescendants = true
     frame.ZIndex = 12
     frame.Parent = parent
     self:CreateCorner(frame)
@@ -1408,10 +1389,16 @@ function GenesisX:CreateInput(parent, config)
     textBox.TextSize = self:S(13)
     textBox.ClearTextOnFocus = false
     textBox.TextTruncate = Enum.TextTruncate.AtEnd
+    textBox.TextXAlignment = Enum.TextXAlignment.Left
     textBox.ClipsDescendants = true
     textBox.ZIndex = 14
     textBox.Parent = frame
     self:CreateCorner(textBox, UDim.new(0, 6))
+
+    local textPad = Instance.new("UIPadding")
+    textPad.PaddingLeft = UDim.new(0, self:S(8))
+    textPad.PaddingRight = UDim.new(0, self:S(8))
+    textPad.Parent = textBox
 
     textBox.Focused:Connect(function()
         self:Tween(stroke, {Color = self.Theme.Accent, Transparency = 0.1}, 0.2)
@@ -1445,6 +1432,7 @@ function GenesisX:CreateNumberInput(parent, config)
     frame.Name = "NumberInput_" .. labelText
     frame.BackgroundColor3 = self.Theme.Card
     frame.Size = UDim2.new(1, 0, 0, height)
+    frame.ClipsDescendants = true
     frame.ZIndex = 12
     frame.Parent = parent
     self:CreateCorner(frame)
@@ -1474,10 +1462,16 @@ function GenesisX:CreateNumberInput(parent, config)
     textBox.TextSize = self:S(13)
     textBox.ClearTextOnFocus = false
     textBox.TextTruncate = Enum.TextTruncate.AtEnd
+    textBox.TextXAlignment = Enum.TextXAlignment.Left
     textBox.ClipsDescendants = true
     textBox.ZIndex = 14
     textBox.Parent = frame
     self:CreateCorner(textBox, UDim.new(0, 6))
+
+    local textPad = Instance.new("UIPadding")
+    textPad.PaddingLeft = UDim.new(0, self:S(8))
+    textPad.PaddingRight = UDim.new(0, self:S(8))
+    textPad.Parent = textBox
 
     textBox.Focused:Connect(function()
         self:Tween(stroke, {Color = self.Theme.Accent, Transparency = 0.1}, 0.2)
