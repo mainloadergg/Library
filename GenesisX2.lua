@@ -27,219 +27,26 @@ GenesisX.Icons = LucideAssets
 GenesisX.Font = "Gotham"
 
 local FontMap = {
-    Legacy = Enum.Font.Legacy, Arial = Enum.Font.Arial, ArialBold = Enum.Font.ArialBold,
-    SourceSans = Enum.Font.SourceSans, SourceSansBold = Enum.Font.SourceSansBold,
-    SourceSansSemibold = Enum.Font.SourceSansSemibold, SourceSansLight = Enum.Font.SourceSansLight,
-    Bodoni = Enum.Font.Bodoni, Garamond = Enum.Font.Garamond, Cartoon = Enum.Font.Cartoon,
-    Code = Enum.Font.Code, Fantasy = Enum.Font.Fantasy, Antique = Enum.Font.Antique,
-    Arcade = Enum.Font.Arcade, SciFi = Enum.Font.SciFi,
-    Gotham = Enum.Font.Gotham, GothamMedium = Enum.Font.GothamMedium, GothamBold = Enum.Font.GothamBold,
-    GothamBlack = Enum.Font.GothamBlack, GothamSemibold = Enum.Font.GothamSemibold,
-    BuilderSans = Enum.Font.BuilderSans, BuilderSansBold = Enum.Font.BuilderSansBold,
-    BuilderSansMedium = Enum.Font.BuilderSansMedium, BuilderSansSemibold = Enum.Font.BuilderSansSemibold,
-    BuilderSansLight = Enum.Font.BuilderSansLight, BuilderSansExtraBold = Enum.Font.BuilderSansExtraBold,
-    Montserrat = Enum.Font.Montserrat, MontserratBold = Enum.Font.MontserratBold,
-    MontserratLight = Enum.Font.MontserratLight, MontserratMedium = Enum.Font.MontserratMedium,
-    MontserratSemibold = Enum.Font.MontserratSemibold,
-    Inter = Enum.Font.Inter, InterBold = Enum.Font.InterBold, InterLight = Enum.Font.InterLight,
-    InterMedium = Enum.Font.InterMedium, InterSemibold = Enum.Font.InterSemibold,
-    Ubuntu = Enum.Font.Ubuntu, UbuntuLight = Enum.Font.UbuntuLight, UbuntuMedium = Enum.Font.UbuntuMedium,
-    UbuntuBold = Enum.Font.UbuntuBold,
-    Roboto = Enum.Font.Roboto, RobotoBold = Enum.Font.RobotoBold, RobotoLight = Enum.Font.RobotoLight,
-    RobotoMedium = Enum.Font.RobotoMedium, RobotoMono = Enum.Font.RobotoMono,
-    RobotoMonoBold = Enum.Font.RobotoMonoBold, RobotoMonoLight = Enum.Font.RobotoMonoLight,
-    RobotoMonoMedium = Enum.Font.RobotoMonoMedium,
-    Merriweather = Enum.Font.Merriweather, MerriweatherBold = Enum.Font.MerriweatherBold,
-    MerriweatherLight = Enum.Font.MerriweatherLight, MerriweatherItalic = Enum.Font.MerriweatherItalic,
-    MerriweatherBoldItalic = Enum.Font.MerriweatherBoldItalic, MerriweatherLightItalic = Enum.Font.MerriweatherLightItalic,
-    Fondamento = Enum.Font.Fondamento, FondamentoItalic = Enum.Font.FondamentoItalic,
-    FondamentoBold = Enum.Font.FondamentoBold, FondamentoBoldItalic = Enum.Font.FondamentoBoldItalic,
-    FredokaOne = Enum.Font.FredokaOne, Balthazar = Enum.Font.Balthazar,
-    Cinzel = Enum.Font.Cinzel, CinzelBold = Enum.Font.CinzelBold,
-    CinzelDecorative = Enum.Font.CinzelDecorative, CinzelDecorativeBold = Enum.Font.CinzelDecorativeBold,
-    Sarpanch = Enum.Font.Sarpanch, SarpanchBold = Enum.Font.SarpanchBold,
-    SarpanchMedium = Enum.Font.SarpanchMedium, SarpanchSemibold = Enum.Font.SarpanchSemibold,
-    SarpanchBlack = Enum.Font.SarpanchBlack,
-    Saira = Enum.Font.Saira, SairaBold = Enum.Font.SairaBold, SairaLight = Enum.Font.SairaLight,
-    SairaMedium = Enum.Font.SairaMedium, SairaSemibold = Enum.Font.SairaSemibold,
-    SairaExtraLight = Enum.Font.SairaExtraLight, SairaExtraBold = Enum.Font.SairaExtraBold,
-    SairaBlack = Enum.Font.SairaBlack,
-    Nunito = Enum.Font.Nunito, NunitoBold = Enum.Font.NunitoBold, NunitoLight = Enum.Font.NunitoLight,
-    NunitoMedium = Enum.Font.NunitoMedium, NunitoSemibold = Enum.Font.NunitoSemibold,
-    NunitoExtraBold = Enum.Font.NunitoExtraBold, NunitoExtraLight = Enum.Font.NunitoExtraLight,
-    NunitoBlack = Enum.Font.NunitoBlack,
-    Oswald = Enum.Font.Oswald, OswaldBold = Enum.Font.OswaldBold, OswaldLight = Enum.Font.OswaldLight,
-    OswaldMedium = Enum.Font.OswaldMedium, OswaldSemibold = Enum.Font.OswaldSemibold,
-    OswaldExtraLight = Enum.Font.OswaldExtraLight, OswaldExtraBold = Enum.Font.OswaldExtraBold,
-    Poppins = Enum.Font.Poppins, PoppinsBold = Enum.Font.PoppinsBold, PoppinsLight = Enum.Font.PoppinsLight,
-    PoppinsMedium = Enum.Font.PoppinsMedium, PoppinsSemibold = Enum.Font.PoppinsSemibold,
-    PoppinsExtraBold = Enum.Font.PoppinsExtraBold, PoppinsExtraLight = Enum.Font.PoppinsExtraLight,
-    PoppinsThin = Enum.Font.PoppinsThin, PoppinsBlack = Enum.Font.PoppinsBlack,
-    RussoOne = Enum.Font.RussoOne,
-    TitilliumWeb = Enum.Font.TitilliumWeb, TitilliumWebBold = Enum.Font.TitilliumWebBold,
-    TitilliumWebLight = Enum.Font.TitilliumWebLight, TitilliumWebSemibold = Enum.Font.TitilliumWebSemibold,
-    TitilliumWebExtraLight = Enum.Font.TitilliumWebExtraLight, TitilliumWebBlack = Enum.Font.TitilliumWebBlack,
-    Jura = Enum.Font.Jura, JuraBold = Enum.Font.JuraBold, JuraLight = Enum.Font.JuraLight,
-    JuraMedium = Enum.Font.JuraMedium, JuraSemibold = Enum.Font.JuraSemibold,
-    JuraExtraLight = Enum.Font.JuraExtraLight, JuraExtraBold = Enum.Font.JuraExtraBold,
-    JuraBlack = Enum.Font.JuraBlack,
-    AmaticSC = Enum.Font.AmaticSC, AmaticSCBold = Enum.Font.AmaticSCBold,
-    Michroma = Enum.Font.Michroma, PressStart2P = Enum.Font.PressStart2P,
-    SpecialElite = Enum.Font.SpecialElite,
-    Inconsolata = Enum.Font.Inconsolata, InconsolataBold = Enum.Font.InconsolataBold,
-    InconsolataExtraBold = Enum.Font.InconsolataExtraBold, InconsolataMedium = Enum.Font.InconsolataMedium,
-    InconsolataSemiBold = Enum.Font.InconsolataSemiBold, InconsolataLight = Enum.Font.InconsolataLight,
-    InconsolataExtraLight = Enum.Font.InconsolataExtraLight, InconsolataBlack = Enum.Font.InconsolataBlack,
-    GrenzeGotisch = Enum.Font.GrenzeGotisch, GrenzeGotischBold = Enum.Font.GrenzeGotischBold,
-    GrenzeGotischLight = Enum.Font.GrenzeGotischLight, GrenzeGotischMedium = Enum.Font.GrenzeGotischMedium,
-    GrenzeGotischSemibold = Enum.Font.GrenzeGotischSemibold, GrenzeGotischExtraLight = Enum.Font.GrenzeGotischExtraLight,
-    GrenzeGotischExtraBold = Enum.Font.GrenzeGotischExtraBold, GrenzeGotischBlack = Enum.Font.GrenzeGotischBlack,
-    GrenzeGotischThin = Enum.Font.GrenzeGotischThin,
-    Kalam = Enum.Font.Kalam, KalamBold = Enum.Font.KalamBold, KalamLight = Enum.Font.KalamLight,
-    KalamMedium = Enum.Font.KalamMedium, KalamSemiBold = Enum.Font.KalamSemiBold,
-    KalamExtraLight = Enum.Font.KalamExtraLight, KalamExtraBold = Enum.Font.KalamExtraBold,
-    KalamBlack = Enum.Font.KalamBlack, KalamThin = Enum.Font.KalamThin,
-    NotoSans = Enum.Font.NotoSans, NotoSansBold = Enum.Font.NotoSansBold,
-    NotoSansLight = Enum.Font.NotoSansLight, NotoSansMedium = Enum.Font.NotoSansMedium,
-    NotoSansSemibold = Enum.Font.NotoSansSemibold, NotoSansExtraLight = Enum.Font.NotoSansExtraLight,
-    NotoSansExtraBold = Enum.Font.NotoSansExtraBold, NotoSansBlack = Enum.Font.NotoSansBlack,
-    NotoSansThin = Enum.Font.NotoSansThin,
+    Arcade = Enum.Font.Arcade,
+    Fantasy = Enum.Font.Fantasy,
+    GothamBlack = Enum.Font.GothamBlack,
 }
 
-function GenesisX:GetFont(name)
-    name = name or self.Font
-    if typeof(name) == "EnumItem" then return name end
-    local font = FontMap[name] or FontMap[self.Font]
-    if font then
-        local ok = pcall(function() local _ = font.Name end)
-        if ok then return font end
-    end
-    return Enum.Font.Gotham
+function GenesisX:GetFont()
+    return FontMap[self.Font] or Enum.Font.Gotham
 end
 
 function GenesisX:GetFontBold()
-    local base = self.Font or "Gotham"
-    local boldMap = {
-        Gotham = "GothamBold", SourceSans = "SourceSansBold", BuilderSans = "BuilderSansBold",
-        Montserrat = "MontserratBold", Inter = "InterBold", Ubuntu = "UbuntuBold",
-        Roboto = "RobotoBold", RobotoMono = "RobotoMonoBold", Merriweather = "MerriweatherBold",
-        Cinzel = "CinzelBold", Sarpanch = "SarpanchBold", Saira = "SairaBold",
-        Nunito = "NunitoBold", Oswald = "OswaldBold", Poppins = "PoppinsBold",
-        TitilliumWeb = "TitilliumWebBold", Jura = "JuraBold",
-        Inconsolata = "InconsolataBold", GrenzeGotisch = "GrenzeGotischBold",
-        Kalam = "KalamBold", NotoSans = "NotoSansBold",
-    }
-    local font = FontMap[boldMap[base]] or FontMap[base]
-    if font then
-        local ok = pcall(function() local _ = font.Name end)
-        if ok then return font end
-    end
-    return Enum.Font.GothamBold
+    return FontMap[self.Font] or Enum.Font.GothamBold
 end
 
 function GenesisX:GetFontSemibold()
-    local base = self.Font or "Gotham"
-    local semiMap = {
-        Gotham = "GothamSemibold", SourceSans = "SourceSansSemibold", BuilderSans = "BuilderSansSemibold",
-        Montserrat = "MontserratSemibold", Inter = "InterSemibold", Ubuntu = "UbuntuMedium",
-        Roboto = "RobotoMedium", RobotoMono = "RobotoMonoMedium", Merriweather = "Merriweather",
-        Cinzel = "Cinzel", Sarpanch = "SarpanchSemibold", Saira = "SairaSemibold",
-        Nunito = "NunitoSemibold", Oswald = "OswaldSemibold", Poppins = "PoppinsSemibold",
-        TitilliumWeb = "TitilliumWebSemibold", Jura = "JuraSemibold",
-        Inconsolata = "InconsolataSemiBold", GrenzeGotisch = "GrenzeGotischSemibold",
-        Kalam = "KalamSemiBold", NotoSans = "NotoSansSemibold",
-    }
-    local font = FontMap[semiMap[base]] or FontMap[base]
-    if font then
-        local ok = pcall(function() local _ = font.Name end)
-        if ok then return font end
-    end
-    return Enum.Font.GothamSemibold
+    return FontMap[self.Font] or Enum.Font.GothamSemibold
 end
 
 function GenesisX:GetFontBlack()
-    local base = self.Font or "Gotham"
-    local blackMap = {
-        Gotham = "GothamBlack", SourceSans = "SourceSansBold", BuilderSans = "BuilderSansExtraBold",
-        Montserrat = "MontserratBold", Inter = "InterBold", Ubuntu = "UbuntuBold",
-        Roboto = "RobotoBold", RobotoMono = "RobotoMonoBold", Merriweather = "MerriweatherBold",
-        Cinzel = "CinzelBold", Sarpanch = "SarpanchBlack", Saira = "SairaBlack",
-        Nunito = "NunitoBlack", Oswald = "OswaldExtraBold", Poppins = "PoppinsBlack",
-        TitilliumWeb = "TitilliumWebBlack", Jura = "JuraBlack",
-        Inconsolata = "InconsolataBlack", GrenzeGotisch = "GrenzeGotischBlack",
-        Kalam = "KalamBlack", NotoSans = "NotoSansBlack",
-    }
-    local font = FontMap[blackMap[base]] or FontMap[base]
-    if font then
-        local ok = pcall(function() local _ = font.Name end)
-        if ok then return font end
-    end
-    return Enum.Font.GothamBlack
+    return FontMap[self.Font] or Enum.Font.GothamBlack
 end
-
-
-
--- ─── THEME SYSTEM ─────────────────────────────────────────────────────────────
-GenesisX.Themes = {
-    Dark = {
-        Background = Color3.fromRGB(8, 8, 8),
-        Header = Color3.fromRGB(12, 12, 12),
-        Sidebar = Color3.fromRGB(10, 10, 10),
-        Card = Color3.fromRGB(16, 16, 16),
-        CardHover = Color3.fromRGB(24, 24, 24),
-        Input = Color3.fromRGB(22, 22, 22),
-        InputHover = Color3.fromRGB(30, 30, 30),
-        Accent = Color3.fromRGB(150, 80, 230),
-        AccentHover = Color3.fromRGB(180, 110, 255),
-        AccentSecondary = Color3.fromRGB(210, 160, 255),
-        AccentDark = Color3.fromRGB(90, 40, 160),
-        Text = Color3.fromRGB(255, 255, 255),
-        TextSecondary = Color3.fromRGB(190, 190, 190),
-        TextMuted = Color3.fromRGB(120, 120, 120),
-        Success = Color3.fromRGB(220, 190, 255),
-        Warning = Color3.fromRGB(190, 130, 255),
-        Info = Color3.fromRGB(140, 90, 220),
-        Error = Color3.fromRGB(80, 40, 140),
-        Border = Color3.fromRGB(40, 35, 50),
-        BorderBright = Color3.fromRGB(75, 65, 90),
-        ToggleOff = Color3.fromRGB(35, 30, 45),
-        ToggleOn = Color3.fromRGB(150, 80, 230),
-    },
-    Light = {
-        Background = Color3.fromRGB(245, 242, 250),
-        Header = Color3.fromRGB(235, 232, 242),
-        Sidebar = Color3.fromRGB(240, 237, 247),
-        Card = Color3.fromRGB(255, 255, 255),
-        CardHover = Color3.fromRGB(248, 245, 252),
-        Input = Color3.fromRGB(235, 232, 242),
-        InputHover = Color3.fromRGB(225, 220, 235),
-        Accent = Color3.fromRGB(130, 60, 210),
-        AccentHover = Color3.fromRGB(150, 80, 230),
-        AccentSecondary = Color3.fromRGB(100, 40, 180),
-        AccentDark = Color3.fromRGB(80, 30, 160),
-        Text = Color3.fromRGB(30, 30, 35),
-        TextSecondary = Color3.fromRGB(80, 75, 90),
-        TextMuted = Color3.fromRGB(130, 125, 140),
-        Success = Color3.fromRGB(100, 60, 180),
-        Warning = Color3.fromRGB(140, 90, 40),
-        Info = Color3.fromRGB(100, 60, 180),
-        Error = Color3.fromRGB(160, 40, 60),
-        Border = Color3.fromRGB(210, 205, 220),
-        BorderBright = Color3.fromRGB(180, 175, 195),
-        ToggleOff = Color3.fromRGB(200, 195, 210),
-        ToggleOn = Color3.fromRGB(130, 60, 210),
-    }
-}
-
-GenesisX.Theme = GenesisX.Themes.Dark
-
--- ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
-GenesisX.Config = {
-    AnimationSpeed = 0.2,
-    CornerRadius = 8,
-    ShadowEnabled = true,
-    ShadowIntensity = 0.7,
-}
 
 -- ─── ESCALA RESPONSIVA ────────────────────────────────────────────────────────
 local ScaleData = {
