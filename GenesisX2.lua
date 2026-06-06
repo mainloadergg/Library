@@ -36,7 +36,7 @@ local FontMap = {
     Gotham = Enum.Font.Gotham, GothamMedium = Enum.Font.GothamMedium, GothamBold = Enum.Font.GothamBold,
     GothamBlack = Enum.Font.GothamBlack, GothamSemibold = Enum.Font.GothamSemibold,
     BuilderSans = Enum.Font.BuilderSans, BuilderSansBold = Enum.Font.BuilderSansBold,
-    BuilderSansMedium = Enum.Font.BuilderSansMedium, BuilderSansSemibold = Enum.Font.BuilderSansSemibold,
+    BuilderSansMedium = Enum.Font.BuilderSansMedium,
     BuilderSansLight = Enum.Font.BuilderSansLight, BuilderSansExtraBold = Enum.Font.BuilderSansExtraBold,
     Montserrat = Enum.Font.Montserrat, MontserratBold = Enum.Font.MontserratBold,
     MontserratLight = Enum.Font.MontserratLight, MontserratMedium = Enum.Font.MontserratMedium,
