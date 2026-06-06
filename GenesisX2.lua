@@ -3062,15 +3062,66 @@ function GenesisX:SetSize(size)
 end
 
 function GenesisX:SetTheme(newTheme)
+    local oldTheme = self.Theme
+    local targetTheme
+
     if type(newTheme) == "string" then
         if newTheme == "Light" and self.Themes and self.Themes.Light then
-            self.Theme = self.Themes.Light
+            targetTheme = self.Themes.Light
         elseif self.Themes and self.Themes.Dark then
-            self.Theme = self.Themes.Dark
+            targetTheme = self.Themes.Dark
         end
     elseif type(newTheme) == "table" then
-        for key, value in pairs(newTheme) do
-            if self.Theme[key] ~= nil then self.Theme[key] = value end
+        targetTheme = newTheme
+    end
+
+    if not targetTheme or not oldTheme then return end
+
+    -- Mapa: cor antiga (string) -> cor nova
+    local colorMap = {}
+    for key, oldColor in pairs(oldTheme) do
+        if targetTheme[key] and typeof(oldColor) == "Color3" and typeof(targetTheme[key]) == "Color3" then
+            colorMap[tostring(oldColor)] = targetTheme[key]
+        end
+    end
+
+    -- Atualizar tema
+    self.Theme = targetTheme
+
+    -- Atualizar todos os elementos da UI
+    if self.ScreenGui then
+        for _, obj in ipairs(self.ScreenGui:GetDescendants()) do
+            -- BackgroundColor3
+            if obj:IsA("GuiObject") and colorMap[tostring(obj.BackgroundColor3)] then
+                obj.BackgroundColor3 = colorMap[tostring(obj.BackgroundColor3)]
+            end
+            -- TextColor3
+            if (obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox")) and colorMap[tostring(obj.TextColor3)] then
+                obj.TextColor3 = colorMap[tostring(obj.TextColor3)]
+            end
+            -- ImageColor3
+            if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+                if colorMap[tostring(obj.ImageColor3)] then
+                    obj.ImageColor3 = colorMap[tostring(obj.ImageColor3)]
+                end
+            end
+            -- UIStroke Color
+            if obj:IsA("UIStroke") and colorMap[tostring(obj.Color)] then
+                obj.Color = colorMap[tostring(obj.Color)]
+            end
+            -- UIGradient
+            if obj:IsA("UIGradient") and obj.Color then
+                local newKeypoints = {}
+                for _, kp in ipairs(obj.Color.Keypoints) do
+                    local newColor = colorMap[tostring(kp.Value)] or kp.Value
+                    table.insert(newKeypoints, ColorSequenceKeypoint.new(kp.Time, newColor))
+                end
+                obj.Color = ColorSequence.new(newKeypoints)
+            end
+            -- ScrollBarImageColor3
+            if obj:IsA("ScrollingFrame") and colorMap[tostring(obj.ScrollBarImageColor3)] then
+                obj.ScrollBarImageColor3 = colorMap[tostring(obj.ScrollBarImageColor3)]
+            end
         end
     end
 end
