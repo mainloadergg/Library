@@ -36,6 +36,8 @@ local FontMap = {
     Gotham = Enum.Font.Gotham, GothamMedium = Enum.Font.GothamMedium, GothamBold = Enum.Font.GothamBold,
     GothamBlack = Enum.Font.GothamBlack, GothamSemibold = Enum.Font.GothamSemibold,
     BuilderSans = Enum.Font.BuilderSans, BuilderSansBold = Enum.Font.BuilderSansBold,
+    BuilderSansMedium = Enum.Font.BuilderSansMedium, BuilderSansSemibold = Enum.Font.BuilderSansSemibold,
+    BuilderSansLight = Enum.Font.BuilderSansLight, BuilderSansExtraBold = Enum.Font.BuilderSansExtraBold,
     Montserrat = Enum.Font.Montserrat, MontserratBold = Enum.Font.MontserratBold,
     MontserratLight = Enum.Font.MontserratLight, MontserratMedium = Enum.Font.MontserratMedium,
     MontserratSemibold = Enum.Font.MontserratSemibold,
@@ -107,7 +109,12 @@ local FontMap = {
 function GenesisX:GetFont(name)
     name = name or self.Font
     if typeof(name) == "EnumItem" then return name end
-    return FontMap[name] or FontMap[self.Font] or Enum.Font.Gotham
+    local font = FontMap[name] or FontMap[self.Font]
+    if font then
+        local ok = pcall(function() local _ = font.Name end)
+        if ok then return font end
+    end
+    return Enum.Font.Gotham
 end
 
 function GenesisX:GetFontBold()
@@ -122,13 +129,18 @@ function GenesisX:GetFontBold()
         Inconsolata = "InconsolataBold", GrenzeGotisch = "GrenzeGotischBold",
         Kalam = "KalamBold", NotoSans = "NotoSansBold",
     }
-    return FontMap[boldMap[base]] or FontMap[base] or Enum.Font.GothamBold
+    local font = FontMap[boldMap[base]] or FontMap[base]
+    if font then
+        local ok = pcall(function() local _ = font.Name end)
+        if ok then return font end
+    end
+    return Enum.Font.GothamBold
 end
 
 function GenesisX:GetFontSemibold()
     local base = self.Font or "Gotham"
     local semiMap = {
-        Gotham = "GothamSemibold", SourceSans = "SourceSansSemibold",
+        Gotham = "GothamSemibold", SourceSans = "SourceSansSemibold", BuilderSans = "BuilderSansSemibold",
         Montserrat = "MontserratSemibold", Inter = "InterSemibold", Ubuntu = "UbuntuMedium",
         Roboto = "RobotoMedium", RobotoMono = "RobotoMonoMedium", Merriweather = "Merriweather",
         Cinzel = "Cinzel", Sarpanch = "SarpanchSemibold", Saira = "SairaSemibold",
@@ -137,7 +149,12 @@ function GenesisX:GetFontSemibold()
         Inconsolata = "InconsolataSemiBold", GrenzeGotisch = "GrenzeGotischSemibold",
         Kalam = "KalamSemiBold", NotoSans = "NotoSansSemibold",
     }
-    return FontMap[semiMap[base]] or FontMap[base] or Enum.Font.GothamSemibold
+    local font = FontMap[semiMap[base]] or FontMap[base]
+    if font then
+        local ok = pcall(function() local _ = font.Name end)
+        if ok then return font end
+    end
+    return Enum.Font.GothamSemibold
 end
 
 function GenesisX:GetFontBlack()
@@ -152,7 +169,12 @@ function GenesisX:GetFontBlack()
         Inconsolata = "InconsolataBlack", GrenzeGotisch = "GrenzeGotischBlack",
         Kalam = "KalamBlack", NotoSans = "NotoSansBlack",
     }
-    return FontMap[blackMap[base]] or FontMap[base] or Enum.Font.GothamBlack
+    local font = FontMap[blackMap[base]] or FontMap[base]
+    if font then
+        local ok = pcall(function() local _ = font.Name end)
+        if ok then return font end
+    end
+    return Enum.Font.GothamBlack
 end
 
 
