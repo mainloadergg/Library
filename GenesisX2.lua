@@ -505,7 +505,7 @@ function GenesisX:CreateWindow(config)
     self.MainFrame.Name = "MainFrame"
     self.MainFrame.BackgroundColor3 = self.Theme.Background
     self.MainFrame.BorderSizePixel = 0
-    self.MainFrame.Position = config.Position or UDim2.new(0.5, -windowWidth/2, 0.5, -windowHeight/2)
+    self.MainFrame.Position = config.Position or UDim2.new(0.5, -math.floor(windowWidth/2), 0.5, -math.floor(windowHeight/2))
     self.MainFrame.Size = config.Size or UDim2.new(0, windowWidth, 0, windowHeight)
     self.MainFrame.Active = true
     self.MainFrame.Visible = true
@@ -640,12 +640,12 @@ function GenesisX:CreateWindow(config)
         btn.Position = UDim2.new(1, -(offsetX + btnW), 0.5, -btnH/2)
         btn.Size = UDim2.new(0, btnW, 0, btnH)
         btn.Image = self:FormatAssetId(btnData.Icon) or ""
-        btn.ImageColor3 = self.Theme.TextMuted
+        btn.ImageColor3 = self.Theme.Accent
         btn.AutoButtonColor = false
         btn.ZIndex = 14
         btn.Parent = self.Header
-        self:CreateCorner(btn, UDim.new(0, 10))
-        self:CreateStroke(btn, self.Theme.Accent, 1.5, 0.3)
+        self:CreateCorner(btn, UDim.new(0, 6))
+        self:CreateStroke(btn, self.Theme.Accent, 1, 0.25)
 
         btn.MouseEnter:Connect(function()
             self:Tween(btn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
@@ -717,7 +717,7 @@ function GenesisX:CreateWindow(config)
     self.ContentArea.Name = "ContentArea"
     self.ContentArea.BackgroundTransparency = 1
     self.ContentArea.Position = UDim2.new(0, contentX, 0, headerHeight + self:S(10))
-    self.ContentArea.Size = UDim2.new(1, -(contentX + self:S(10)), 1, -(headerHeight + self:S(16)))
+    self.ContentArea.Size = UDim2.new(1, -(contentX + self:S(14)), 1, -(headerHeight + self:S(20)))
     self.ContentArea.ZIndex = 11
     self.ContentArea.Parent = self.MainFrame
 
@@ -946,6 +946,7 @@ function GenesisX:CreateTab(config)
         scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
         scrollFrame.ZIndex = 11
         scrollFrame.Parent = page
+        self:CreateCorner(scrollFrame, UDim.new(0, 8))
 
         local layout = Instance.new("UIListLayout")
         layout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -953,6 +954,8 @@ function GenesisX:CreateTab(config)
         layout.Parent = scrollFrame
 
         local padding = Instance.new("UIPadding")
+        padding.PaddingLeft   = UDim.new(0, self:S(8))
+        padding.PaddingRight  = UDim.new(0, self:S(8))
         padding.PaddingBottom = UDim.new(0, self:S(10))
         padding.Parent = scrollFrame
 
