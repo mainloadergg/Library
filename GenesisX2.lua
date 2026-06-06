@@ -561,28 +561,27 @@ function GenesisX:CreateWindow(config)
     end
 
     local minBtn = Instance.new("TextButton")
-    minBtn.Name = "MinimizeBtn"
+        minBtn.Name = "MinimizeBtn"
     minBtn.BackgroundColor3 = self.Theme.Input
-    minBtn.Position = UDim2.new(1, -self:S(42), 0.5, -self:S(12))
-    minBtn.Size = UDim2.new(0, self:S(28), 0, self:S(24))
-    minBtn.Font = self:GetFontBold()
-    minBtn.Text = "—"
-    minBtn.TextColor3 = self.Theme.TextMuted
-    minBtn.TextSize = self:S(13)
+    minBtn.Position = UDim2.new(1, -self:S(48), 0.5, -self:S(14))
+    minBtn.Size = UDim2.new(0, self:S(32), 0, self:S(28))
+    minBtn.Image = self:FormatAssetId("lucide-minus") or ""
+    minBtn.ImageColor3 = self.Theme.TextMuted
     minBtn.AutoButtonColor = false
     minBtn.ZIndex = 14
     minBtn.Parent = self.Header
-    self:CreateCorner(minBtn, UDim.new(0, 6))
+    self:CreateCorner(minBtn, UDim.new(0, 8))
+    self:CreateStroke(minBtn, self.Theme.Border, 1, 0.5)
 
     minBtn.MouseEnter:Connect(function()
-        self:Tween(minBtn, {BackgroundColor3 = self.Theme.Accent, TextColor3 = Color3.new(1,1,1)}, 0.15)
+        self:Tween(minBtn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
     end)
     minBtn.MouseLeave:Connect(function()
-        self:Tween(minBtn, {BackgroundColor3 = Color3.fromRGB(35,35,35), TextColor3 = self.Theme.TextMuted}, 0.15)
+        self:Tween(minBtn, {BackgroundColor3 = self.Theme.Input, ImageColor3 = self.Theme.TextMuted}, 0.15)
     end)
     minBtn.MouseButton1Click:Connect(function()
         self.MainFrame.Visible = false
-    end)
+    end))
 
     -- ─── SIDEBAR ────────────────────────────────────────────────────────────────
     local sidebarWidth = self:S(64)
@@ -938,7 +937,7 @@ end
 -- ─── CREATE SECTION ───────────────────────────────────────────────────────────
 function GenesisX:CreateSection(parent, text, color, icon)
     -- icon: nome Lucide opcional, ex: "lucide-sword"
-    color = color or self.Theme.Accent
+    color = self.Theme.Accent  -- Always use accent purple, ignore passed color
     local iconSize = self:S(16)
     local height   = self:S(28)
 
@@ -1141,36 +1140,43 @@ function GenesisX:CreateButton(parent, config)
     btn.Font = self:GetFontBold()
     btn.Text = text
     btn.TextSize = self:S(13)
-    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextColor3 = textColor
     btn.ZIndex = 13
     btn.Parent = frame
     self:CreateCorner(btn)
 
-    local bgColor, bgHover, strokeColor
+    local bgColor, bgHover, strokeColor, textColor
     if style == "accent" then
-        bgColor     = Color3.fromRGB(40, 20, 65)
-        bgHover     = Color3.fromRGB(55, 30, 90)
+        bgColor     = self.Theme.AccentDark
+        bgHover     = self.Theme.Accent
         strokeColor = self.Theme.Accent
+        textColor   = Color3.new(1, 1, 1)
     elseif style == "warning" then
         bgColor     = Color3.fromRGB(40, 25, 5)
         bgHover     = Color3.fromRGB(55, 35, 8)
         strokeColor = Color3.fromRGB(200, 130, 30)
+        textColor   = Color3.new(1, 1, 1)
     elseif style == "info" then
         bgColor     = Color3.fromRGB(10, 20, 45)
         bgHover     = Color3.fromRGB(15, 28, 60)
         strokeColor = Color3.fromRGB(80, 140, 230)
+        textColor   = Color3.new(1, 1, 1)
     elseif style == "danger" then
         bgColor     = Color3.fromRGB(45, 10, 10)
         bgHover     = Color3.fromRGB(60, 15, 15)
         strokeColor = Color3.fromRGB(210, 60, 60)
+        textColor   = Color3.new(1, 1, 1)
     elseif style == "success" then
         bgColor     = Color3.fromRGB(10, 40, 20)
         bgHover     = Color3.fromRGB(15, 55, 28)
         strokeColor = Color3.fromRGB(60, 200, 100)
+        textColor   = Color3.new(1, 1, 1)
     else
-        bgColor     = Color3.fromRGB(22, 22, 22)
-        bgHover     = Color3.fromRGB(32, 32, 32)
-        strokeColor = self.Theme.BorderBright
+        -- Default: theme-aware (white bg in Light, dark in Dark)
+        bgColor     = self.Theme.Card
+        bgHover     = self.Theme.CardHover
+        strokeColor = self.Theme.Accent
+        textColor   = self.Theme.Text
     end
 
     btn.BackgroundColor3 = bgColor
@@ -1705,7 +1711,7 @@ function GenesisX:CreateDropdown(parent, config)
                 check.Position = UDim2.new(0, self:S(10), 0, 0)
                 check.Size = UDim2.new(0, self:S(24), 1, 0)
                 check.Image = self:FormatAssetId("lucide-check") or ""
-                check.ImageColor3 = self.Theme.AccentSecondary
+                check.ImageColor3 = Color3.new(1, 1, 1)
                 check.ZIndex = 504
                 check.Parent = row
             end
@@ -1715,7 +1721,7 @@ function GenesisX:CreateDropdown(parent, config)
             rowBtn.Size = UDim2.new(1, 0, 1, 0)
             rowBtn.Font = self:GetFontSemibold()
             rowBtn.Text = (isSelected and "    " or "  ") .. option
-            rowBtn.TextColor3 = isSelected and self.Theme.AccentSecondary or self.Theme.Text
+            rowBtn.TextColor3 = isSelected and Color3.new(1, 1, 1) or self.Theme.Text
             rowBtn.TextSize = self:S(12)
             rowBtn.TextXAlignment = Enum.TextXAlignment.Left
             rowBtn.ZIndex = 504
@@ -2022,7 +2028,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
             rowBtn.Size = UDim2.new(1, 0, 1, 0)
             rowBtn.Font = self:GetFontSemibold()
             rowBtn.Text = "      " .. option
-            rowBtn.TextColor3 = sel and self.Theme.AccentSecondary or self.Theme.Text
+            rowBtn.TextColor3 = sel and Color3.new(1, 1, 1) or self.Theme.Text
             rowBtn.TextSize = self:S(12)
             rowBtn.TextXAlignment = Enum.TextXAlignment.Left
             rowBtn.ZIndex = 504
