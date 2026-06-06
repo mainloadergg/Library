@@ -47,6 +47,107 @@ end
 function GenesisX:GetFontBlack()
     return FontMap[self.Font] or Enum.Font.GothamBlack
 end
+function GenesisX:_EnsureTheme()
+    if not self.Theme then
+        if not self.Themes then
+            self.Themes = {
+                Dark = {
+                    Background = Color3.fromRGB(8, 8, 8), Header = Color3.fromRGB(12, 12, 12),
+                    Sidebar = Color3.fromRGB(10, 10, 10), Card = Color3.fromRGB(16, 16, 16),
+                    CardHover = Color3.fromRGB(24, 24, 24), Input = Color3.fromRGB(22, 22, 22),
+                    InputHover = Color3.fromRGB(30, 30, 30), Accent = Color3.fromRGB(150, 80, 230),
+                    AccentHover = Color3.fromRGB(180, 110, 255), AccentSecondary = Color3.fromRGB(210, 160, 255),
+                    AccentDark = Color3.fromRGB(90, 40, 160), Text = Color3.fromRGB(255, 255, 255),
+                    TextSecondary = Color3.fromRGB(190, 190, 190), TextMuted = Color3.fromRGB(120, 120, 120),
+                    Success = Color3.fromRGB(220, 190, 255), Warning = Color3.fromRGB(190, 130, 255),
+                    Info = Color3.fromRGB(140, 90, 220), Error = Color3.fromRGB(80, 40, 140),
+                    Border = Color3.fromRGB(40, 35, 50), BorderBright = Color3.fromRGB(75, 65, 90),
+                    ToggleOff = Color3.fromRGB(35, 30, 45), ToggleOn = Color3.fromRGB(150, 80, 230),
+                },
+                Light = {
+                    Background = Color3.fromRGB(245, 242, 250), Header = Color3.fromRGB(235, 232, 242),
+                    Sidebar = Color3.fromRGB(240, 237, 247), Card = Color3.fromRGB(255, 255, 255),
+                    CardHover = Color3.fromRGB(248, 245, 252), Input = Color3.fromRGB(235, 232, 242),
+                    InputHover = Color3.fromRGB(225, 220, 235), Accent = Color3.fromRGB(130, 60, 210),
+                    AccentHover = Color3.fromRGB(150, 80, 230), AccentSecondary = Color3.fromRGB(100, 40, 180),
+                    AccentDark = Color3.fromRGB(80, 30, 160), Text = Color3.fromRGB(30, 30, 35),
+                    TextSecondary = Color3.fromRGB(80, 75, 90), TextMuted = Color3.fromRGB(130, 125, 140),
+                    Success = Color3.fromRGB(100, 60, 180), Warning = Color3.fromRGB(140, 90, 40),
+                    Info = Color3.fromRGB(100, 60, 180), Error = Color3.fromRGB(160, 40, 60),
+                    Border = Color3.fromRGB(210, 205, 220), BorderBright = Color3.fromRGB(180, 175, 195),
+                    ToggleOff = Color3.fromRGB(200, 195, 210), ToggleOn = Color3.fromRGB(130, 60, 210),
+                }
+            }
+        end
+        self.Theme = self.Themes.Dark
+    end
+end
+
+
+
+
+
+-- ─── THEME SYSTEM ─────────────────────────────────────────────────────────────
+GenesisX.Themes = {
+    Dark = {
+        Background = Color3.fromRGB(8, 8, 8),
+        Header = Color3.fromRGB(12, 12, 12),
+        Sidebar = Color3.fromRGB(10, 10, 10),
+        Card = Color3.fromRGB(16, 16, 16),
+        CardHover = Color3.fromRGB(24, 24, 24),
+        Input = Color3.fromRGB(22, 22, 22),
+        InputHover = Color3.fromRGB(30, 30, 30),
+        Accent = Color3.fromRGB(150, 80, 230),
+        AccentHover = Color3.fromRGB(180, 110, 255),
+        AccentSecondary = Color3.fromRGB(210, 160, 255),
+        AccentDark = Color3.fromRGB(90, 40, 160),
+        Text = Color3.fromRGB(255, 255, 255),
+        TextSecondary = Color3.fromRGB(190, 190, 190),
+        TextMuted = Color3.fromRGB(120, 120, 120),
+        Success = Color3.fromRGB(220, 190, 255),
+        Warning = Color3.fromRGB(190, 130, 255),
+        Info = Color3.fromRGB(140, 90, 220),
+        Error = Color3.fromRGB(80, 40, 140),
+        Border = Color3.fromRGB(40, 35, 50),
+        BorderBright = Color3.fromRGB(75, 65, 90),
+        ToggleOff = Color3.fromRGB(35, 30, 45),
+        ToggleOn = Color3.fromRGB(150, 80, 230),
+    },
+    Light = {
+        Background = Color3.fromRGB(245, 242, 250),
+        Header = Color3.fromRGB(235, 232, 242),
+        Sidebar = Color3.fromRGB(240, 237, 247),
+        Card = Color3.fromRGB(255, 255, 255),
+        CardHover = Color3.fromRGB(248, 245, 252),
+        Input = Color3.fromRGB(235, 232, 242),
+        InputHover = Color3.fromRGB(225, 220, 235),
+        Accent = Color3.fromRGB(130, 60, 210),
+        AccentHover = Color3.fromRGB(150, 80, 230),
+        AccentSecondary = Color3.fromRGB(100, 40, 180),
+        AccentDark = Color3.fromRGB(80, 30, 160),
+        Text = Color3.fromRGB(30, 30, 35),
+        TextSecondary = Color3.fromRGB(80, 75, 90),
+        TextMuted = Color3.fromRGB(130, 125, 140),
+        Success = Color3.fromRGB(100, 60, 180),
+        Warning = Color3.fromRGB(140, 90, 40),
+        Info = Color3.fromRGB(100, 60, 180),
+        Error = Color3.fromRGB(160, 40, 60),
+        Border = Color3.fromRGB(210, 205, 220),
+        BorderBright = Color3.fromRGB(180, 175, 195),
+        ToggleOff = Color3.fromRGB(200, 195, 210),
+        ToggleOn = Color3.fromRGB(130, 60, 210),
+    }
+}
+
+GenesisX.Theme = GenesisX.Themes.Dark
+
+-- ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
+GenesisX.Config = {
+    AnimationSpeed = 0.2,
+    CornerRadius = 8,
+    ShadowEnabled = true,
+    ShadowIntensity = 0.7,
+}
 
 -- ─── ESCALA RESPONSIVA ────────────────────────────────────────────────────────
 local ScaleData = {
@@ -315,10 +416,11 @@ end
 
 -- ─── CREATE WINDOW ────────────────────────────────────────────────────────────
 function GenesisX:CreateWindow(config)
+    self:_EnsureTheme()
     config = config or {}
     local window = setmetatable({}, self)
     self:UpdateScale()
-    -- Theme & Font setup with safety
+    -- Theme & Font setup
     if not self.Themes then
         self.Themes = { Dark = { Background = Color3.fromRGB(8,8,8), Header = Color3.fromRGB(12,12,12), Sidebar = Color3.fromRGB(10,10,10), Card = Color3.fromRGB(16,16,16), CardHover = Color3.fromRGB(24,24,24), Input = Color3.fromRGB(22,22,22), InputHover = Color3.fromRGB(30,30,30), Accent = Color3.fromRGB(150,80,230), AccentHover = Color3.fromRGB(180,110,255), AccentSecondary = Color3.fromRGB(210,160,255), AccentDark = Color3.fromRGB(90,40,160), Text = Color3.fromRGB(255,255,255), TextSecondary = Color3.fromRGB(190,190,190), TextMuted = Color3.fromRGB(120,120,120), Success = Color3.fromRGB(220,190,255), Warning = Color3.fromRGB(190,130,255), Info = Color3.fromRGB(140,90,220), Error = Color3.fromRGB(80,40,140), Border = Color3.fromRGB(40,35,50), BorderBright = Color3.fromRGB(75,65,90), ToggleOff = Color3.fromRGB(35,30,45), ToggleOn = Color3.fromRGB(150,80,230) } }
     end
@@ -2913,10 +3015,6 @@ function GenesisX:SetSize(size)
     if self.MainFrame then self.MainFrame.Size = size end
 end
 
-function GenesisX:SetFont(fontName)
-    self.Font = fontName or "Gotham"
-end
-
 function GenesisX:SetTheme(newTheme)
     if type(newTheme) == "string" then
         if newTheme == "Light" and self.Themes and self.Themes.Light then
@@ -2929,6 +3027,10 @@ function GenesisX:SetTheme(newTheme)
             if self.Theme[key] ~= nil then self.Theme[key] = value end
         end
     end
+end
+
+function GenesisX:SetFont(fontName)
+    self.Font = fontName or "Gotham"
 end
 
 -- ─── ALIASES / COMPATIBILIDADE ────────────────────────────────────────────────
