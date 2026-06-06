@@ -1133,19 +1133,6 @@ function GenesisX:CreateButton(parent, config)
     pad.PaddingRight = UDim.new(0, self:S(4))
     pad.Parent = frame
 
-    local btn = Instance.new("TextButton")
-    btn.Name = "Button"
-    btn.AutoButtonColor = false
-    btn.BorderSizePixel = 0
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.Font = self:GetFontBold()
-    btn.Text = text
-    btn.TextSize = self:S(13)
-    btn.TextColor3 = textColor
-    btn.ZIndex = 13
-    btn.Parent = frame
-    self:CreateCorner(btn)
-
     local bgColor, bgHover, strokeColor, textColor
     if style == "accent" then
         bgColor     = self.Theme.AccentDark
@@ -1180,7 +1167,19 @@ function GenesisX:CreateButton(parent, config)
         textColor   = Color3.fromRGB(30, 30, 30)
     end
 
+    local btn = Instance.new("TextButton")
+    btn.Name = "Button"
+    btn.AutoButtonColor = false
+    btn.BorderSizePixel = 0
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.Font = self:GetFontBold()
+    btn.Text = text
+    btn.TextSize = self:S(13)
+    btn.TextColor3 = textColor
     btn.BackgroundColor3 = bgColor
+    btn.ZIndex = 13
+    btn.Parent = frame
+    self:CreateCorner(btn)
     self:CreateStroke(btn, strokeColor, 1.2, 0.2)
 
     local rippleHolder = Instance.new("Frame")
