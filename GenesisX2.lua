@@ -830,21 +830,7 @@ function GenesisX:_CreateFloatingButton(config)
 
     self.FloatBtn.MouseButton1Click:Connect(function()
         if not dragging then
-            if not self.MainFrame.Visible then
-                -- Show: fade in
-                self.MainFrame.Visible = true
-                self.MainFrame.BackgroundTransparency = 0.5
-                self:Tween(self.MainFrame, {BackgroundTransparency = 0}, 0.25)
-            else
-                -- Hide: fade out
-                self:Tween(self.MainFrame, {BackgroundTransparency = 0.5}, 0.2)
-                task.delay(0.2, function()
-                    if self.MainFrame then
-                        self.MainFrame.Visible = false
-                        self.MainFrame.BackgroundTransparency = 0
-                    end
-                end)
-            end
+            self.MainFrame.Visible = not self.MainFrame.Visible
         end
     end)
 end
@@ -1014,23 +1000,13 @@ function GenesisX:SelectTab(tabId)
     local newTab = self.Tabs[tabId]
     if not newTab then return end
 
-    -- Fade out old tab
+    -- Hide old tab
     if oldTab and oldTab.Container then
-        self:Tween(oldTab.Container, {BackgroundTransparency = 0.3}, 0.12)
+        oldTab.Container.Visible = false
     end
 
-    task.delay(0.12, function()
-        -- Hide old tab
-        if oldTab and oldTab.Container then
-            oldTab.Container.Visible = false
-            oldTab.Container.BackgroundTransparency = 0
-        end
-
-        -- Show new tab with fade
-        newTab.Container.Visible = true
-        newTab.Container.BackgroundTransparency = 0.3
-        self:Tween(newTab.Container, {BackgroundTransparency = 0}, 0.18)
-    end)
+    -- Show new tab
+    newTab.Container.Visible = true
 
     -- Update sidebar buttons with smooth tween
     for id, data in pairs(self.Tabs) do
