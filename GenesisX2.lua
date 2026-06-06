@@ -560,28 +560,60 @@ function GenesisX:CreateWindow(config)
         subtitleLabel.Parent = self.Header
     end
 
-    local minBtn = Instance.new("ImageButton")
-    minBtn.Name = "MinimizeBtn"
-    minBtn.BackgroundColor3 = self.Theme.Input
-    minBtn.Position = UDim2.new(1, -self:S(52), 0.5, -self:S(16))
-    minBtn.Size = UDim2.new(0, self:S(34), 0, self:S(32))
-    minBtn.Image = self:FormatAssetId("lucide-minus") or ""
-    minBtn.ImageColor3 = self.Theme.TextMuted
-    minBtn.AutoButtonColor = false
-    minBtn.ZIndex = 14
-    minBtn.Parent = self.Header
-    self:CreateCorner(minBtn, UDim.new(0, 10))
-    self:CreateStroke(minBtn, self.Theme.Accent, 1.5, 0.3)
+    -- Header buttons: Minimize & Discord
+    local headerButtons = {}
+    local btnW, btnH = self:S(34), self:S(32)
+    local btnGap = self:S(8)
+    local rightPad = self:S(14)
 
-    minBtn.MouseEnter:Connect(function()
-        self:Tween(minBtn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
-    end)
-    minBtn.MouseLeave:Connect(function()
-        self:Tween(minBtn, {BackgroundColor3 = self.Theme.Input, ImageColor3 = self.Theme.TextMuted}, 0.15)
-    end)
-    minBtn.MouseButton1Click:Connect(function()
-        self.MainFrame.Visible = false
-    end)
+    -- Minimize button config
+    if config.MinimizeBtn == true then
+        table.insert(headerButtons, {Type = "minimize", Icon = "lucide-minus", Action = function()
+            self.MainFrame.Visible = false
+        end})
+    end
+
+    -- Discord button config
+    local discordLink = nil
+    if type(config.DiscordBtn) == "string" and config.DiscordBtn ~= "" then
+        discordLink = config.DiscordBtn
+    elseif config.DiscordBtn == true and type(config.DiscordLink) == "string" and config.DiscordLink ~= "" then
+        discordLink = config.DiscordLink
+    end
+    if discordLink then
+        table.insert(headerButtons, {Type = "discord", Icon = "lucide-discord", Link = discordLink, Action = function()
+            if setclipboard then
+                setclipboard(discordLink)
+            end
+        end})
+    end
+
+    -- Position from right to left (first = rightmost)
+    for i, btnData in ipairs(headerButtons) do
+        local offsetX = rightPad + (i - 1) * (btnW + btnGap)
+        local btn = Instance.new("ImageButton")
+        btn.Name = btnData.Type .. "Btn"
+        btn.BackgroundColor3 = self.Theme.Input
+        btn.Position = UDim2.new(1, -(offsetX + btnW), 0.5, -btnH/2)
+        btn.Size = UDim2.new(0, btnW, 0, btnH)
+        btn.Image = self:FormatAssetId(btnData.Icon) or ""
+        btn.ImageColor3 = self.Theme.TextMuted
+        btn.AutoButtonColor = false
+        btn.ZIndex = 14
+        btn.Parent = self.Header
+        self:CreateCorner(btn, UDim.new(0, 10))
+        self:CreateStroke(btn, self.Theme.Accent, 1.5, 0.3)
+
+        btn.MouseEnter:Connect(function()
+            self:Tween(btn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
+        end)
+        btn.MouseLeave:Connect(function()
+            self:Tween(btn, {BackgroundColor3 = self.Theme.Input, ImageColor3 = self.Theme.TextMuted}, 0.15)
+        end)
+        btn.MouseButton1Click:Connect(function()
+            if btnData.Action then btnData.Action() end
+        end)
+    end
 
     -- --- SIDEBAR ----------------------------------------------------------------
     local sidebarWidth = self:S(64)
