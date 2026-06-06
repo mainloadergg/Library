@@ -2228,8 +2228,7 @@ function GenesisX:CreateLabel(parent, config)
     local color     = config.Color   or self.Theme.TextSecondary
     -- Se o texto contem quebra de linha manual (\n) e Wrapped nao foi explicitamente definido,
     -- desabilita TextWrapped para que as quebras manuais funcionem corretamente.
-    local hasNewline = text:find("
-") ~= nil
+    local hasNewline = text:find("\n") ~= nil
     local wrapped
     if config.Wrapped == nil then
         wrapped = not hasNewline
