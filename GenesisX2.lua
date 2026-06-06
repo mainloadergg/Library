@@ -492,6 +492,17 @@ function GenesisX:CreateWindow(config)
         self.ScreenGui.Parent = PlayerGui
     end
 
+    -- Blur overlay para fade effects
+    self.BlurOverlay = Instance.new("Frame")
+    self.BlurOverlay.Name = "BlurOverlay"
+    self.BlurOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
+    self.BlurOverlay.BackgroundTransparency = 1
+    self.BlurOverlay.BorderSizePixel = 0
+    self.BlurOverlay.Size = UDim2.new(1, 0, 1, 0)
+    self.BlurOverlay.ZIndex = 9998
+    self.BlurOverlay.Visible = false
+    self.BlurOverlay.Parent = self.ScreenGui
+
     self._notifications = {}
     self.Dropdowns = {}
     self._dropdowns = {}
@@ -829,10 +840,10 @@ function GenesisX:_CreateFloatingButton(config)
     self.FloatBtn.MouseButton1Click:Connect(function()
         if not dragging then
             local visible = not self.MainFrame.Visible
-            self.MainFrame.Visible = visible
             if visible then
-                self.MainFrame.BackgroundTransparency = 1
-                self:Tween(self.MainFrame, {BackgroundTransparency = 0}, 0.25)
+                self:FadeIn(self.MainFrame, 0.3, true)
+            else
+                self:FadeOut(self.MainFrame, 0.25, nil, true)
             end
         end
     end)
@@ -947,6 +958,59 @@ function GenesisX:CreateTab(config)
         scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
         scrollFrame.ZIndex = 11
         scrollFrame.Parent = page
+
+        -- Heavy scroll feel for mobile
+        scrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+        scrollFrame.ElasticBehavior = Enum.ElasticBehavior.Always
+        scrollFrame.ScrollingEnabled = true
+
+        -- Custom touch scrolling with heavier feel
+        if ScaleData.IsMobile then
+            scrollFrame.ScrollBarThickness = 6
+            scrollFrame.TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+            scrollFrame.BottomImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+            scrollFrame.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+
+            -- Add custom touch inertia
+            local touchStart = nil
+            local scrollStart = nil
+            local velocity = 0
+            local lastPos = 0
+            local damping = 0.92
+            local minVelocity = 0.5
+
+            scrollFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch then
+                    touchStart = input.Position.Y
+                    scrollStart = scrollFrame.CanvasPosition.Y
+                    lastPos = touchStart
+                    velocity = 0
+                end
+            end)
+
+            scrollFrame.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch and touchStart then
+                    local delta = input.Position.Y - lastPos
+                    lastPos = input.Position.Y
+                    velocity = delta * 0.3
+                    scrollFrame.CanvasPosition = Vector2.new(0, scrollStart - (input.Position.Y - touchStart))
+                end
+            end)
+
+            scrollFrame.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch then
+                    touchStart = nil
+                    -- Inertia decay
+                    task.spawn(function()
+                        while math.abs(velocity) > minVelocity do
+                            velocity = velocity * damping
+                            scrollFrame.CanvasPosition = Vector2.new(0, scrollFrame.CanvasPosition.Y - velocity)
+                            task.wait(0.016)
+                        end
+                    end)
+                end
+            end)
+        end
         self:CreateCorner(scrollFrame, UDim.new(0, 8))
 
         local layout = Instance.new("UIListLayout")
@@ -986,10 +1050,62 @@ end
 
 -- --- SELECT TAB ---------------------------------------------------------------
 function GenesisX:SelectTab(tabId)
+    if self.CurrentTab == tabId then return end
+
+    local oldTab = self.CurrentTab and self.Tabs[self.CurrentTab]
+    local newTab = self.Tabs[tabId]
+    if not newTab then return end
+
+    -- Fade out old tab content
+    if oldTab and oldTab.Container then
+        for _, child in ipairs(oldTab.Container:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                if child.BackgroundTransparency < 1 then
+                    self:Tween(child, {BackgroundTransparency = 1}, 0.15)
+                end
+                if (child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox")) and child.TextTransparency < 1 then
+                    self:Tween(child, {TextTransparency = 1}, 0.15)
+                end
+                if (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency < 1 then
+                    self:Tween(child, {ImageTransparency = 1}, 0.15)
+                end
+            end
+        end
+    end
+
+    task.delay(0.15, function()
+        -- Hide old tab
+        if oldTab and oldTab.Container then
+            oldTab.Container.Visible = false
+        end
+
+        -- Show new tab
+        newTab.Container.Visible = true
+        newTab.Container.BackgroundTransparency = 0
+
+        -- Fade in new tab content
+        for _, child in ipairs(newTab.Container:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                if child.BackgroundTransparency < 1 then
+                    child.BackgroundTransparency = 1
+                    self:Tween(child, {BackgroundTransparency = 0}, 0.2)
+                end
+                if (child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox")) and child.TextTransparency < 1 then
+                    child.TextTransparency = 1
+                    self:Tween(child, {TextTransparency = 0}, 0.2)
+                end
+                if (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency < 1 then
+                    child.ImageTransparency = 1
+                    self:Tween(child, {ImageTransparency = 0}, 0.2)
+                end
+            end
+        end
+    end)
+
+    -- Update sidebar buttons
     for id, data in pairs(self.Tabs) do
         local icon = data.Button:FindFirstChild("Icon")
         if id == tabId then
-            data.Container.Visible = true
             self:Tween(data.Button, {BackgroundColor3 = self.Theme.Accent}, 0.2)
             if icon then
                 if icon:IsA("TextLabel") then
@@ -999,7 +1115,6 @@ function GenesisX:SelectTab(tabId)
                 end
             end
         else
-            data.Container.Visible = false
             self:Tween(data.Button, {BackgroundColor3 = self.Theme.Card}, 0.2)
             if icon then
                 if icon:IsA("TextLabel") then
@@ -1010,6 +1125,7 @@ function GenesisX:SelectTab(tabId)
             end
         end
     end
+
     self.CurrentTab = tabId
 end
 
