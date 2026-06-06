@@ -3091,9 +3091,6 @@ function GenesisX:Notify(config)
 
     restack(true)
 
-    -- -- Timer bar shrink -----------------------------------------------------
-    self:Tween(, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
-
     -- -- Dismiss ---------------------------------------------------------------
     local dismissed = false
     local function dismiss()
