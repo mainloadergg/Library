@@ -774,7 +774,7 @@ function GenesisX:_CreateFloatingButton(config)
         iconImg.Position = UDim2.new(0.15, 0, 0.15, 0)
         iconImg.Image = floatIconAsset
         iconImg.ScaleType = Enum.ScaleType.Stretch
-        iconImg.ZIndex = 99  -- Below the button's rounded corners
+        iconImg.ZIndex = 102  -- Above the button's border/stroke
         iconImg.Parent = self.FloatBtn
     else
         local iconLabel = Instance.new("TextLabel")
@@ -785,7 +785,7 @@ function GenesisX:_CreateFloatingButton(config)
         iconLabel.Text = tostring(floatIconRaw)
         iconLabel.TextColor3 = Color3.new(1, 1, 1)
         iconLabel.TextSize = self:S(22)
-        iconLabel.ZIndex = 99  -- Below the button's rounded corners
+        iconLabel.ZIndex = 102  -- Above the button's border/stroke
         iconLabel.Parent = self.FloatBtn
     end
 
