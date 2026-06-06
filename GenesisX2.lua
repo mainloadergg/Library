@@ -722,6 +722,7 @@ function GenesisX:CreateWindow(config)
     self.ContentArea.Position = UDim2.new(0, contentX, 0, headerHeight + self:S(10))
     self.ContentArea.Size = UDim2.new(1, -(contentX + self:S(14)), 1, -(headerHeight + self:S(20)))
     self.ContentArea.ZIndex = 11
+    self.ContentArea.ClipsDescendants = true
     self.ContentArea.Parent = self.MainFrame
 
     self:_CreateFloatingButton(config)
@@ -922,10 +923,20 @@ function GenesisX:CreateTab(config)
     page.ZIndex = 11
     page.Parent = self.ContentArea
 
+    -- Background card for the tab content (covers the game background)
+    local bgCard = Instance.new("Frame")
+    bgCard.Name = "BgCard"
+    bgCard.BackgroundColor3 = self.Theme.Background
+    bgCard.BorderSizePixel = 0
+    bgCard.Size = UDim2.new(1, 0, 1, 0)
+    bgCard.ZIndex = 10
+    bgCard.Parent = page
+    self:CreateCorner(bgCard, UDim.new(0, 8))
+
     local divider = Instance.new("Frame")
     divider.Name = "Divider"
     divider.BackgroundColor3 = self.Theme.Border
-    divider.BackgroundTransparency = 0.5
+    divider.BackgroundTransparency = 0.7
     divider.BorderSizePixel = 0
     divider.Position = UDim2.new(0.5, -1, 0, 0)
     divider.Size = UDim2.new(0, 1, 1, 0)
