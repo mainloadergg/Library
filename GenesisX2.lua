@@ -595,16 +595,17 @@ function GenesisX:CreateWindow(config)
         subtitleLabel.Parent = self.Header
     end
 
-    -- Header buttons: Minimize & Discord
+    -- Header buttons: Theme, Discord & Minimize
     local headerButtons = {}
     local btnW, btnH = self:S(34), self:S(32)
     local btnGap = self:S(8)
     local rightPad = self:S(14)
 
-    -- Minimize button config
-    if config.MinimizeBtn == true then
-        table.insert(headerButtons, {Type = "minimize", Icon = "lucide-minus", Action = function()
-            self.MainFrame.Visible = false
+    -- Theme toggle button
+    if config.ThemeBtn == true then
+        table.insert(headerButtons, {Type = "theme", Icon = "lucide-sun-moon", Action = function()
+            local newTheme = (self.Theme == self.Themes.Dark) and "Light" or "Dark"
+            self:SetTheme(newTheme)
         end})
     end
 
@@ -620,6 +621,13 @@ function GenesisX:CreateWindow(config)
             if setclipboard then
                 setclipboard(discordLink)
             end
+        end})
+    end
+
+    -- Minimize button config
+    if config.MinimizeBtn == true then
+        table.insert(headerButtons, {Type = "minimize", Icon = "lucide-minus", Action = function()
+            self.MainFrame.Visible = false
         end})
     end
 
@@ -1260,10 +1268,18 @@ function GenesisX:CreateButton(parent, config)
     self:CreateCorner(rippleHolder)
 
     btn.MouseEnter:Connect(function()
-        self:Tween(btn, {BackgroundColor3 = bgHover}, 0.15)
+        local targetHover = bgHover
+        if style == "default" then
+            targetHover = self.Theme.CardHover
+        end
+        self:Tween(btn, {BackgroundColor3 = targetHover}, 0.15)
     end)
     btn.MouseLeave:Connect(function()
-        self:Tween(btn, {BackgroundColor3 = bgColor}, 0.15)
+        local targetBg = bgColor
+        if style == "default" then
+            targetBg = self.Theme.Card
+        end
+        self:Tween(btn, {BackgroundColor3 = targetBg}, 0.15)
     end)
     btn.MouseButton1Click:Connect(function()
         self:CreateRipple(btn, UserInputService:GetMouseLocation())
