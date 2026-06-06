@@ -1192,11 +1192,11 @@ function GenesisX:CreateButton(parent, config)
         strokeColor = Color3.fromRGB(60, 200, 100)
         textColor   = Color3.new(1, 1, 1)
     else
-        -- Default: white fill, purple border, black text (as requested)
-        bgColor     = Color3.fromRGB(255, 255, 255)
-        bgHover     = Color3.fromRGB(245, 245, 245)
+        -- Default: theme-aware (adapts to Dark/Light automatically)
+        bgColor     = self.Theme.Card
+        bgHover     = self.Theme.CardHover
         strokeColor = self.Theme.Accent
-        textColor   = Color3.fromRGB(30, 30, 30)
+        textColor   = self.Theme.Text
     end
 
     local btn = Instance.new("TextButton")
@@ -3099,10 +3099,15 @@ function GenesisX:SetTheme(newTheme)
             if (obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox")) and colorMap[tostring(obj.TextColor3)] then
                 obj.TextColor3 = colorMap[tostring(obj.TextColor3)]
             end
-            -- ImageColor3
-            if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
-                if colorMap[tostring(obj.ImageColor3)] then
-                    obj.ImageColor3 = colorMap[tostring(obj.ImageColor3)]
+            -- ImageColor3: proteger icones brancos (Color3.new(1,1,1)) e icones que usam TextMuted
+            if (obj:IsA("ImageLabel") or obj:IsA("ImageButton")) and colorMap[tostring(obj.ImageColor3)] then
+                local current = obj.ImageColor3
+                local white = Color3.new(1, 1, 1)
+                -- Se for branco puro, mantem branco (icones devem permanecer brancos)
+                if current == white then
+                    obj.ImageColor3 = white
+                else
+                    obj.ImageColor3 = colorMap[tostring(current)]
                 end
             end
             -- UIStroke Color
