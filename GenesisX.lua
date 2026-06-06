@@ -23,58 +23,238 @@ pcall(function()
 end)
 GenesisX.Icons = LucideAssets
 
--- ─── THEME ────────────────────────────────────────────────────────────────────
--- ══════════ TEMAS ══════════
+-- ─── FONT HELPER ─────────────────────────────────────────────────────────────
+GenesisX.Font = "Gotham"
+
+local FontMap = {
+    Legacy = Enum.Font.Legacy, Arial = Enum.Font.Arial, ArialBold = Enum.Font.ArialBold,
+    SourceSans = Enum.Font.SourceSans, SourceSansBold = Enum.Font.SourceSansBold,
+    SourceSansSemibold = Enum.Font.SourceSansSemibold, SourceSansLight = Enum.Font.SourceSansLight,
+    Bodoni = Enum.Font.Bodoni, Garamond = Enum.Font.Garamond, Cartoon = Enum.Font.Cartoon,
+    Code = Enum.Font.Code, Fantasy = Enum.Font.Fantasy, Antique = Enum.Font.Antique,
+    Arcade = Enum.Font.Arcade, SciFi = Enum.Font.SciFi, ArcadeLegacy = Enum.Font.ArcadeLegacy,
+    Gotham = self:GetFont(), GothamMedium = Enum.Font.GothamMedium, GothamBold = self:GetFontBold(),
+    GothamBlack = self:GetFontBlack(), GothamSemibold = self:GetFontSemibold(),
+    BuilderSans = Enum.Font.BuilderSans, BuilderSansBold = Enum.Font.BuilderSansBold,
+    BuilderSansMedium = Enum.Font.BuilderSansMedium, BuilderSansSemibold = Enum.Font.BuilderSansSemibold,
+    BuilderSansLight = Enum.Font.BuilderSansLight, BuilderSansExtraBold = Enum.Font.BuilderSansExtraBold,
+    Montserrat = Enum.Font.Montserrat, MontserratBold = Enum.Font.MontserratBold,
+    MontserratLight = Enum.Font.MontserratLight, MontserratMedium = Enum.Font.MontserratMedium,
+    MontserratSemibold = Enum.Font.MontserratSemibold,
+    Inter = Enum.Font.Inter, InterBold = Enum.Font.InterBold, InterLight = Enum.Font.InterLight,
+    InterMedium = Enum.Font.InterMedium, InterSemibold = Enum.Font.InterSemibold,
+    Ubuntu = Enum.Font.Ubuntu, UbuntuLight = Enum.Font.UbuntuLight, UbuntuMedium = Enum.Font.UbuntuMedium,
+    UbuntuBold = Enum.Font.UbuntuBold,
+    Roboto = Enum.Font.Roboto, RobotoBold = Enum.Font.RobotoBold, RobotoLight = Enum.Font.RobotoLight,
+    RobotoMedium = Enum.Font.RobotoMedium, RobotoMono = Enum.Font.RobotoMono,
+    RobotoMonoBold = Enum.Font.RobotoMonoBold, RobotoMonoLight = Enum.Font.RobotoMonoLight,
+    RobotoMonoMedium = Enum.Font.RobotoMonoMedium,
+    Merriweather = Enum.Font.Merriweather, MerriweatherBold = Enum.Font.MerriweatherBold,
+    MerriweatherLight = Enum.Font.MerriweatherLight, MerriweatherItalic = Enum.Font.MerriweatherItalic,
+    MerriweatherBoldItalic = Enum.Font.MerriweatherBoldItalic,
+    MerriweatherLightItalic = Enum.Font.MerriweatherLightItalic,
+    Fondamento = Enum.Font.Fondamento, FondamentoItalic = Enum.Font.FondamentoItalic,
+    FondamentoBold = Enum.Font.FondamentoBold, FondamentoBoldItalic = Enum.Font.FondamentoBoldItalic,
+    FredokaOne = Enum.Font.FredokaOne, Balthazar = Enum.Font.Balthazar,
+    Cinzel = Enum.Font.Cinzel, CinzelBold = Enum.Font.CinzelBold,
+    CinzelDecorative = Enum.Font.CinzelDecorative, CinzelDecorativeBold = Enum.Font.CinzelDecorativeBold,
+    Sarpanch = Enum.Font.Sarpanch, SarpanchBold = Enum.Font.SarpanchBold,
+    SarpanchMedium = Enum.Font.SarpanchMedium, SarpanchSemibold = Enum.Font.SarpanchSemibold,
+    SarpanchBlack = Enum.Font.SarpanchBlack,
+    Saira = Enum.Font.Saira, SairaBold = Enum.Font.SairaBold, SairaLight = Enum.Font.SairaLight,
+    SairaMedium = Enum.Font.SairaMedium, SairaSemibold = Enum.Font.SairaSemibold,
+    SairaExtraLight = Enum.Font.SairaExtraLight, SairaExtraBold = Enum.Font.SairaExtraBold,
+    SairaBlack = Enum.Font.SairaBlack,
+    Nunito = Enum.Font.Nunito, NunitoBold = Enum.Font.NunitoBold, NunitoLight = Enum.Font.NunitoLight,
+    NunitoMedium = Enum.Font.NunitoMedium, NunitoSemibold = Enum.Font.NunitoSemibold,
+    NunitoExtraBold = Enum.Font.NunitoExtraBold, NunitoExtraLight = Enum.Font.NunitoExtraLight,
+    NunitoBlack = Enum.Font.NunitoBlack,
+    Oswald = Enum.Font.Oswald, OswaldBold = Enum.Font.OswaldBold, OswaldLight = Enum.Font.OswaldLight,
+    OswaldMedium = Enum.Font.OswaldMedium, OswaldSemibold = Enum.Font.OswaldSemibold,
+    OswaldExtraLight = Enum.Font.OswaldExtraLight, OswaldExtraBold = Enum.Font.OswaldExtraBold,
+    Poppins = Enum.Font.Poppins, PoppinsBold = Enum.Font.PoppinsBold, PoppinsLight = Enum.Font.PoppinsLight,
+    PoppinsMedium = Enum.Font.PoppinsMedium, PoppinsSemibold = Enum.Font.PoppinsSemibold,
+    PoppinsExtraBold = Enum.Font.PoppinsExtraBold, PoppinsExtraLight = Enum.Font.PoppinsExtraLight,
+    PoppinsThin = Enum.Font.PoppinsThin, PoppinsBlack = Enum.Font.PoppinsBlack,
+    RussoOne = Enum.Font.RussoOne,
+    TitilliumWeb = Enum.Font.TitilliumWeb, TitilliumWebBold = Enum.Font.TitilliumWebBold,
+    TitilliumWebLight = Enum.Font.TitilliumWebLight, TitilliumWebSemibold = Enum.Font.TitilliumWebSemibold,
+    TitilliumWebExtraLight = Enum.Font.TitilliumWebExtraLight, TitilliumWebBlack = Enum.Font.TitilliumWebBlack,
+    Jura = Enum.Font.Jura, JuraBold = Enum.Font.JuraBold, JuraLight = Enum.Font.JuraLight,
+    JuraMedium = Enum.Font.JuraMedium, JuraSemibold = Enum.Font.JuraSemibold,
+    JuraExtraLight = Enum.Font.JuraExtraLight, JuraExtraBold = Enum.Font.JuraExtraBold,
+    JuraBlack = Enum.Font.JuraBlack,
+    AmaticSC = Enum.Font.AmaticSC, AmaticSCBold = Enum.Font.AmaticSCBold,
+    Michroma = Enum.Font.Michroma, PressStart2P = Enum.Font.PressStart2P,
+    SpecialElite = Enum.Font.SpecialElite,
+    Inconsolata = Enum.Font.Inconsolata, InconsolataBold = Enum.Font.InconsolataBold,
+    InconsolataExtraBold = Enum.Font.InconsolataExtraBold, InconsolataMedium = Enum.Font.InconsolataMedium,
+    InconsolataSemiBold = Enum.Font.InconsolataSemiBold, InconsolataLight = Enum.Font.InconsolataLight,
+    InconsolataExtraLight = Enum.Font.InconsolataExtraLight, InconsolataBlack = Enum.Font.InconsolataBlack,
+    GrenzeGotisch = Enum.Font.GrenzeGotisch, GrenzeGotischBold = Enum.Font.GrenzeGotischBold,
+    GrenzeGotischLight = Enum.Font.GrenzeGotischLight, GrenzeGotischMedium = Enum.Font.GrenzeGotischMedium,
+    GrenzeGotischSemibold = Enum.Font.GrenzeGotischSemibold, GrenzeGotischExtraLight = Enum.Font.GrenzeGotischExtraLight,
+    GrenzeGotischExtraBold = Enum.Font.GrenzeGotischExtraBold, GrenzeGotischBlack = Enum.Font.GrenzeGotischBlack,
+    GrenzeGotischThin = Enum.Font.GrenzeGotischThin,
+    Kalam = Enum.Font.Kalam, KalamBold = Enum.Font.KalamBold, KalamLight = Enum.Font.KalamLight,
+    KalamMedium = Enum.Font.KalamMedium, KalamSemiBold = Enum.Font.KalamSemiBold,
+    KalamExtraLight = Enum.Font.KalamExtraLight, KalamExtraBold = Enum.Font.KalamExtraBold,
+    KalamBlack = Enum.Font.KalamBlack, KalamThin = Enum.Font.KalamThin,
+    NotoSans = Enum.Font.NotoSans, NotoSansBold = Enum.Font.NotoSansBold,
+    NotoSansLight = Enum.Font.NotoSansLight, NotoSansMedium = Enum.Font.NotoSansMedium,
+    NotoSansSemibold = Enum.Font.NotoSansSemibold, NotoSansExtraLight = Enum.Font.NotoSansExtraLight,
+    NotoSansExtraBold = Enum.Font.NotoSansExtraBold, NotoSansBlack = Enum.Font.NotoSansBlack,
+    NotoSansThin = Enum.Font.NotoSansThin,
+}
+
+function GenesisX:GetFont(name)
+    name = name or self.Font
+    if typeof(name) == "EnumItem" then return name end
+    return FontMap[name] or FontMap[self.Font] or self:GetFont()
+end
+
+function GenesisX:GetFontBold()
+    local base = self.Font or "Gotham"
+    local boldMap = {
+        Gotham = "GothamBold", GothamMedium = "GothamBold", GothamSemibold = "GothamBold",
+        SourceSans = "SourceSansBold", SourceSansLight = "SourceSansSemibold",
+        BuilderSans = "BuilderSansBold", BuilderSansLight = "BuilderSansSemibold",
+        Montserrat = "MontserratBold", MontserratLight = "MontserratSemibold",
+        Inter = "InterBold", InterLight = "InterSemibold",
+        Ubuntu = "UbuntuBold", UbuntuLight = "UbuntuMedium",
+        Roboto = "RobotoBold", RobotoLight = "RobotoMedium",
+        RobotoMono = "RobotoMonoBold", RobotoMonoLight = "RobotoMonoMedium",
+        Merriweather = "MerriweatherBold", MerriweatherLight = "MerriweatherSemibold",
+        Cinzel = "CinzelBold", CinzelDecorative = "CinzelDecorativeBold",
+        Sarpanch = "SarpanchBold", SarpanchMedium = "SarpanchSemibold",
+        Saira = "SairaBold", SairaLight = "SairaSemibold",
+        Nunito = "NunitoBold", NunitoLight = "NunitoSemibold",
+        Oswald = "OswaldBold", OswaldLight = "OswaldSemibold",
+        Poppins = "PoppinsBold", PoppinsLight = "PoppinsSemibold",
+        TitilliumWeb = "TitilliumWebBold", TitilliumWebLight = "TitilliumWebSemibold",
+        Jura = "JuraBold", JuraLight = "JuraSemibold",
+        Inconsolata = "InconsolataBold", InconsolataLight = "InconsolataSemiBold",
+        GrenzeGotisch = "GrenzeGotischBold", GrenzeGotischLight = "GrenzeGotischSemibold",
+        Kalam = "KalamBold", KalamLight = "KalamSemiBold",
+        NotoSans = "NotoSansBold", NotoSansLight = "NotoSansSemibold",
+    }
+    local boldName = boldMap[base] or base
+    return FontMap[boldName] or FontMap[base] or self:GetFontBold()
+end
+
+function GenesisX:GetFontSemibold()
+    local base = self.Font or "Gotham"
+    local semiMap = {
+        Gotham = "GothamSemibold", GothamMedium = "GothamSemibold",
+        SourceSans = "SourceSansSemibold", SourceSansLight = "SourceSans",
+        BuilderSans = "BuilderSansSemibold", BuilderSansLight = "BuilderSans",
+        Montserrat = "MontserratSemibold", MontserratLight = "Montserrat",
+        Inter = "InterSemibold", InterLight = "Inter",
+        Ubuntu = "UbuntuMedium", UbuntuLight = "Ubuntu",
+        Roboto = "RobotoMedium", RobotoLight = "Roboto",
+        RobotoMono = "RobotoMonoMedium", RobotoMonoLight = "RobotoMono",
+        Merriweather = "Merriweather", MerriweatherLight = "MerriweatherLight",
+        Cinzel = "Cinzel", CinzelDecorative = "CinzelDecorative",
+        Sarpanch = "SarpanchSemibold", SarpanchMedium = "Sarpanch",
+        Saira = "SairaSemibold", SairaLight = "Saira",
+        Nunito = "NunitoSemibold", NunitoLight = "Nunito",
+        Oswald = "OswaldSemibold", OswaldLight = "Oswald",
+        Poppins = "PoppinsSemibold", PoppinsLight = "Poppins",
+        TitilliumWeb = "TitilliumWebSemibold", TitilliumWebLight = "TitilliumWeb",
+        Jura = "JuraSemibold", JuraLight = "Jura",
+        Inconsolata = "InconsolataSemiBold", InconsolataLight = "Inconsolata",
+        GrenzeGotisch = "GrenzeGotischSemibold", GrenzeGotischLight = "GrenzeGotisch",
+        Kalam = "KalamSemiBold", KalamLight = "Kalam",
+        NotoSans = "NotoSansSemibold", NotoSansLight = "NotoSans",
+    }
+    local semiName = semiMap[base] or base
+    return FontMap[semiName] or FontMap[base] or self:GetFontSemibold()
+end
+
+function GenesisX:GetFontBlack()
+    local base = self.Font or "Gotham"
+    local blackMap = {
+        Gotham = "GothamBlack", GothamBold = "GothamBlack", GothamSemibold = "GothamBlack",
+        SourceSans = "SourceSansBold", SourceSansBold = "SourceSansBold",
+        BuilderSans = "BuilderSansExtraBold", BuilderSansBold = "BuilderSansExtraBold",
+        Montserrat = "MontserratBold", MontserratBold = "MontserratBold",
+        Inter = "InterBold", InterBold = "InterBold",
+        Ubuntu = "UbuntuBold", UbuntuBold = "UbuntuBold",
+        Roboto = "RobotoBold", RobotoBold = "RobotoBold",
+        RobotoMono = "RobotoMonoBold", RobotoMonoBold = "RobotoMonoBold",
+        Merriweather = "MerriweatherBold", MerriweatherBold = "MerriweatherBold",
+        Cinzel = "CinzelBold", CinzelBold = "CinzelBold",
+        Sarpanch = "SarpanchBlack", SarpanchBold = "SarpanchBlack",
+        Saira = "SairaBlack", SairaBold = "SairaBlack",
+        Nunito = "NunitoBlack", NunitoBold = "NunitoBlack",
+        Oswald = "OswaldExtraBold", OswaldBold = "OswaldExtraBold",
+        Poppins = "PoppinsBlack", PoppinsBold = "PoppinsBlack",
+        TitilliumWeb = "TitilliumWebBlack", TitilliumWebBold = "TitilliumWebBlack",
+        Jura = "JuraBlack", JuraBold = "JuraBlack",
+        Inconsolata = "InconsolataBlack", InconsolataBold = "InconsolataBlack",
+        GrenzeGotisch = "GrenzeGotischBlack", GrenzeGotischBold = "GrenzeGotischBlack",
+        Kalam = "KalamBlack", KalamBold = "KalamBlack",
+        NotoSans = "NotoSansBlack", NotoSansBold = "NotoSansBlack",
+    }
+    local blackName = blackMap[base] or base
+    return FontMap[blackName] or FontMap[base] or self:GetFontBlack()
+end
+
+
+
+-- ─── THEME SYSTEM ────────────────────────────────────────────────────────────
 GenesisX.Themes = {
-    Dark = {  -- seu tema atual, mantido igual
-        Background      = Color3.fromRGB(8, 8, 8),
-        Header          = Color3.fromRGB(12, 12, 12),
-        Sidebar         = Color3.fromRGB(10, 10, 10),
-        Card            = Color3.fromRGB(16, 16, 16),
-        CardHover       = Color3.fromRGB(24, 24, 24),
-        Input           = Color3.fromRGB(22, 22, 22),
-        InputHover      = Color3.fromRGB(30, 30, 30),
-        Accent          = Color3.fromRGB(150, 80, 230),
-        AccentHover     = Color3.fromRGB(180, 110, 255),
+    Dark = {
+        Background = Color3.fromRGB(8, 8, 8),
+        Header = Color3.fromRGB(12, 12, 12),
+        Sidebar = Color3.fromRGB(10, 10, 10),
+        Card = Color3.fromRGB(16, 16, 16),
+        CardHover = Color3.fromRGB(24, 24, 24),
+        Input = Color3.fromRGB(22, 22, 22),
+        InputHover = Color3.fromRGB(30, 30, 30),
+        Accent = Color3.fromRGB(150, 80, 230),
+        AccentHover = Color3.fromRGB(180, 110, 255),
         AccentSecondary = Color3.fromRGB(210, 160, 255),
-        AccentDark      = Color3.fromRGB(90, 40, 160),
-        Text            = Color3.fromRGB(255, 255, 255),
-        TextSecondary   = Color3.fromRGB(190, 190, 190),
-        TextMuted       = Color3.fromRGB(120, 120, 120),
-        Success         = Color3.fromRGB(220, 190, 255),
-        Warning         = Color3.fromRGB(190, 130, 255),
-        Info            = Color3.fromRGB(140, 90, 220),
-        Error           = Color3.fromRGB(80, 40, 140),
-        Border          = Color3.fromRGB(40, 35, 50),
-        BorderBright    = Color3.fromRGB(75, 65, 90),
-        ToggleOff       = Color3.fromRGB(35, 30, 45),
-        ToggleOn        = Color3.fromRGB(150, 80, 230),
+        AccentDark = Color3.fromRGB(90, 40, 160),
+        Text = Color3.fromRGB(255, 255, 255),
+        TextSecondary = Color3.fromRGB(190, 190, 190),
+        TextMuted = Color3.fromRGB(120, 120, 120),
+        Success = Color3.fromRGB(220, 190, 255),
+        Warning = Color3.fromRGB(190, 130, 255),
+        Info = Color3.fromRGB(140, 90, 220),
+        Error = Color3.fromRGB(80, 40, 140),
+        Border = Color3.fromRGB(40, 35, 50),
+        BorderBright = Color3.fromRGB(75, 65, 90),
+        ToggleOff = Color3.fromRGB(35, 30, 45),
+        ToggleOn = Color3.fromRGB(150, 80, 230),
     },
     Light = {
-        Background      = Color3.fromRGB(248, 246, 252),
-        Header          = Color3.fromRGB(238, 236, 245),
-        Sidebar         = Color3.fromRGB(242, 240, 250),
-        Card            = Color3.fromRGB(255, 255, 255),
-        CardHover       = Color3.fromRGB(245, 243, 250),
-        Input           = Color3.fromRGB(240, 238, 246),
-        InputHover      = Color3.fromRGB(235, 232, 242),
-        Accent          = Color3.fromRGB(130, 60, 210),
-        AccentHover     = Color3.fromRGB(150, 85, 230),
-        AccentSecondary = Color3.fromRGB(170, 120, 240),
-        AccentDark      = Color3.fromRGB(100, 40, 180),
-        Text            = Color3.fromRGB(25, 25, 40),
-        TextSecondary   = Color3.fromRGB(70, 70, 90),
-        TextMuted       = Color3.fromRGB(130, 130, 150),
-        Success         = Color3.fromRGB(140, 100, 210),
-        Warning         = Color3.fromRGB(160, 110, 220),
-        Info            = Color3.fromRGB(120, 70, 200),
-        Error           = Color3.fromRGB(180, 60, 110),
-        Border          = Color3.fromRGB(200, 196, 215),
-        BorderBright    = Color3.fromRGB(180, 176, 200),
-        ToggleOff       = Color3.fromRGB(210, 206, 230),
-        ToggleOn        = Color3.fromRGB(130, 60, 210),
+        Background = Color3.fromRGB(245, 242, 250),
+        Header = Color3.fromRGB(235, 232, 242),
+        Sidebar = Color3.fromRGB(240, 237, 247),
+        Card = Color3.fromRGB(255, 255, 255),
+        CardHover = Color3.fromRGB(248, 245, 252),
+        Input = Color3.fromRGB(235, 232, 242),
+        InputHover = Color3.fromRGB(225, 220, 235),
+        Accent = Color3.fromRGB(130, 60, 210),
+        AccentHover = Color3.fromRGB(150, 80, 230),
+        AccentSecondary = Color3.fromRGB(100, 40, 180),
+        AccentDark = Color3.fromRGB(80, 30, 160),
+        Text = Color3.fromRGB(30, 30, 35),
+        TextSecondary = Color3.fromRGB(80, 75, 90),
+        TextMuted = Color3.fromRGB(130, 125, 140),
+        Success = Color3.fromRGB(100, 60, 180),
+        Warning = Color3.fromRGB(140, 90, 40),
+        Info = Color3.fromRGB(100, 60, 180),
+        Error = Color3.fromRGB(160, 40, 60),
+        Border = Color3.fromRGB(210, 205, 220),
+        BorderBright = Color3.fromRGB(180, 175, 195),
+        ToggleOff = Color3.fromRGB(200, 195, 210),
+        ToggleOn = Color3.fromRGB(130, 60, 210),
     }
 }
+
+GenesisX.Theme = GenesisX.Themes.Dark
 
 -- ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
 GenesisX.Config = {
@@ -313,7 +493,7 @@ function GenesisX:CreateIcon(parent, iconData, size, color)
         lbl.Name = "Icon"
         lbl.BackgroundTransparency = 1
         lbl.Size = size
-        lbl.Font = self.Font
+        lbl.Font = self:GetFontBold()
         lbl.Text = tostring(iconData):sub(1, 2)
         lbl.TextColor3 = color
         lbl.TextSize = size.Y.Offset or 16
@@ -354,6 +534,15 @@ function GenesisX:CreateWindow(config)
     config = config or {}
     local window = setmetatable({}, self)
     self:UpdateScale()
+    -- Theme & Font setup
+    local themeName = config.Theme or "Dark"
+    if themeName == "Light" then
+        self.Theme = self.Themes.Light
+    else
+        self.Theme = self.Themes.Dark
+    end
+    self.Font = config.Font or self.Font or "Gotham"
+
 
     if PlayerGui:FindFirstChild("GenesisX") then
         PlayerGui.GenesisX:Destroy()
@@ -397,19 +586,6 @@ function GenesisX:CreateWindow(config)
     self.MainFrame.Parent = self.ScreenGui
     self:CreateCorner(self.MainFrame, UDim.new(0, 12))
     self:CreateStroke(self.MainFrame, self.Theme.Accent, 1.5, 0)
-    
-    -- ─── TEMA ────────────────────────────────────────────────
-    local themeName = config.Theme or "Dark"
-    local baseTheme = self.Themes[themeName] or self.Themes.Dark
-    window.Theme = {}
-    for k, v in pairs(baseTheme) do window.Theme[k] = v end   -- cópia rasa
-
-    -- ─── FONTE ───────────────────────────────────────────────
-    local font = config.Font or Enum.Font.GothamBold
-    if type(font) == "string" then
-    font = Enum.Font[font] or Enum.Font.GothamBold
-    end
-    window.Font = font
 
     -- ─── HEADER ─────────────────────────────────────────────────────────────────
     local headerHeight = self:S(56)
@@ -452,7 +628,7 @@ function GenesisX:CreateWindow(config)
         iconLabel.Name = "IconLabel"
         iconLabel.BackgroundTransparency = 1
         iconLabel.Size = UDim2.new(1, 0, 1, 0)
-        iconLabel.Font = Enum.Font.GothamBlack
+        iconLabel.Font = self:GetFontBlack()
         iconLabel.Text = config.Icon or "S"
         iconLabel.TextColor3 = Color3.new(1, 1, 1)
         iconLabel.TextSize = self:S(16)
@@ -466,7 +642,7 @@ function GenesisX:CreateWindow(config)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Position = UDim2.new(0, titleX, 0, 0)
     titleLabel.Size = UDim2.new(0, self:S(300), 1, 0)
-    titleLabel.Font = self.Font
+    titleLabel.Font = self:GetFontBold()
     titleLabel.Text = config.Title or "GenesisX"
     titleLabel.TextColor3 = self.Theme.Text
     titleLabel.TextSize = self:S(18)
@@ -483,7 +659,7 @@ function GenesisX:CreateWindow(config)
         subtitleLabel.BackgroundTransparency = 1
         subtitleLabel.Position = UDim2.new(0, titleX, 0, self:S(30))
         subtitleLabel.Size = UDim2.new(0, self:S(300), 0, self:S(16))
-        subtitleLabel.Font = Enum.Font.Gotham
+        subtitleLabel.Font = self:GetFont()
         subtitleLabel.Text = config.Subtitle
         subtitleLabel.TextColor3 = self.Theme.TextMuted
         subtitleLabel.TextSize = self:S(10)
@@ -497,7 +673,7 @@ function GenesisX:CreateWindow(config)
     minBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     minBtn.Position = UDim2.new(1, -self:S(42), 0.5, -self:S(12))
     minBtn.Size = UDim2.new(0, self:S(28), 0, self:S(24))
-    minBtn.Font = self.Font
+    minBtn.Font = self:GetFontBold()
     minBtn.Text = "—"
     minBtn.TextColor3 = self.Theme.TextMuted
     minBtn.TextSize = self:S(13)
@@ -634,7 +810,7 @@ function GenesisX:_CreateFloatingButton(config)
         iconLabel.Name = "Icon"
         iconLabel.BackgroundTransparency = 1
         iconLabel.Size = UDim2.new(1, 0, 1, 0)
-        iconLabel.Font = Enum.Font.GothamBlack
+        iconLabel.Font = self:GetFontBlack()
         iconLabel.Text = tostring(floatIconRaw)
         iconLabel.TextColor3 = Color3.new(1, 1, 1)
         iconLabel.TextSize = self:S(22)
@@ -735,7 +911,7 @@ function GenesisX:CreateTab(config)
         iconLabel.Name = "Icon"
         iconLabel.BackgroundTransparency = 1
         iconLabel.Size = UDim2.new(1, 0, 1, 0)
-        iconLabel.Font = self.Font
+        iconLabel.Font = self:GetFontBold()
         iconLabel.Text = tostring(fallback)
         iconLabel.TextColor3 = self.Theme.TextMuted
         iconLabel.TextSize = self:S(16)
@@ -751,7 +927,7 @@ function GenesisX:CreateTab(config)
     tooltip.Position = UDim2.new(1, self:S(10), 0.5, -self:S(11))
     tooltip.Size = UDim2.new(0, 0, 0, self:S(22))
     tooltip.AutomaticSize = Enum.AutomaticSize.X
-    tooltip.Font = Enum.Font.GothamSemibold
+    tooltip.Font = self:GetFontSemibold()
     tooltip.Text = "  " .. tabId .. "  "
     tooltip.TextColor3 = self.Theme.Text
     tooltip.TextSize = self:S(11)
@@ -935,7 +1111,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     label.BackgroundTransparency = 1
     label.AutomaticSize = Enum.AutomaticSize.X
     label.Size = UDim2.new(0, 0, 1, 0)
-    label.Font = self.Font
+    label.Font = self:GetFontBold()
     label.Text = text
     label.TextColor3 = color
     label.TextSize = self:S(11)
@@ -977,7 +1153,7 @@ function GenesisX:CreateToggle(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(14), 0, 0)
     label.Size = UDim2.new(0.6, 0, 1, 0)
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = text
     label.TextColor3 = self.Theme.Text
     label.TextSize = self:S(13)
@@ -1070,7 +1246,7 @@ function GenesisX:CreateButton(parent, config)
     btn.AutoButtonColor = false
     btn.BorderSizePixel = 0
     btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.Font = self.Font
+    btn.Font = self:GetFontBold()
     btn.Text = text
     btn.TextSize = self:S(13)
     btn.TextColor3 = Color3.new(1, 1, 1)
@@ -1160,7 +1336,7 @@ function GenesisX:CreateInput(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     label.Size = UDim2.new(1, -self:S(28), 0, self:S(16))
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = labelText
     label.TextColor3 = self.Theme.TextMuted
     label.TextSize = self:S(10)
@@ -1173,7 +1349,7 @@ function GenesisX:CreateInput(parent, config)
     textBox.BackgroundColor3 = self.Theme.Input
     textBox.Position = UDim2.new(0, self:S(12), 0, self:S(28))
     textBox.Size = UDim2.new(1, -self:S(24), 0, self:S(26))
-    textBox.Font = Enum.Font.Gotham
+    textBox.Font = self:GetFont()
     textBox.Text = tostring(default)
     textBox.PlaceholderText = placeholder
     textBox.PlaceholderColor3 = self.Theme.TextMuted
@@ -1226,7 +1402,7 @@ function GenesisX:CreateNumberInput(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     label.Size = UDim2.new(1, -self:S(28), 0, self:S(16))
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = labelText
     label.TextColor3 = self.Theme.TextMuted
     label.TextSize = self:S(10)
@@ -1239,7 +1415,7 @@ function GenesisX:CreateNumberInput(parent, config)
     textBox.BackgroundColor3 = self.Theme.Input
     textBox.Position = UDim2.new(0, self:S(12), 0, self:S(28))
     textBox.Size = UDim2.new(1, -self:S(24), 0, self:S(26))
-    textBox.Font = self.Font
+    textBox.Font = self:GetFontBold()
     textBox.Text = tostring(default)
     textBox.TextColor3 = self.Theme.Text
     textBox.TextSize = self:S(13)
@@ -1301,7 +1477,7 @@ function GenesisX:CreateSlider(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     label.Size = UDim2.new(0.6, 0, 0, self:S(18))
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = text
     label.TextColor3 = self.Theme.Text
     label.TextSize = self:S(12)
@@ -1324,7 +1500,7 @@ function GenesisX:CreateSlider(parent, config)
     valueLabel.Name = "ValueLabel"
     valueLabel.BackgroundTransparency = 1
     valueLabel.Size = UDim2.new(1, 0, 1, 0)
-    valueLabel.Font = self.Font
+    valueLabel.Font = self:GetFontBold()
     valueLabel.Text = tostring(default)
     valueLabel.TextColor3 = Color3.new(1, 1, 1)
     valueLabel.TextSize = self:S(11)
@@ -1337,7 +1513,7 @@ function GenesisX:CreateSlider(parent, config)
     valueInput.Name = "ValueInput"
     valueInput.BackgroundTransparency = 1
     valueInput.Size = UDim2.new(1, 0, 1, 0)
-    valueInput.Font = self.Font
+    valueInput.Font = self:GetFontBold()
     valueInput.Text = ""
     valueInput.PlaceholderText = ""
     valueInput.TextColor3 = Color3.new(1, 1, 1)
@@ -1501,7 +1677,7 @@ function GenesisX:CreateDropdown(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     label.Size = UDim2.new(1, -self:S(28), 0, self:S(14))
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = labelText
     label.TextColor3 = self.Theme.TextMuted
     label.TextSize = self:S(10)
@@ -1515,7 +1691,7 @@ function GenesisX:CreateDropdown(parent, config)
     dropBtn.AutoButtonColor = false
     dropBtn.Position = UDim2.new(0, self:S(12), 0, self:S(26))
     dropBtn.Size = UDim2.new(1, -self:S(24), 0, self:S(28))
-    dropBtn.Font = Enum.Font.GothamSemibold
+    dropBtn.Font = self:GetFontSemibold()
     dropBtn.Text = "  " .. (default or "Selecionar...")
     dropBtn.TextColor3 = default and self.Theme.Text or self.Theme.TextMuted
     dropBtn.TextSize = self:S(12)
@@ -1567,7 +1743,7 @@ function GenesisX:CreateDropdown(parent, config)
     listTitle.BackgroundTransparency = 1
     listTitle.Position = UDim2.new(0, self:S(16), 0, self:S(12))
     listTitle.Size = UDim2.new(1, -self:S(32), 0, self:S(22))
-    listTitle.Font = self.Font
+    listTitle.Font = self:GetFontBold()
     listTitle.Text = labelText
     listTitle.TextColor3 = self.Theme.Text
     listTitle.TextSize = self:S(14)
@@ -1645,7 +1821,7 @@ function GenesisX:CreateDropdown(parent, config)
             local rowBtn = Instance.new("TextButton")
             rowBtn.BackgroundTransparency = 1
             rowBtn.Size = UDim2.new(1, 0, 1, 0)
-            rowBtn.Font = Enum.Font.GothamSemibold
+            rowBtn.Font = self:GetFontSemibold()
             rowBtn.Text = (isSelected and "    " or "  ") .. option
             rowBtn.TextColor3 = isSelected and self.Theme.AccentSecondary or self.Theme.Text
             rowBtn.TextSize = self:S(12)
@@ -1754,7 +1930,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     label.Size = UDim2.new(1, -self:S(28), 0, self:S(14))
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = labelText
     label.TextColor3 = self.Theme.TextMuted
     label.TextSize = self:S(10)
@@ -1768,7 +1944,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     dropBtn.AutoButtonColor = false
     dropBtn.Position = UDim2.new(0, self:S(12), 0, self:S(26))
     dropBtn.Size = UDim2.new(1, -self:S(24), 0, self:S(28))
-    dropBtn.Font = Enum.Font.GothamSemibold
+    dropBtn.Font = self:GetFontSemibold()
     dropBtn.Text = "  Selecionar..."
     dropBtn.TextColor3 = self.Theme.TextMuted
     dropBtn.TextSize = self:S(12)
@@ -1821,7 +1997,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     listTitle.BackgroundTransparency = 1
     listTitle.Position = UDim2.new(0, self:S(16), 0, self:S(12))
     listTitle.Size = UDim2.new(0.6, 0, 0, self:S(22))
-    listTitle.Font = self.Font
+    listTitle.Font = self:GetFontBold()
     listTitle.Text = labelText
     listTitle.TextColor3 = self.Theme.Text
     listTitle.TextSize = self:S(14)
@@ -1834,7 +2010,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     countBadge.BackgroundColor3 = self.Theme.Accent
     countBadge.Position = UDim2.new(1, -self:S(48), 0, self:S(10))
     countBadge.Size = UDim2.new(0, self:S(36), 0, self:S(22))
-    countBadge.Font = self.Font
+    countBadge.Font = self:GetFontBold()
     countBadge.Text = "0"
     countBadge.TextColor3 = Color3.new(1, 1, 1)
     countBadge.TextSize = self:S(11)
@@ -1952,7 +2128,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
             local rowBtn = Instance.new("TextButton")
             rowBtn.BackgroundTransparency = 1
             rowBtn.Size = UDim2.new(1, 0, 1, 0)
-            rowBtn.Font = Enum.Font.GothamSemibold
+            rowBtn.Font = self:GetFontSemibold()
             rowBtn.Text = "      " .. option
             rowBtn.TextColor3 = sel and self.Theme.AccentSecondary or self.Theme.Text
             rowBtn.TextSize = self:S(12)
@@ -2077,7 +2253,7 @@ function GenesisX:CreateCheckbox(parent, config)
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, self:S(42), 0, 0)
     label.Size = UDim2.new(1, -self:S(56), 1, 0)
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = text
     label.TextColor3 = self.Theme.Text
     label.TextSize = self:S(13)
@@ -2147,7 +2323,7 @@ function GenesisX:CreateLabel(parent, config)
     label.BackgroundTransparency = 1
     label.Size = UDim2.new(1, 0, 0, 0)           -- altura começa 0
     label.AutomaticSize = Enum.AutomaticSize.Y    -- cresce com o texto
-    label.Font = Enum.Font.GothamSemibold
+    label.Font = self:GetFontSemibold()
     label.Text = text
     label.TextColor3 = color
     label.TextSize = self:S(12)
@@ -2208,7 +2384,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Position = UDim2.new(0, self:S(14), 0, self:S(10))
     titleLabel.Size = UDim2.new(1, -self:S(28), 0, self:S(20))
-    titleLabel.Font = self.Font
+    titleLabel.Font = self:GetFontBold()
     titleLabel.Text = titleText
     titleLabel.TextColor3 = titleColor
     titleLabel.TextSize = self:S(13)
@@ -2235,7 +2411,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         subLabel.Name = "Subtitle_" .. i
         subLabel.BackgroundTransparency = 1
         subLabel.Size = UDim2.new(1, 0, 0, self:S(16))
-        subLabel.Font = Enum.Font.Gotham
+        subLabel.Font = self:GetFont()
         subLabel.Text = subText
         subLabel.TextColor3 = self.Theme.TextSecondary
         subLabel.TextSize = self:S(11)
@@ -2263,7 +2439,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         btn.AutoButtonColor = false
         btn.BorderSizePixel = 0
         btn.Size = UDim2.new(1, 0, 1, 0)
-        btn.Font = self.Font
+        btn.Font = self:GetFontBold()
         btn.Text = btnText
         btn.TextSize = self:S(12)
         btn.ZIndex = 15
@@ -2484,7 +2660,7 @@ function GenesisX:CreateStatusCard(parent, config)
     headerTitle.BackgroundTransparency = 1
     headerTitle.Position = UDim2.new(0, self:S(16), 0, 0)
     headerTitle.Size = UDim2.new(1, -self:S(16), 1, 0)
-    headerTitle.Font = self.Font
+    headerTitle.Font = self:GetFontBold()
     headerTitle.Text = title
     headerTitle.TextColor3 = self.Theme.Text
     headerTitle.TextSize = self:S(12)
@@ -2504,7 +2680,7 @@ function GenesisX:CreateStatusCard(parent, config)
     statusLabel.Name = "Status"
     statusLabel.BackgroundTransparency = 1
     statusLabel.Size = UDim2.new(1, 0, 0, self:S(20))
-    statusLabel.Font = Enum.Font.GothamSemibold
+    statusLabel.Font = self:GetFontSemibold()
     statusLabel.Text = "● Idle"
     statusLabel.TextColor3 = self.Theme.TextMuted
     statusLabel.TextSize = self:S(12)
@@ -2517,7 +2693,7 @@ function GenesisX:CreateStatusCard(parent, config)
     infoLabel.BackgroundTransparency = 1
     infoLabel.Position = UDim2.new(0, 0, 0, self:S(22))
     infoLabel.Size = UDim2.new(1, 0, 0, self:S(16))
-    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.Font = self:GetFont()
     infoLabel.Text = "Aguardando..."
     infoLabel.TextColor3 = self.Theme.TextMuted
     infoLabel.TextSize = self:S(10)
@@ -2714,7 +2890,7 @@ function GenesisX:Notify(config)
     titleLabel.Name             = "Title"
     titleLabel.BackgroundTransparency = 1
     titleLabel.Size             = UDim2.new(1, 0, 0, self:S(20))
-    titleLabel.Font             = self.Font
+    titleLabel.Font             = self:GetFontBold()
     titleLabel.Text             = title or message
     titleLabel.TextColor3       = accentColor
     titleLabel.TextSize         = self:S(13)
@@ -2734,7 +2910,7 @@ function GenesisX:Notify(config)
             subLabel.BackgroundTransparency = 1
             subLabel.Position         = UDim2.new(0, 0, 0, subtitleY + ((i-1) * self:S(18)))
             subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
-            subLabel.Font             = Enum.Font.Gotham
+            subLabel.Font             = self:GetFont()
             subLabel.Text             = subText
             subLabel.TextColor3       = self.Theme.TextSecondary
             subLabel.TextSize         = self:S(11)
@@ -2750,7 +2926,7 @@ function GenesisX:Notify(config)
         subLabel.BackgroundTransparency = 1
         subLabel.Position         = UDim2.new(0, 0, 0, subtitleY)
         subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
-        subLabel.Font             = Enum.Font.Gotham
+        subLabel.Font             = self:GetFont()
         subLabel.Text             = subtitle
         subLabel.TextColor3       = self.Theme.TextSecondary
         subLabel.TextSize         = self:S(11)
@@ -2768,7 +2944,7 @@ function GenesisX:Notify(config)
         subLabel.BackgroundTransparency = 1
         subLabel.Position         = UDim2.new(0, 0, 0, subtitleY)
         subLabel.Size             = UDim2.new(1, 0, 0, self:S(16))
-        subLabel.Font             = Enum.Font.Gotham
+        subLabel.Font             = self:GetFont()
         subLabel.Text             = message
         subLabel.TextColor3       = self.Theme.TextSecondary
         subLabel.TextSize         = self:S(11)
