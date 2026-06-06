@@ -505,7 +505,8 @@ function GenesisX:CreateWindow(config)
     self.MainFrame.Name = "MainFrame"
     self.MainFrame.BackgroundColor3 = self.Theme.Background
     self.MainFrame.BorderSizePixel = 0
-    self.MainFrame.Position = config.Position or UDim2.new(0.5, -math.floor(windowWidth/2), 0.5, -math.floor(windowHeight/2))
+    self.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.MainFrame.Position = config.Position or UDim2.new(0.5, 0, 0.5, 0)
     self.MainFrame.Size = config.Size or UDim2.new(0, windowWidth, 0, windowHeight)
     self.MainFrame.Active = true
     self.MainFrame.Visible = true
@@ -651,7 +652,7 @@ function GenesisX:CreateWindow(config)
             self:Tween(btn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
         end)
         btn.MouseLeave:Connect(function()
-            self:Tween(btn, {BackgroundColor3 = self.Theme.Input, ImageColor3 = self.Theme.TextMuted}, 0.15)
+            self:Tween(btn, {BackgroundColor3 = self.Theme.Input, ImageColor3 = self.Theme.Accent}, 0.15)
         end)
         btn.MouseButton1Click:Connect(function()
             if btnData.Action then btnData.Action() end
@@ -3145,6 +3146,20 @@ function GenesisX:SetTheme(newTheme)
 
     -- Atualizar tema
     self.Theme = targetTheme
+
+    -- Atualizar header buttons
+    if self.Header then
+        for _, child in ipairs(self.Header:GetChildren()) do
+            if child:IsA("ImageButton") then
+                child.BackgroundColor3 = self.Theme.Input
+                child.ImageColor3 = self.Theme.Accent
+                local stroke = child:FindFirstChildOfClass("UIStroke")
+                if stroke then
+                    stroke.Color = self.Theme.Accent
+                end
+            end
+        end
+    end
 
     -- Atualizar todos os elementos da UI
     if self.ScreenGui then
