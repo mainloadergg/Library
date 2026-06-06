@@ -831,17 +831,12 @@ function GenesisX:_CreateFloatingButton(config)
     self.FloatBtn.MouseButton1Click:Connect(function()
         if not dragging then
             if not self.MainFrame.Visible then
+                -- Show
                 self.MainFrame.Visible = true
-                self.MainFrame.BackgroundTransparency = 0.3
-                self:Tween(self.MainFrame, {BackgroundTransparency = 0}, 0.2)
+                self.MainFrame.BackgroundTransparency = 0
             else
-                self:Tween(self.MainFrame, {BackgroundTransparency = 1}, 0.2)
-                task.delay(0.2, function()
-                    if self.MainFrame then
-                        self.MainFrame.Visible = false
-                        self.MainFrame.BackgroundTransparency = 0
-                    end
-                end)
+                -- Hide
+                self.MainFrame.Visible = false
             end
         end
     end)
@@ -937,6 +932,7 @@ function GenesisX:CreateTab(config)
     local divider = Instance.new("Frame")
     divider.Name = "Divider"
     divider.BackgroundColor3 = self.Theme.Border
+    divider.BackgroundTransparency = 0.5
     divider.BorderSizePixel = 0
     divider.Position = UDim2.new(0.5, -1, 0, 0)
     divider.Size = UDim2.new(0, 1, 1, 0)
