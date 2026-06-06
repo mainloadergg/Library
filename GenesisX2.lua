@@ -1,7 +1,7 @@
 local GenesisX = {}
 GenesisX.__index = GenesisX
 
--- ─── SERVIÇOS ─────────────────────────────────────────────────────────────────
+-- --- SERVICOS -----------------------------------------------------------------
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- ─── ÍCONES LUCIDE / SPECTRUMX ──────────────────────────────────────────────
+-- --- ICONES LUCIDE / SPECTRUMX ----------------------------------------------
 local LucideAssets = {}
 pcall(function()
     local raw = loadstring(game:HttpGet(
@@ -23,7 +23,7 @@ pcall(function()
 end)
 GenesisX.Icons = LucideAssets
 
--- ─── FONT SYSTEM ──────────────────────────────────────────────────────────────
+-- --- FONT SYSTEM --------------------------------------------------------------
 GenesisX.Font = "Gotham"
 
 local FontMap = {
@@ -87,7 +87,7 @@ end
 
 
 
--- ─── THEME SYSTEM ─────────────────────────────────────────────────────────────
+-- --- THEME SYSTEM -------------------------------------------------------------
 GenesisX.Themes = {
     Dark = {
         Background = Color3.fromRGB(8, 8, 8),
@@ -141,7 +141,7 @@ GenesisX.Themes = {
 
 GenesisX.Theme = GenesisX.Themes.Dark
 
--- ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
+-- --- CONFIGURACOES ------------------------------------------------------------
 GenesisX.Config = {
     AnimationSpeed = 0.2,
     CornerRadius = 8,
@@ -149,7 +149,7 @@ GenesisX.Config = {
     ShadowIntensity = 0.7,
 }
 
--- ─── ESCALA RESPONSIVA ────────────────────────────────────────────────────────
+-- --- ESCALA RESPONSIVA --------------------------------------------------------
 local ScaleData = {
     IsMobile = false,
     ScaleFactor = 1,
@@ -184,7 +184,7 @@ function GenesisX:S(value)
     return value
 end
 
--- ─── UTILITÁRIOS BÁSICOS ──────────────────────────────────────────────────────
+-- --- UTILITARIOS BASICOS ------------------------------------------------------
 function GenesisX:Tween(obj, props, time, style, direction)
     if not obj or not obj.Parent then return nil end
     local tweenInfo = TweenInfo.new(
@@ -222,7 +222,7 @@ function GenesisX:CreateGradient(parent, color1, color2, rotation)
     return gradient
 end
 
--- ─── SISTEMA DE SOMBRAS ───────────────────────────────────────────────────────
+-- --- SISTEMA DE SOMBRAS -------------------------------------------------------
 function GenesisX:CreateShadow(parent, size, intensity)
     if not self.Config.ShadowEnabled then return nil end
     size = size or 20
@@ -263,7 +263,7 @@ function GenesisX:CreateSimpleShadow(parent, size, transparency)
     return shadow
 end
 
--- ─── DRAGGABLE ────────────────────────────────────────────────────────────────
+-- --- DRAGGABLE ----------------------------------------------------------------
 function GenesisX:MakeDraggable(frame, handle)
     handle = handle or frame
     local dragging = false
@@ -300,7 +300,7 @@ function GenesisX:MakeDraggable(frame, handle)
     end)
 end
 
--- ─── RIPPLE EFFECT ────────────────────────────────────────────────────────────
+-- --- RIPPLE EFFECT ------------------------------------------------------------
 function GenesisX:CreateRipple(parent, position)
     local ripple = Instance.new("Frame")
     ripple.Name = "Ripple"
@@ -331,12 +331,12 @@ function GenesisX:CreateRipple(parent, position)
     end)
 end
 
--- ─── HELPERS DE ÍCONE ─────────────────────────────────────────────────────────
+-- --- HELPERS DE ICONE ---------------------------------------------------------
 function GenesisX:IsAssetId(value)
     if type(value) ~= "string" and type(value) ~= "number" then return false end
     local s = tostring(value)
     if s:match("^rbxassetid://") ~= nil or s:match("^%d+$") ~= nil then return true end
-    -- Também aceita nomes de ícones registrados
+    -- Tambem aceita nomes de icones registrados
     if LucideAssets and LucideAssets[s] then return true end
     return false
 end
@@ -345,7 +345,7 @@ function GenesisX:FormatAssetId(value)
     if type(value) == "number" then
         return "rbxassetid://" .. value
     elseif type(value) == "string" then
-        -- Prioridade: nome de ícone Lucide registrado
+        -- Prioridade: nome de icone Lucide registrado
         if LucideAssets and LucideAssets[value] then
             return LucideAssets[value]
         end
@@ -387,7 +387,7 @@ function GenesisX:CreateIcon(parent, iconData, size, color)
     end
 end
 
--- ─── REGISTRO DE DROPDOWNS ────────────────────────────────────────────────────
+-- --- REGISTRO DE DROPDOWNS ----------------------------------------------------
 function GenesisX:_RegisterDropdown(list, button, closeFunction)
     if not self._dropdowns then self._dropdowns = {} end
     table.insert(self._dropdowns, { List = list, Button = button, Close = closeFunction })
@@ -414,7 +414,7 @@ function GenesisX:_CloseDropdownsOnClick(position)
     end
 end
 
--- ─── CREATE WINDOW ────────────────────────────────────────────────────────────
+-- --- CREATE WINDOW ------------------------------------------------------------
 function GenesisX:CreateWindow(config)
     self:_EnsureTheme()
     config = config or {}
@@ -447,12 +447,12 @@ function GenesisX:CreateWindow(config)
     self.ScreenGui.IgnoreGuiInset = true
     self.ScreenGui.DisplayOrder = 999999
 
-    -- Parent no CoreGui se possível (fica por cima da UI do Roblox)
+    -- Parent no CoreGui se possivel (fica por cima da UI do Roblox)
     local parentSuccess = pcall(function()
         self.ScreenGui.Parent = CoreGui
     end)
 
-    -- Se falhar (executor não permite), usa PlayerGui
+    -- Se falhar (executor nao permite), usa PlayerGui
     if not parentSuccess then
         self.ScreenGui.Parent = PlayerGui
     end
@@ -479,7 +479,7 @@ function GenesisX:CreateWindow(config)
     self:CreateCorner(self.MainFrame, UDim.new(0, 12))
     self:CreateStroke(self.MainFrame, self.Theme.Accent, 1.5, 0)
 
-    -- ─── HEADER ─────────────────────────────────────────────────────────────────
+    -- --- HEADER -----------------------------------------------------------------
     local headerHeight = self:S(56)
 
     self.Header = Instance.new("Frame")
@@ -492,7 +492,7 @@ function GenesisX:CreateWindow(config)
     self:CreateCorner(self.Header, UDim.new(0, 10))
 
     local iconX = self:S(16)
-    -- FIX: Detectar asset ID corretamente para o ícone do header (agora inclui nomes Lucide)
+    -- FIX: Detectar asset ID corretamente para o icone do header (agora inclui nomes Lucide)
     local headerIconAsset = config.IconAssetId and self:FormatAssetId(config.IconAssetId)
                          or (config.Icon and self:FormatAssetId(config.Icon))
 
@@ -583,7 +583,7 @@ function GenesisX:CreateWindow(config)
         self.MainFrame.Visible = false
     end))
 
-    -- ─── SIDEBAR ────────────────────────────────────────────────────────────────
+    -- --- SIDEBAR ----------------------------------------------------------------
     local sidebarWidth = self:S(64)
 
     local sidebarWrap = Instance.new("Frame")
@@ -635,7 +635,7 @@ function GenesisX:CreateWindow(config)
         self.Sidebar.CanvasSize = UDim2.new(0, 0, 0, sidebarLayout.AbsoluteContentSize.Y + self:S(24))
     end)
 
-    -- ─── CONTENT AREA ───────────────────────────────────────────────────────────
+    -- --- CONTENT AREA -----------------------------------------------------------
     local contentX = sidebarWidth + self:S(10)
 
     self.ContentArea = Instance.new("Frame")
@@ -666,7 +666,7 @@ function GenesisX:CreateWindow(config)
     return window
 end
 
--- ─── FLOATING BUTTON ──────────────────────────────────────────────────────────
+-- --- FLOATING BUTTON ----------------------------------------------------------
 function GenesisX:_CreateFloatingButton(config)
     config = config or {}
     local btnSize = self:S(52)
@@ -682,7 +682,7 @@ function GenesisX:_CreateFloatingButton(config)
     self.FloatBtn.Parent = self.ScreenGui
     self:CreateCorner(self.FloatBtn, UDim.new(0, 14))
 
-    -- FIX: Detectar asset ID para ícone do botão flutuante (agora suporta nomes Lucide)
+    -- FIX: Detectar asset ID para icone do botao flutuante (agora suporta nomes Lucide)
     local floatIconRaw = config.FloatIconAssetId or config.FloatIcon or config.IconAssetId or config.Icon or "S"
     local floatIconAsset = self:FormatAssetId(floatIconRaw)
 
@@ -762,7 +762,7 @@ function GenesisX:_CreateFloatingButton(config)
     end)
 end
 
--- ─── CREATE TAB ───────────────────────────────────────────────────────────────
+-- --- CREATE TAB ---------------------------------------------------------------
 function GenesisX:CreateTab(config)
     config = config or {}
     local tabId = config.Name or "Tab"
@@ -778,12 +778,12 @@ function GenesisX:CreateTab(config)
     tabBtn.Parent = self.Sidebar
     self:CreateCorner(tabBtn, UDim.new(0, 10))
 
-    -- FIX: Detectar corretamente se Icon é asset ID ou nome Lucide
+    -- FIX: Detectar corretamente se Icon e asset ID ou nome Lucide
     local iconRaw = config.Icon or config.IconAssetId
     local iconAssetId = iconRaw and self:FormatAssetId(iconRaw)
 
     if iconAssetId then
-        -- É um asset ID ou nome Lucide válido — renderizar como ImageLabel
+        -- E um asset ID ou nome Lucide valido - renderizar como ImageLabel
         local iconImg = Instance.new("ImageLabel")
         iconImg.Name = "Icon"
         iconImg.BackgroundTransparency = 1
@@ -796,7 +796,7 @@ function GenesisX:CreateTab(config)
         iconImg.ZIndex = 14
         iconImg.Parent = tabBtn
     else
-        -- É texto/emoji — renderizar como TextLabel
+        -- E texto/emoji - renderizar como TextLabel
         local fallback = iconRaw or tabId:sub(1, 1)
         local iconLabel = Instance.new("TextLabel")
         iconLabel.Name = "Icon"
@@ -905,7 +905,7 @@ function GenesisX:CreateTab(config)
     return tabData
 end
 
--- ─── SELECT TAB ───────────────────────────────────────────────────────────────
+-- --- SELECT TAB ---------------------------------------------------------------
 function GenesisX:SelectTab(tabId)
     for id, data in pairs(self.Tabs) do
         local icon = data.Button:FindFirstChild("Icon")
@@ -934,7 +934,7 @@ function GenesisX:SelectTab(tabId)
     self.CurrentTab = tabId
 end
 
--- ─── CREATE SECTION ───────────────────────────────────────────────────────────
+-- --- CREATE SECTION -----------------------------------------------------------
 function GenesisX:CreateSection(parent, text, color, icon)
     -- icon: nome Lucide opcional, ex: "lucide-sword"
     color = self.Theme.Accent  -- Always use accent purple, ignore passed color
@@ -959,7 +959,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     line.ZIndex = 11
     line.Parent = wrap
 
-    -- Container do label (ícone + texto, fundo igual ao pai p/ "cortar" a linha)
+    -- Container do label (icone + texto, fundo igual ao pai p/ "cortar" a linha)
     local labelBg = Instance.new("Frame")
     labelBg.Name = "LabelBg"
     labelBg.BackgroundColor3 = self.Theme.Background
@@ -981,7 +981,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     pad.PaddingRight = UDim.new(0, self:S(6))
     pad.Parent = labelBg
 
-    -- Ícone (se fornecido)
+    -- Icone (se fornecido)
     if icon then
         local assetId = self:FormatAssetId(icon)
         if assetId then
@@ -1012,7 +1012,7 @@ function GenesisX:CreateSection(parent, text, color, icon)
     return wrap
 end
 
--- ─── CREATE TOGGLE ────────────────────────────────────────────────────────────
+-- --- CREATE TOGGLE ------------------------------------------------------------
 function GenesisX:CreateToggle(parent, config)
     config = config or {}
     local text = config.Text or "Toggle"
@@ -1111,7 +1111,7 @@ function GenesisX:CreateToggle(parent, config)
     }
 end
 
--- ─── CREATE BUTTON ────────────────────────────────────────────────────────────
+-- --- CREATE BUTTON ------------------------------------------------------------
 function GenesisX:CreateButton(parent, config)
     config = config or {}
     local text     = config.Text     or "Button"
@@ -1126,7 +1126,7 @@ function GenesisX:CreateButton(parent, config)
     frame.ZIndex = 12
     frame.Parent = parent
 
-    -- padding pra não cortar nas laterais
+    -- padding pra nao cortar nas laterais
     local pad = Instance.new("UIPadding")
     pad.PaddingLeft  = UDim.new(0, self:S(4))
     pad.PaddingRight = UDim.new(0, self:S(4))
@@ -1211,7 +1211,7 @@ function GenesisX:CreateButton(parent, config)
     }
 end
 
--- ─── CREATE INPUT ─────────────────────────────────────────────────────────────
+-- --- CREATE INPUT -------------------------------------------------------------
 function GenesisX:CreateInput(parent, config)
     config = config or {}
     local labelText = config.Label or "Input"
@@ -1276,7 +1276,7 @@ function GenesisX:CreateInput(parent, config)
     }
 end
 
--- ─── CREATE NUMBER INPUT ──────────────────────────────────────────────────────
+-- --- CREATE NUMBER INPUT ------------------------------------------------------
 function GenesisX:CreateNumberInput(parent, config)
     config = config or {}
     local labelText = config.Label or "Number"
@@ -1350,7 +1350,7 @@ function GenesisX:CreateNumberInput(parent, config)
     }
 end
 
--- ─── CREATE SLIDER ────────────────────────────────────────────────────────────
+-- --- CREATE SLIDER ------------------------------------------------------------
 function GenesisX:CreateSlider(parent, config)
     config = config or {}
     local text     = config.Text      or "Slider"
@@ -1383,7 +1383,7 @@ function GenesisX:CreateSlider(parent, config)
     label.ZIndex = 13
     label.Parent = frame
 
-    -- ── Valor clicável (vira TextBox ao clicar) ────────────────────────────
+    -- -- Valor clicavel (vira TextBox ao clicar) ----------------------------
     local valueBg = Instance.new("Frame")
     valueBg.Name = "ValueBg"
     valueBg.BackgroundColor3 = self.Theme.Accent
@@ -1393,7 +1393,7 @@ function GenesisX:CreateSlider(parent, config)
     valueBg.Parent = frame
     self:CreateCorner(valueBg, UDim.new(0, 5))
 
-    -- Label de display (visível normalmente)
+    -- Label de display (visivel normalmente)
     local valueLabel = Instance.new("TextButton")
     valueLabel.Name = "ValueLabel"
     valueLabel.BackgroundTransparency = 1
@@ -1406,7 +1406,7 @@ function GenesisX:CreateSlider(parent, config)
     valueLabel.ZIndex = 16
     valueLabel.Parent = valueBg
 
-    -- TextBox de input (invisível por padrão)
+    -- TextBox de input (invisivel por padrao)
     local valueInput = Instance.new("TextBox")
     valueInput.Name = "ValueInput"
     valueInput.BackgroundTransparency = 1
@@ -1421,7 +1421,7 @@ function GenesisX:CreateSlider(parent, config)
     valueInput.ZIndex = 17
     valueInput.Parent = valueBg
 
-    -- ── Track ──────────────────────────────────────────────────────────────
+    -- -- Track --------------------------------------------------------------
     local trackHeight = self:S(6)
     local trackBg = Instance.new("Frame")
     trackBg.Name = "TrackBg"
@@ -1503,7 +1503,7 @@ function GenesisX:CreateSlider(parent, config)
         end
     end)
 
-    -- ── Clique no valor → vira input ───────────────────────────────────────
+    -- -- Clique no valor -> vira input ---------------------------------------
     valueLabel.MouseButton1Click:Connect(function()
         valueLabel.Visible = false
         valueInput.Visible = true
@@ -1536,7 +1536,7 @@ function GenesisX:CreateSlider(parent, config)
     }
 end
 
--- ─── HELPER: POSIÇÃO DO DROPDOWN ──────────────────────────────────────────────
+-- --- HELPER: POSICAO DO DROPDOWN ----------------------------------------------
 local function getDropdownPosition(button, layout, maxHeight)
     local btnPos = button.AbsolutePosition
     local btnSize = button.AbsoluteSize
@@ -1551,7 +1551,7 @@ local function getDropdownPosition(button, layout, maxHeight)
     return UDim2.fromOffset(btnPos.X, targetY), targetHeight, contentHeight
 end
 
--- ─── CREATE DROPDOWN ──────────────────────────────────────────────────────────
+-- --- CREATE DROPDOWN ----------------------------------------------------------
 function GenesisX:CreateDropdown(parent, config)
     config = config or {}
     local labelText = config.Label or "Dropdown"
@@ -2113,7 +2113,7 @@ function GenesisX:CreateMultiDropdown(parent, config)
     }
 end
 
--- ─── CREATE CHECKBOX ──────────────────────────────────────────────────────────
+-- --- CREATE CHECKBOX ----------------------------------------------------------
 function GenesisX:CreateCheckbox(parent, config)
     config = config or {}
     local text = config.Text or "Checkbox"
@@ -2189,7 +2189,7 @@ function GenesisX:CreateCheckbox(parent, config)
 end
 
 
--- ─── CREATE LABEL ─────────────────────────────────────────────────────────────
+-- --- CREATE LABEL -------------------------------------------------------------
 function GenesisX:CreateLabel(parent, config)
     config = config or {}
     local text      = config.Text    or "Label"
@@ -2203,7 +2203,7 @@ function GenesisX:CreateLabel(parent, config)
     frame.Name = "Label_" .. text:sub(1, 10)
     frame.BackgroundColor3 = self.Theme.Card
     frame.Size = UDim2.new(1, 0, 0, minHeight)
-    frame.ClipsDescendants = false   -- não corta o conteúdo
+    frame.ClipsDescendants = false   -- nao corta o conteudo
     frame.ZIndex = 12
     frame.Parent = parent
     self:CreateCorner(frame)
@@ -2219,7 +2219,7 @@ function GenesisX:CreateLabel(parent, config)
     local label = Instance.new("TextLabel")
     label.Name = "Text"
     label.BackgroundTransparency = 1
-    label.Size = UDim2.new(1, 0, 0, 0)           -- altura começa 0
+    label.Size = UDim2.new(1, 0, 0, 0)           -- altura comeca 0
     label.AutomaticSize = Enum.AutomaticSize.Y    -- cresce com o texto
     label.Font = self:GetFontSemibold()
     label.Text = text
@@ -2254,7 +2254,7 @@ function GenesisX:CreateLabel(parent, config)
     }
 end
 
--- ─── CREATE LABEL TOGGLE SUBTITLE ─────────────────────────────────────────────
+-- --- CREATE LABEL TOGGLE SUBTITLE ---------------------------------------------
 function GenesisX:CreateLabelToggleSubTitle(parent, config)
     config = config or {}
     local titleText = config.Title or "Title"
@@ -2344,7 +2344,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         btn.Parent = btnFrame
         self:CreateCorner(btn, UDim.new(0, 6))
 
-        -- Cor sólida, sem borda, sem gradiente
+        -- Cor solida, sem borda, sem gradiente
         local bgColor, hoverColor, textColor
         if btnStyle == "accent" then
             bgColor    = self.Theme.Accent
@@ -2479,7 +2479,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
     }
 end
 
--- ─── CREATE SEPARATOR ─────────────────────────────────────────────────────────
+-- --- CREATE SEPARATOR ---------------------------------------------------------
 function GenesisX:CreateSeparator(parent)
     local wrap = Instance.new("Frame")
     wrap.Name = "Separator"
@@ -2501,7 +2501,7 @@ function GenesisX:CreateSeparator(parent)
     return wrap
 end
 
--- ─── CREATE STATUS CARD ───────────────────────────────────────────────────────
+-- --- CREATE STATUS CARD -------------------------------------------------------
 function GenesisX:CreateStatusCard(parent, config)
     config = config or {}
     local title = config.Title or "Status"
@@ -2579,7 +2579,7 @@ function GenesisX:CreateStatusCard(parent, config)
     statusLabel.BackgroundTransparency = 1
     statusLabel.Size = UDim2.new(1, 0, 0, self:S(20))
     statusLabel.Font = self:GetFontSemibold()
-    statusLabel.Text = "● Idle"
+    statusLabel.Text = "* Idle"
     statusLabel.TextColor3 = self.Theme.TextMuted
     statusLabel.TextSize = self:S(12)
     statusLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -2624,7 +2624,7 @@ function GenesisX:CreateStatusCard(parent, config)
     return {
         Frame = frame,
         SetStatus = function(status, color)
-            statusLabel.Text = "● " .. status
+            statusLabel.Text = "* " .. status
             statusLabel.TextColor3 = color or self.Theme.TextMuted
         end,
         SetInfo = function(info) infoLabel.Text = info end,
@@ -2646,12 +2646,12 @@ function GenesisX:CreateStatusCard(parent, config)
     }
 end
 
--- ═══════════════════════════════════════════════════════════════════════════════
--- ─── NOTIFICATIONS — REDESIGN GENESISX ───────────────────────────────────────
--- ═══════════════════════════════════════════════════════════════════════════════
+-- ===============================================================================
+-- --- NOTIFICATIONS - REDESIGN GENESISX ---------------------------------------
+-- ===============================================================================
 function GenesisX:Notify(config)
     config = config or {}
-    local message   = config.Text     or "Notificação"
+    local message   = config.Text     or "Notificacao"
     local title     = config.Title    or nil
     local subtitle  = config.Subtitle or nil
     local subtitles = config.Subtitles or nil
@@ -2660,13 +2660,13 @@ function GenesisX:Notify(config)
 
     self:UpdateScale()
 
-    -- ── Dimensões ──────────────────────────────────────────────────────────────
+    -- -- Dimensoes --------------------------------------------------------------
     local W  = self:S(ScaleData.IsMobile and 320 or 380)
     local PAD_RIGHT  = self:S(16)
     local PAD_BOTTOM = self:S(16)
     local GAP        = self:S(10)
 
-    -- ── Cores do tipo ─────────────────────────────────────────────────────────
+    -- -- Cores do tipo ---------------------------------------------------------
     local typeColors = {
         success = self.Theme.Success,
         warning = self.Theme.Warning,
@@ -2684,16 +2684,16 @@ function GenesisX:Notify(config)
     local accentColor = typeColors[ntype] or self.Theme.Info
     local iconName    = typeIcons[ntype]  or "lucide-info"
 
-    -- ── Viewport helper ───────────────────────────────────────────────────────
+    -- -- Viewport helper -------------------------------------------------------
     local function viewport()
         local ok, cam = pcall(function() return workspace.CurrentCamera end)
         return (ok and cam) and cam.ViewportSize or Vector2.new(1366, 768)
     end
 
-    -- ── Calcular altura dinâmica ──────────────────────────────────────────────
+    -- -- Calcular altura dinamica ----------------------------------------------
     local iconAreaW = self:S(70)
     local contentX = iconAreaW + self:S(12)
-    local contentW = W - contentX - self:S(36) -- espaço pro X
+    local contentW = W - contentX - self:S(36) -- espaco pro X
     local baseH = self:S(72)
     local totalH = baseH
 
@@ -2704,7 +2704,7 @@ function GenesisX:Notify(config)
         totalH = baseH + self:S(18)
     end
 
-    -- ── Criar frame principal ─────────────────────────────────────────────────
+    -- -- Criar frame principal -------------------------------------------------
     local notif = Instance.new("Frame")
     notif.Name               = "GX_Notification"
     notif.BackgroundColor3   = self.Theme.Background
@@ -2716,7 +2716,7 @@ function GenesisX:Notify(config)
     self:CreateCorner(notif, UDim.new(0, self:S(14)))
     self:CreateStroke(notif, accentColor, 1.5, 0.3)
 
-    -- ── Área do ícone (esquerda) ──────────────────────────────────────────────
+    -- -- Area do icone (esquerda) ----------------------------------------------
     local iconArea = Instance.new("Frame")
     iconArea.Name             = "IconArea"
     iconArea.BackgroundTransparency = 1
@@ -2725,7 +2725,7 @@ function GenesisX:Notify(config)
     iconArea.ZIndex           = 5001
     iconArea.Parent           = notif
 
-    -- Background do ícone com glow sutil
+    -- Background do icone com glow sutil
     local iconBg = Instance.new("Frame")
     iconBg.Name             = "IconBg"
     iconBg.BackgroundColor3 = accentColor
@@ -2738,7 +2738,7 @@ function GenesisX:Notify(config)
     iconBg.Parent           = iconArea
     self:CreateCorner(iconBg, UDim.new(1, 0))
 
-    -- Glow mais forte atrás
+    -- Glow mais forte atras
     local iconGlow = Instance.new("Frame")
     iconGlow.Name             = "IconGlow"
     iconGlow.BackgroundColor3 = accentColor
@@ -2751,7 +2751,7 @@ function GenesisX:Notify(config)
     iconGlow.Parent           = iconArea
     self:CreateCorner(iconGlow, UDim.new(1, 0))
 
-    -- Ícone Lucide
+    -- Icone Lucide
     local iconImg = Instance.new("ImageLabel")
     iconImg.Name                = "Icon"
     iconImg.BackgroundTransparency = 1
@@ -2762,7 +2762,7 @@ function GenesisX:Notify(config)
     iconImg.ZIndex              = 5002
     iconImg.Parent              = iconBg
 
-    -- ── Separador vertical ───────────────────────────────────────────────────
+    -- -- Separador vertical ---------------------------------------------------
     local separator = Instance.new("Frame")
     separator.Name             = "Separator"
     separator.BackgroundColor3 = accentColor
@@ -2774,7 +2774,7 @@ function GenesisX:Notify(config)
     separator.ZIndex           = 5001
     separator.Parent           = notif
 
-    -- ── Área de conteúdo (texto) ─────────────────────────────────────────────
+    -- -- Area de conteudo (texto) ---------------------------------------------
     local contentArea = Instance.new("Frame")
     contentArea.Name             = "ContentArea"
     contentArea.BackgroundTransparency = 1
@@ -2833,10 +2833,10 @@ function GenesisX:Notify(config)
         subLabel.ZIndex           = 5002
         subLabel.Parent           = contentArea
     elseif not title then
-        -- Se não tiver title, a mensagem é o title (já setado acima)
-        -- e não precisa de subtitle
+        -- Se nao tiver title, a mensagem e o title (ja setado acima)
+        -- e nao precisa de subtitle
     else
-        -- Se tiver title mas não subtitle, usar message como subtitle
+        -- Se tiver title mas nao subtitle, usar message como subtitle
         local subLabel = Instance.new("TextLabel")
         subLabel.Name             = "Subtitle"
         subLabel.BackgroundTransparency = 1
@@ -2852,7 +2852,7 @@ function GenesisX:Notify(config)
         subLabel.Parent           = contentArea
     end
 
-    -- ── Botão fechar (X) ───────────────────────────────────────────────────────
+    -- -- Botao fechar (X) -------------------------------------------------------
     local closeSize = self:S(18)
     local closeBtn = Instance.new("ImageButton")
     closeBtn.Name               = "CloseBtn"
@@ -2873,7 +2873,7 @@ function GenesisX:Notify(config)
         self:Tween(closeBtn, {ImageColor3 = self.Theme.TextMuted}, 0.1)
     end)
 
-    -- ── Barra de progresso (timer) na base ───────────────────────────────────
+    -- -- Barra de progresso (timer) na base -----------------------------------
     local timerBg = Instance.new("Frame")
     timerBg.Name                = "TimerBg"
     timerBg.BackgroundColor3    = self.Theme.Card
@@ -2891,7 +2891,7 @@ function GenesisX:Notify(config)
     timerBar.ZIndex             = 5002
     timerBar.Parent             = timerBg
 
-    -- ── Registrar e posicionar ───────────────────────────────────────────────
+    -- -- Registrar e posicionar -----------------------------------------------
     table.insert(self._notifications, notif)
     local myIndex = #self._notifications
 
@@ -2922,23 +2922,23 @@ function GenesisX:Notify(config)
         end
     end
 
-    -- Posição inicial (fora da tela à direita)
+    -- Posicao inicial (fora da tela a direita)
     do
         local yPos = bottomY(#self._notifications)
         notif.Position = UDim2.fromOffset(offscreenX(), yPos)
     end
 
-    -- Animação de entrada
+    -- Animacao de entrada
     self:Tween(notif, {
         Position = UDim2.fromOffset(targetX(), bottomY(#self._notifications))
     }, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
     restack(true)
 
-    -- ── Timer bar shrink ─────────────────────────────────────────────────────
+    -- -- Timer bar shrink -----------------------------------------------------
     self:Tween(timerBar, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
 
-    -- ── Dismiss ───────────────────────────────────────────────────────────────
+    -- -- Dismiss ---------------------------------------------------------------
     local dismissed = false
     local function dismiss()
         if dismissed then return end
@@ -2964,7 +2964,7 @@ function GenesisX:Notify(config)
 
     closeBtn.MouseButton1Click:Connect(dismiss)
 
-    -- Click no corpo também descarta
+    -- Click no corpo tambem descarta
     notif.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or
            input.UserInputType == Enum.UserInputType.Touch then
@@ -2996,7 +2996,7 @@ function GenesisX:Notify(config)
     }
 end
 
--- ─── DESTROY ──────────────────────────────────────────────────────────────────
+-- --- DESTROY ------------------------------------------------------------------
 function GenesisX:Destroy()
     if self.ScreenGui then self.ScreenGui:Destroy() end
 end
@@ -3062,7 +3062,7 @@ function GenesisX:SetFont(fontName)
     end
 end
 
--- ─── ALIASES / COMPATIBILIDADE ────────────────────────────────────────────────
+-- --- ALIASES / COMPATIBILIDADE ------------------------------------------------
 -- Permite usar GenesisX:Notify, SpectrumX:Notify, ou Notify() diretamente
 local env = (getgenv and getgenv()) or _G or {}
 env.SpectrumX = GenesisX
