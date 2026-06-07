@@ -2969,7 +2969,7 @@ function GenesisX:Notify(config)
     titleLabel.TextColor3       = accentColor
     titleLabel.TextSize         = self:S(13)
     titleLabel.TextXAlignment   = Enum.TextXAlignment.Left
-    titleLabel.TextTruncate     = Enum.TextTruncate.AtEnd
+    titleLabel.TextWrapped      = true
     titleLabel.ZIndex           = 5002
     titleLabel.Parent           = contentArea
 
@@ -2990,7 +2990,6 @@ function GenesisX:Notify(config)
             subLabel.TextSize         = self:S(11)
             subLabel.TextXAlignment   = Enum.TextXAlignment.Left
             subLabel.TextWrapped      = true
-            subLabel.TextTruncate     = Enum.TextTruncate.None
             subLabel.ZIndex           = 5002
             subLabel.Parent           = contentArea
             table.insert(subtitleTexts, subLabel)
@@ -3007,7 +3006,6 @@ function GenesisX:Notify(config)
         subLabel.TextSize         = self:S(11)
         subLabel.TextXAlignment   = Enum.TextXAlignment.Left
         subLabel.TextWrapped      = true
-        subLabel.TextTruncate     = Enum.TextTruncate.None
         subLabel.ZIndex           = 5002
         subLabel.Parent           = contentArea
     elseif not title then
@@ -3025,8 +3023,7 @@ function GenesisX:Notify(config)
         subLabel.TextColor3       = self.Theme.TextSecondary
         subLabel.TextSize         = self:S(11)
         subLabel.TextXAlignment   = Enum.TextXAlignment.Left
-        subLabel.TextTruncate     = Enum.TextTruncate.AtEnd
-        subLabel.ZIndex           = 5002
+            subLabel.ZIndex           = 5002
         subLabel.Parent           = contentArea
     end
 
