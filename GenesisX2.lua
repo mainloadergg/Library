@@ -2272,6 +2272,10 @@ function GenesisX:CreateMultiDropdown(parent, config)
             selected = {}
             for _, val in ipairs(v) do table.insert(selected, val) end
             updateText()
+            -- Refresh UI if dropdown is open
+            if isOpen then
+                populate()
+            end
         end,
         SetOptions = function(newOptions) options = newOptions end,
     }
