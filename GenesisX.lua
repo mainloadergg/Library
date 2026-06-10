@@ -694,7 +694,7 @@ function GenesisX:CreateWindow(config)
         if type(tabSelect) == "string" then
             local tabData = self.Tabs[tabSelect]
             if tabData then
-                self:SelectTab(tabData.Id)
+                GenesisX:SelectTab(tabSelect)
             end
         end
     end
