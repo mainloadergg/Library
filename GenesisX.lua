@@ -1129,6 +1129,49 @@ function GenesisV2:CreateWindow(Configs)
 
     CloseButton.Activated:Connect(Window.CloseBtn)
     MinimizeButton.Activated:Connect(Window.MinimizeBtn)
+
+    -- Métodos de elementos (API GenesisV2 - chamáveis via Window:Method)
+    function Window:CreateSection(parent, config_or_text, color, icon)
+        if type(config_or_text) == "string" then
+            return GenesisV2.CreateSection(GenesisV2, parent, config_or_text, color, icon)
+        else
+            return GenesisV2.CreateSection(GenesisV2, parent, config_or_text)
+        end
+    end
+    function Window:CreateLabel(parent, config)
+        return GenesisV2.CreateLabel(GenesisV2, parent, config)
+    end
+    function Window:CreateButton(parent, config)
+        return GenesisV2.CreateButton(GenesisV2, parent, config)
+    end
+    function Window:CreateToggle(parent, config)
+        return GenesisV2.CreateToggle(GenesisV2, parent, config)
+    end
+    function Window:CreateSlider(parent, config)
+        return GenesisV2.CreateSlider(GenesisV2, parent, config)
+    end
+    function Window:CreateDropdown(parent, config)
+        return GenesisV2.CreateDropdown(GenesisV2, parent, config)
+    end
+    function Window:CreateMultiDropdown(parent, config)
+        return GenesisV2.CreateDropdown(GenesisV2, parent, config)
+    end
+    function Window:CreateInput(parent, config)
+        return GenesisV2.CreateInput(GenesisV2, parent, config)
+    end
+    function Window:CreateNumberInput(parent, config)
+        return GenesisV2.CreateNumberInput(GenesisV2, parent, config)
+    end
+    function Window:CreateDiscordInvite(parent, config)
+        return GenesisV2.CreateDiscordInvite(GenesisV2, parent, config)
+    end
+    function Window:CreateSeparator(parent)
+        return GenesisV2.CreateSeparator(GenesisV2, parent)
+    end
+    function Window:CreateLabelToggleSubTitle(parent, config)
+        return GenesisV2.CreateLabelToggleSubTitle(GenesisV2, parent, config)
+    end
+
     return Window
 end
 
