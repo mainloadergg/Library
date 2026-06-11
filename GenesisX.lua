@@ -1139,6 +1139,58 @@ function GenesisV2:CreateWindow(config)
         }
     end
     
+    -- CREATE NUMBER INPUT
+    function window:CreateNumberInput(parent, config)
+    local labelText = config.Label or "Number"
+    local default = tonumber(config.Default) or 0
+    local min = tonumber(config.Min) or -math.huge
+    local max = tonumber(config.Max) or math.huge
+    local flag = config.Flag
+    local callback = config.Callback or function() end
+
+    if flag and self.GetFlag(flag) ~= nil then
+        local saved = tonumber(self.GetFlag(flag))
+        if saved then default = saved end
+    end
+
+    local frame, titleLabel, descLabel = CreateButtonFrame(parent, labelText, config.Description)
+
+    local inputBox = Instance.new("TextBox")
+    inputBox.Size = UDim2.new(0, 150, 0, 18)
+    inputBox.Position = UDim2.new(1, -10, 0.5)
+    inputBox.AnchorPoint = Vector2.new(1, 0.5)
+    inputBox.BackgroundColor3 = self.Theme["Color Stroke"]
+    inputBox.Font = Enum.Font.GothamBold
+    inputBox.TextScaled = true
+    inputBox.TextColor3 = self.Theme["Color Text"]
+    inputBox.PlaceholderText = "Número"
+    inputBox.Text = tostring(default)
+    inputBox.Parent = frame
+    self:CreateCorner(inputBox, UDim.new(0,4))
+
+    local function setValue(value)
+        local num = tonumber(value)
+        if not num then
+            inputBox.Text = tostring(default)
+            return
+        end
+        num = math.clamp(num, min, max)
+        inputBox.Text = tostring(num)
+        if flag then self.SetFlag(flag, num) end
+        callback(num)
+    end
+
+    inputBox.FocusLost:Connect(function()
+        setValue(inputBox.Text)
+    end)
+
+    return {
+        Frame = frame,
+        GetValue = function() return tonumber(inputBox.Text) or default end,
+        SetValue = function(v) setValue(v) end
+        }
+    end
+    
     -- CREATE LABEL
     function window:CreateLabel(parent, config)
         local text = config.Text or "Label"
