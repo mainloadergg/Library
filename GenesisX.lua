@@ -1,5 +1,13 @@
 --[[
     GenesisV2 - Fusão da API da GenesisX com o visual da redzlib (CORRIGIDO)
+    - Layout com abas, cada aba com Left/Right
+    - Ícones dinâmicos (repositório remoto)
+    - Sistema de flags (salvamento automático)
+    - Estilo visual da redzlib (gradientes, strokes, temas)
+    - Métodos: CreateTab, CreateSection, CreateToggle, CreateButton, CreateSlider,
+      CreateDropdown, CreateMultiDropdown, CreateInput, CreateLabel, CreateSeparator,
+      Notify, Dialog
+    - Nome global: GenesisV2, GenesisX, SpectrumX
 ]]
 
 local GenesisV2 = {}
@@ -10,6 +18,7 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
@@ -293,7 +302,7 @@ function GenesisV2:CreateWindow(config)
     SubTitle.Font = Enum.Font.Gotham
     SubTitle.Parent = Title
     
-    -- Botões de controle
+    -- Botões
     local function MakeControlBtn(parent, image, callback)
         local btn = Instance.new("ImageButton")
         btn.Size = UDim2.new(0, 14, 0, 14)
@@ -360,7 +369,7 @@ function GenesisV2:CreateWindow(config)
     sidebarLayout.Padding = UDim.new(0, 5)
     sidebarLayout.Parent = MainScroll
     
-    -- Área de conteúdo (container das abas)
+    -- Área de conteúdo
     local Containers = Instance.new("Frame")
     Containers.Size = UDim2.new(1, -TabSize, 1, -TopBar.Size.Y.Offset)
     Containers.AnchorPoint = Vector2.new(1, 1)
@@ -402,7 +411,6 @@ function GenesisV2:CreateWindow(config)
         local name = tabConfig.Name or "Tab"
         local icon = self:GetIcon(tabConfig.Icon) or ""
         
-        -- Botão da aba
         local tabBtn = Instance.new("TextButton")
         tabBtn.Size = UDim2.new(1, 0, 0, 24)
         tabBtn.AutoButtonColor = false
@@ -431,9 +439,9 @@ function GenesisV2:CreateWindow(config)
             labelIcon.Parent = tabBtn
         end
         
-        -- Barra lateral de seleção
+        -- Barra lateral indicadora (agora guardada em uma variável)
         local selectedBar = Instance.new("Frame")
-        selectedBar.Size = UDim2.new(0, 4, 0, 4)
+        selectedBar.Size = UDim2.new(0, 4, 0, 13)
         selectedBar.Position = UDim2.new(0, 1, 0.5)
         selectedBar.AnchorPoint = Vector2.new(0, 0.5)
         selectedBar.BackgroundColor3 = self.Theme["Color Theme"]
@@ -441,17 +449,33 @@ function GenesisV2:CreateWindow(config)
         selectedBar.Parent = tabBtn
         self:CreateCorner(selectedBar, UDim.new(0.5, 0))
         
-        -- Container da aba (com Left e Right)
-        local container = Instance.new("Frame")
+        -- Container da aba (Left + Right)
+        local container = Instance.new("ScrollingFrame")
         container.Size = UDim2.new(1, 0, 1, 0)
         container.BackgroundTransparency = 1
+        container.ScrollBarThickness = 1.5
+        container.ScrollBarImageColor3 = self.Theme["Color Theme"]
+        container.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        container.ScrollingDirection = Enum.ScrollingDirection.Y
+        container.BorderSizePixel = 0
         container.Visible = false
         container.Parent = Containers
         
-        -- Layout horizontal para Left/Right usando dois frames lado a lado
+        local containerPad = Instance.new("UIPadding")
+        containerPad.PaddingLeft = UDim.new(0, 10)
+        containerPad.PaddingRight = UDim.new(0, 10)
+        containerPad.PaddingTop = UDim.new(0, 10)
+        containerPad.PaddingBottom = UDim.new(0, 10)
+        containerPad.Parent = container
+        
+        local columnsLayout = Instance.new("UIListLayout")
+        columnsLayout.FillDirection = Enum.FillDirection.Horizontal
+        columnsLayout.Padding = UDim.new(0, 10)
+        columnsLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        columnsLayout.Parent = container
+        
         local leftCol = Instance.new("ScrollingFrame")
         leftCol.Size = UDim2.new(0.49, 0, 1, 0)
-        leftCol.Position = UDim2.new(0, 0, 0, 0)
         leftCol.BackgroundTransparency = 1
         leftCol.ScrollBarThickness = 1.5
         leftCol.ScrollBarImageColor3 = self.Theme["Color Theme"]
@@ -469,7 +493,6 @@ function GenesisV2:CreateWindow(config)
         leftLayout.Parent = leftCol
         
         local rightCol = leftCol:Clone()
-        rightCol.Position = UDim2.new(0.51, 0, 0, 0)
         rightCol.Parent = container
         
         local tabData = {
@@ -478,7 +501,7 @@ function GenesisV2:CreateWindow(config)
             Left = leftCol,
             Right = rightCol,
             Name = name,
-            SelectedBar = selectedBar, -- armazenar a barra
+            SelectedBar = selectedBar,  -- armazena a barra
             Enable = function()
                 for _, t in pairs(window.Tabs) do
                     t.Container.Visible = false
@@ -517,9 +540,9 @@ function GenesisV2:CreateWindow(config)
         frame.Size = UDim2.new(1, 0, 0, 25)
         frame.AutomaticSize = Enum.AutomaticSize.Y
         frame.AutoButtonColor = false
-        frame.BackgroundColor3 = window.Theme["Color Hub 2"]
+        frame.BackgroundColor3 = self.Theme["Color Hub 2"]
         frame.Parent = parent
-        window:CreateCorner(frame, UDim.new(0,6))
+        self:CreateCorner(frame, UDim.new(0,6))
         
         local holder = Instance.new("Frame")
         holder.AutomaticSize = Enum.AutomaticSize.Y
@@ -530,7 +553,7 @@ function GenesisV2:CreateWindow(config)
         
         local titleLabel = Instance.new("TextLabel")
         titleLabel.Font = Enum.Font.GothamMedium
-        titleLabel.TextColor3 = window.Theme["Color Text"]
+        titleLabel.TextColor3 = self.Theme["Color Text"]
         titleLabel.Size = UDim2.new(1, -20, 0, 0)
         titleLabel.AutomaticSize = Enum.AutomaticSize.Y
         titleLabel.BackgroundTransparency = 1
@@ -544,7 +567,7 @@ function GenesisV2:CreateWindow(config)
         if desc and desc ~= "" then
             descLabel = Instance.new("TextLabel")
             descLabel.Font = Enum.Font.Gotham
-            descLabel.TextColor3 = window.Theme["Color Dark Text"]
+            descLabel.TextColor3 = self.Theme["Color Dark Text"]
             descLabel.Size = UDim2.new(1, -20, 0, 0)
             descLabel.AutomaticSize = Enum.AutomaticSize.Y
             descLabel.Position = UDim2.new(0, 0, 0, 15)
@@ -567,14 +590,14 @@ function GenesisV2:CreateWindow(config)
     
     -- CREATE SECTION
     function window:CreateSection(parent, text, color, icon)
-        color = color or window.Theme["Color Theme"]
+        color = color or self.Theme["Color Theme"]
         local frame = Instance.new("Frame")
         frame.Size = UDim2.new(1, 0, 0, 20)
         frame.BackgroundTransparency = 1
         frame.Parent = parent
         
         local line = Instance.new("Frame")
-        line.BackgroundColor3 = window.Theme["Color Theme"]
+        line.BackgroundColor3 = self.Theme["Color Theme"]
         line.BackgroundTransparency = 0.7
         line.BorderSizePixel = 0
         line.Position = UDim2.new(0, 0, 0.5, 0)
@@ -582,7 +605,7 @@ function GenesisV2:CreateWindow(config)
         line.Parent = frame
         
         local labelBg = Instance.new("Frame")
-        labelBg.BackgroundColor3 = window.Theme["Color Hub 2"]
+        labelBg.BackgroundColor3 = self.Theme["Color Hub 2"]
         labelBg.BorderSizePixel = 0
         labelBg.AutomaticSize = Enum.AutomaticSize.X
         labelBg.Position = UDim2.new(0, 6, 0, 0)
@@ -590,13 +613,13 @@ function GenesisV2:CreateWindow(config)
         labelBg.Parent = frame
         
         if icon then
-            local iconAsset = window:GetIcon(icon)
+            local iconAsset = self:GetIcon(icon)
             if iconAsset then
                 local iconImg = Instance.new("ImageLabel")
                 iconImg.Size = UDim2.new(0, 14, 0, 14)
                 iconImg.BackgroundTransparency = 1
                 iconImg.Image = iconAsset
-                iconImg.ImageColor3 = window.Theme["Color Theme"]
+                iconImg.ImageColor3 = self.Theme["Color Theme"]
                 iconImg.Parent = labelBg
             end
         end
@@ -607,7 +630,7 @@ function GenesisV2:CreateWindow(config)
         label.Size = UDim2.new(0, 0, 1, 0)
         label.Font = Enum.Font.GothamBold
         label.Text = text
-        label.TextColor3 = window.Theme["Color Theme"]
+        label.TextColor3 = self.Theme["Color Theme"]
         label.TextSize = 11
         label.Parent = labelBg
         
@@ -624,7 +647,7 @@ function GenesisV2:CreateWindow(config)
     function window:CreateToggle(parent, config)
         local text = config.Text or "Toggle"
         local flag = config.Flag
-        local default = (flag and window:GetFlag(flag) ~= nil) and window:GetFlag(flag) or (config.Default or false)
+        local default = (flag and self.GetFlag(flag) ~= nil) and self.GetFlag(flag) or (config.Default or false)
         local callback = config.Callback or function() end
         
         local frame, titleLabel, descLabel = CreateButtonFrame(parent, text, config.Description)
@@ -633,9 +656,9 @@ function GenesisV2:CreateWindow(config)
         toggleHolder.Size = UDim2.new(0, 35, 0, 18)
         toggleHolder.Position = UDim2.new(1, -10, 0.5)
         toggleHolder.AnchorPoint = Vector2.new(1, 0.5)
-        toggleHolder.BackgroundColor3 = window.Theme["Color Stroke"]
+        toggleHolder.BackgroundColor3 = self.Theme["Color Stroke"]
         toggleHolder.Parent = frame
-        window:CreateCorner(toggleHolder, UDim.new(0.5,0))
+        self:CreateCorner(toggleHolder, UDim.new(0.5,0))
         
         local slider = Instance.new("Frame")
         slider.BackgroundTransparency = 1
@@ -648,26 +671,24 @@ function GenesisV2:CreateWindow(config)
         toggle.Size = UDim2.new(0, 12, 0, 12)
         toggle.Position = default and UDim2.new(1, 0, 0.5) or UDim2.new(0, 0, 0.5)
         toggle.AnchorPoint = default and Vector2.new(1, 0.5) or Vector2.new(0, 0.5)
-        toggle.BackgroundColor3 = window.Theme["Color Theme"]
+        toggle.BackgroundColor3 = self.Theme["Color Theme"]
         toggle.BackgroundTransparency = default and 0 or 0.8
         toggle.Parent = slider
-        window:CreateCorner(toggle, UDim.new(0.5,0))
+        self:CreateCorner(toggle, UDim.new(0.5,0))
         
         local state = default
         local function setState(newState, skipCallback)
-            if skipCallback then
-                state = newState
-            else
-                state = newState
-                if flag then window:SetFlag(flag, state) end
+            state = newState
+            if not skipCallback then
+                if flag then self.SetFlag(flag, state) end
                 callback(state)
             end
             if state then
-                window:Tween(toggle, {Position = UDim2.new(1, 0, 0.5), BackgroundTransparency = 0}, 0.25)
-                window:Tween(toggle, {AnchorPoint = Vector2.new(1, 0.5)}, 0.25)
+                self:Tween(toggle, {Position = UDim2.new(1, 0, 0.5), BackgroundTransparency = 0}, 0.25)
+                self:Tween(toggle, {AnchorPoint = Vector2.new(1, 0.5)}, 0.25)
             else
-                window:Tween(toggle, {Position = UDim2.new(0, 0, 0.5), BackgroundTransparency = 0.8}, 0.25)
-                window:Tween(toggle, {AnchorPoint = Vector2.new(0, 0.5)}, 0.25)
+                self:Tween(toggle, {Position = UDim2.new(0, 0, 0.5), BackgroundTransparency = 0.8}, 0.25)
+                self:Tween(toggle, {AnchorPoint = Vector2.new(0, 0.5)}, 0.25)
             end
         end
         
@@ -714,7 +735,7 @@ function GenesisV2:CreateWindow(config)
         local flag = config.Flag
         local callback = config.Callback or function() end
         
-        if flag and window:GetFlag(flag) ~= nil then default = window:GetFlag(flag) end
+        if flag and self.GetFlag(flag) ~= nil then default = self.GetFlag(flag) end
         
         local frame, titleLabel, descLabel = CreateButtonFrame(parent, text, config.Description)
         
@@ -729,16 +750,16 @@ function GenesisV2:CreateWindow(config)
         sliderBar.Size = UDim2.new(1, -20, 0, 6)
         sliderBar.Position = UDim2.new(0.5, 0, 0.5, 0)
         sliderBar.AnchorPoint = Vector2.new(0.5, 0.5)
-        sliderBar.BackgroundColor3 = window.Theme["Color Stroke"]
+        sliderBar.BackgroundColor3 = self.Theme["Color Stroke"]
         sliderBar.Parent = sliderHolder
-        window:CreateCorner(sliderBar, UDim.new(1,0))
+        self:CreateCorner(sliderBar, UDim.new(1,0))
         
         local fill = Instance.new("Frame")
-        fill.BackgroundColor3 = window.Theme["Color Theme"]
+        fill.BackgroundColor3 = self.Theme["Color Theme"]
         fill.Size = UDim2.new((default-min)/(max-min), 0, 1, 0)
         fill.BorderSizePixel = 0
         fill.Parent = sliderBar
-        window:CreateCorner(fill, UDim.new(1,0))
+        self:CreateCorner(fill, UDim.new(1,0))
         
         local knob = Instance.new("Frame")
         knob.Size = UDim2.new(0, 6, 0, 12)
@@ -747,14 +768,14 @@ function GenesisV2:CreateWindow(config)
         knob.AnchorPoint = Vector2.new(0.5, 0.5)
         knob.BackgroundTransparency = 0.2
         knob.Parent = sliderBar
-        window:CreateCorner(knob, UDim.new(1,0))
+        self:CreateCorner(knob, UDim.new(1,0))
         
         local valueLabel = Instance.new("TextLabel")
         valueLabel.Size = UDim2.new(0, 14, 0, 14)
         valueLabel.AnchorPoint = Vector2.new(1, 0.5)
         valueLabel.Position = UDim2.new(0, 0, 0.5)
         valueLabel.BackgroundTransparency = 1
-        valueLabel.TextColor3 = window.Theme["Color Text"]
+        valueLabel.TextColor3 = self.Theme["Color Text"]
         valueLabel.Font = Enum.Font.FredokaOne
         valueLabel.TextSize = 12
         valueLabel.Text = tostring(default)
@@ -769,7 +790,7 @@ function GenesisV2:CreateWindow(config)
             fill.Size = UDim2.new(percent, 0, 1, 0)
             knob.Position = UDim2.new(percent, -3, 0.5, 0)
             valueLabel.Text = tostring(math.floor(current))
-            if flag then window:SetFlag(flag, current) end
+            if flag then self.SetFlag(flag, current) end
             callback(current)
         end
         
@@ -809,7 +830,7 @@ function GenesisV2:CreateWindow(config)
         }
     end
     
-    -- CREATE DROPDOWN
+    -- CREATE DROPDOWN (simples)
     function window:CreateDropdown(parent, config)
         local labelText = config.Label or "Dropdown"
         local options = config.Options or {}
@@ -817,7 +838,7 @@ function GenesisV2:CreateWindow(config)
         local flag = config.Flag
         local callback = config.Callback or function() end
         
-        if flag and window:GetFlag(flag) then default = window:GetFlag(flag) end
+        if flag and self.GetFlag(flag) then default = self.GetFlag(flag) end
         
         local frame, titleLabel, descLabel = CreateButtonFrame(parent, labelText, config.Description)
         
@@ -825,9 +846,9 @@ function GenesisV2:CreateWindow(config)
         selectedFrame.Size = UDim2.new(0, 150, 0, 18)
         selectedFrame.Position = UDim2.new(1, -10, 0.5)
         selectedFrame.AnchorPoint = Vector2.new(1, 0.5)
-        selectedFrame.BackgroundColor3 = window.Theme["Color Stroke"]
+        selectedFrame.BackgroundColor3 = self.Theme["Color Stroke"]
         selectedFrame.Parent = frame
-        window:CreateCorner(selectedFrame, UDim.new(0,4))
+        self:CreateCorner(selectedFrame, UDim.new(0,4))
         
         local selectedText = Instance.new("TextLabel")
         selectedText.Size = UDim2.new(0.85, 0, 0.85, 0)
@@ -836,7 +857,7 @@ function GenesisV2:CreateWindow(config)
         selectedText.BackgroundTransparency = 1
         selectedText.Font = Enum.Font.GothamBold
         selectedText.TextScaled = true
-        selectedText.TextColor3 = window.Theme["Color Text"]
+        selectedText.TextColor3 = self.Theme["Color Text"]
         selectedText.Text = tostring(default)
         selectedText.Parent = selectedFrame
         
@@ -854,14 +875,13 @@ function GenesisV2:CreateWindow(config)
         dropdownContainer.BackgroundTransparency = 0.1
         dropdownContainer.ClipsDescendants = true
         dropdownContainer.Visible = false
-        dropdownContainer.Parent = window.ScreenGui
-        window:CreateCorner(dropdownContainer)
+        dropdownContainer.Parent = self.ScreenGui
         
         local dropdownList = Instance.new("ScrollingFrame")
         dropdownList.Size = UDim2.new(1, 0, 1, 0)
         dropdownList.BackgroundTransparency = 1
         dropdownList.ScrollBarThickness = 1.5
-        dropdownList.ScrollBarImageColor3 = window.Theme["Color Theme"]
+        dropdownList.ScrollBarImageColor3 = self.Theme["Color Theme"]
         dropdownList.CanvasSize = UDim2.new()
         dropdownList.AutomaticCanvasSize = Enum.AutomaticSize.Y
         dropdownList.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -876,15 +896,14 @@ function GenesisV2:CreateWindow(config)
         local function close()
             if not isOpen then return end
             isOpen = false
-            window:Tween(dropdownContainer, {Size = UDim2.new(0, 152, 0, 0)}, 0.2)
-            window:Tween(arrow, {Rotation = 0}, 0.2)
+            self:Tween(dropdownContainer, {Size = UDim2.new(0, 152, 0, 0)}, 0.2)
+            self:Tween(arrow, {Rotation = 0}, 0.2)
             task.wait(0.2)
             dropdownContainer.Visible = false
         end
         
         local function open()
             if isOpen then close(); return end
-            -- popular opções
             for _, child in ipairs(dropdownList:GetChildren()) do
                 if child:IsA("TextButton") then child:Destroy() end
             end
@@ -894,14 +913,14 @@ function GenesisV2:CreateWindow(config)
                 btn.Text = "  " .. opt
                 btn.TextXAlignment = Enum.TextXAlignment.Left
                 btn.Font = Enum.Font.GothamBold
-                btn.TextColor3 = window.Theme["Color Text"]
-                btn.BackgroundColor3 = window.Theme["Color Hub 2"]
+                btn.TextColor3 = self.Theme["Color Text"]
+                btn.BackgroundColor3 = self.Theme["Color Hub 2"]
                 btn.AutoButtonColor = false
                 btn.Parent = dropdownList
-                window:CreateCorner(btn, UDim.new(0,4))
+                self:CreateCorner(btn, UDim.new(0,4))
                 btn.MouseButton1Click:Connect(function()
                     selectedText.Text = opt
-                    if flag then window:SetFlag(flag, opt) end
+                    if flag then self.SetFlag(flag, opt) end
                     callback(opt)
                     close()
                 end)
@@ -911,8 +930,8 @@ function GenesisV2:CreateWindow(config)
             dropdownContainer.Size = UDim2.new(0, 152, 0, 0)
             dropdownContainer.Visible = true
             dropdownContainer.Position = UDim2.new(0, selectedFrame.AbsolutePosition.X, 0, selectedFrame.AbsolutePosition.Y + selectedFrame.AbsoluteSize.Y)
-            window:Tween(dropdownContainer, {Size = UDim2.new(0, 152, 0, targetHeight)}, 0.2)
-            window:Tween(arrow, {Rotation = 180}, 0.2)
+            self:Tween(dropdownContainer, {Size = UDim2.new(0, 152, 0, targetHeight)}, 0.2)
+            self:Tween(arrow, {Rotation = 180}, 0.2)
             isOpen = true
         end
         
@@ -922,6 +941,167 @@ function GenesisV2:CreateWindow(config)
             Frame = frame,
             GetValue = function() return selectedText.Text end,
             SetValue = function(v) selectedText.Text = v; callback(v) end,
+            SetOptions = function(newOpts) options = newOpts end
+        }
+    end
+    
+    -- CREATE MULTI DROPDOWN (estilo GenesisX)
+    function window:CreateMultiDropdown(parent, config)
+        local labelText = config.Label or "Multi Select"
+        local options = config.Options or {}
+        local default = config.Default or {}
+        local flag = config.Flag
+        local callback = config.Callback or function() end
+        
+        local selectedValues = {}
+        for _, v in ipairs(default) do table.insert(selectedValues, v) end
+        if flag and self.GetFlag(flag) then
+            local saved = self.GetFlag(flag)
+            if type(saved) == "table" then
+                selectedValues = saved
+            end
+        end
+        
+        local frame, titleLabel, descLabel = CreateButtonFrame(parent, labelText, config.Description)
+        
+        local selectedFrame = Instance.new("Frame")
+        selectedFrame.Size = UDim2.new(0, 150, 0, 18)
+        selectedFrame.Position = UDim2.new(1, -10, 0.5)
+        selectedFrame.AnchorPoint = Vector2.new(1, 0.5)
+        selectedFrame.BackgroundColor3 = self.Theme["Color Stroke"]
+        selectedFrame.Parent = frame
+        self:CreateCorner(selectedFrame, UDim.new(0,4))
+        
+        local selectedText = Instance.new("TextLabel")
+        selectedText.Size = UDim2.new(0.85, 0, 0.85, 0)
+        selectedText.AnchorPoint = Vector2.new(0.5, 0.5)
+        selectedText.Position = UDim2.new(0.5, 0, 0.5, 0)
+        selectedText.BackgroundTransparency = 1
+        selectedText.Font = Enum.Font.GothamBold
+        selectedText.TextScaled = true
+        selectedText.TextColor3 = self.Theme["Color Text"]
+        selectedText.Text = #selectedValues > 0 and #selectedValues .. " selecionados" or "Nenhum"
+        selectedText.Parent = selectedFrame
+        
+        local arrow = Instance.new("ImageLabel")
+        arrow.Size = UDim2.new(0, 15, 0, 15)
+        arrow.Position = UDim2.new(0, -5, 0.5)
+        arrow.AnchorPoint = Vector2.new(1, 0.5)
+        arrow.Image = "rbxassetid://10709791523"
+        arrow.BackgroundTransparency = 1
+        arrow.Parent = selectedFrame
+        
+        local dropdownContainer = Instance.new("Frame")
+        dropdownContainer.Size = UDim2.new(0, 152, 0, 0)
+        dropdownContainer.BackgroundColor3 = Color3.fromRGB(255,255,255)
+        dropdownContainer.BackgroundTransparency = 0.1
+        dropdownContainer.ClipsDescendants = true
+        dropdownContainer.Visible = false
+        dropdownContainer.Parent = self.ScreenGui
+        
+        local dropdownList = Instance.new("ScrollingFrame")
+        dropdownList.Size = UDim2.new(1, 0, 1, 0)
+        dropdownList.BackgroundTransparency = 1
+        dropdownList.ScrollBarThickness = 1.5
+        dropdownList.ScrollBarImageColor3 = self.Theme["Color Theme"]
+        dropdownList.CanvasSize = UDim2.new()
+        dropdownList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        dropdownList.ScrollingDirection = Enum.ScrollingDirection.Y
+        dropdownList.Parent = dropdownContainer
+        
+        local listLayout = Instance.new("UIListLayout")
+        listLayout.Padding = UDim.new(0, 4)
+        listLayout.Parent = dropdownList
+        
+        local isOpen = false
+        
+        local function isSelected(opt)
+            for _, v in ipairs(selectedValues) do
+                if v == opt then return true end
+            end
+            return false
+        end
+        
+        local function updateText()
+            if #selectedValues == 0 then
+                selectedText.Text = "Nenhum"
+            elseif #selectedValues == 1 then
+                selectedText.Text = selectedValues[1]
+            else
+                selectedText.Text = #selectedValues .. " selecionados"
+            end
+            if flag then self.SetFlag(flag, selectedValues) end
+            callback(selectedValues)
+        end
+        
+        local function toggleOption(opt)
+            local found = false
+            for i, v in ipairs(selectedValues) do
+                if v == opt then
+                    table.remove(selectedValues, i)
+                    found = true
+                    break
+                end
+            end
+            if not found then
+                table.insert(selectedValues, opt)
+            end
+            updateText()
+            -- Recriar lista para atualizar checkmarks
+            open() -- fecha e reabre para atualizar visual
+        end
+        
+        local function close()
+            if not isOpen then return end
+            isOpen = false
+            self:Tween(dropdownContainer, {Size = UDim2.new(0, 152, 0, 0)}, 0.2)
+            self:Tween(arrow, {Rotation = 0}, 0.2)
+            task.wait(0.2)
+            dropdownContainer.Visible = false
+        end
+        
+        local function open()
+            if isOpen then close(); return end
+            for _, child in ipairs(dropdownList:GetChildren()) do
+                if child:IsA("TextButton") then child:Destroy() end
+            end
+            for _, opt in ipairs(options) do
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(1, 0, 0, 21)
+                local prefix = isSelected(opt) and "✓ " or "  "
+                btn.Text = prefix .. opt
+                btn.TextXAlignment = Enum.TextXAlignment.Left
+                btn.Font = Enum.Font.GothamBold
+                btn.TextColor3 = self.Theme["Color Text"]
+                btn.BackgroundColor3 = self.Theme["Color Hub 2"]
+                btn.AutoButtonColor = false
+                btn.Parent = dropdownList
+                self:CreateCorner(btn, UDim.new(0,4))
+                btn.MouseButton1Click:Connect(function()
+                    toggleOption(opt)
+                end)
+            end
+            local contentHeight = listLayout.AbsoluteContentSize.Y + 10
+            local targetHeight = math.min(contentHeight, 200)
+            dropdownContainer.Size = UDim2.new(0, 152, 0, 0)
+            dropdownContainer.Visible = true
+            dropdownContainer.Position = UDim2.new(0, selectedFrame.AbsolutePosition.X, 0, selectedFrame.AbsolutePosition.Y + selectedFrame.AbsoluteSize.Y)
+            self:Tween(dropdownContainer, {Size = UDim2.new(0, 152, 0, targetHeight)}, 0.2)
+            self:Tween(arrow, {Rotation = 180}, 0.2)
+            isOpen = true
+        end
+        
+        frame.MouseButton1Click:Connect(open)
+        
+        return {
+            Frame = frame,
+            GetValues = function() return selectedValues end,
+            SetValues = function(vals)
+                selectedValues = {}
+                for _, val in ipairs(vals) do table.insert(selectedValues, val) end
+                updateText()
+                if isOpen then open() end
+            end,
             SetOptions = function(newOpts) options = newOpts end
         }
     end
@@ -939,14 +1119,14 @@ function GenesisV2:CreateWindow(config)
         inputBox.Size = UDim2.new(0, 150, 0, 18)
         inputBox.Position = UDim2.new(1, -10, 0.5)
         inputBox.AnchorPoint = Vector2.new(1, 0.5)
-        inputBox.BackgroundColor3 = window.Theme["Color Stroke"]
+        inputBox.BackgroundColor3 = self.Theme["Color Stroke"]
         inputBox.Font = Enum.Font.GothamBold
         inputBox.TextScaled = true
-        inputBox.TextColor3 = window.Theme["Color Text"]
+        inputBox.TextColor3 = self.Theme["Color Text"]
         inputBox.PlaceholderText = placeholder
         inputBox.Text = tostring(default)
         inputBox.Parent = frame
-        window:CreateCorner(inputBox, UDim.new(0,4))
+        self:CreateCorner(inputBox, UDim.new(0,4))
         
         inputBox.FocusLost:Connect(function()
             callback(inputBox.Text)
@@ -962,7 +1142,7 @@ function GenesisV2:CreateWindow(config)
     -- CREATE LABEL
     function window:CreateLabel(parent, config)
         local text = config.Text or "Label"
-        local color = config.Color or window.Theme["Color Dark Text"]
+        local color = config.Color or self.Theme["Color Dark Text"]
         
         local frame = Instance.new("Frame")
         frame.Size = UDim2.new(1, 0, 0, 20)
@@ -995,7 +1175,7 @@ function GenesisV2:CreateWindow(config)
         frame.Parent = parent
         
         local line = Instance.new("Frame")
-        line.BackgroundColor3 = window.Theme["Color Stroke"]
+        line.BackgroundColor3 = self.Theme["Color Stroke"]
         line.BorderSizePixel = 0
         line.Position = UDim2.new(0, 0, 0.5, 0)
         line.Size = UDim2.new(1, 0, 0, 1)
@@ -1016,19 +1196,19 @@ function GenesisV2:CreateWindow(config)
             warning = Color3.fromRGB(255, 140, 0),
             error = Color3.fromRGB(255, 50, 50),
             info = Color3.fromRGB(65, 150, 255),
-            genesis = window.Theme["Color Theme"]
+            genesis = self.Theme["Color Theme"]
         }
         local accent = colors[ntype] or colors.info
         
         local notif = Instance.new("Frame")
         notif.Size = UDim2.new(0, 300, 0, 50)
         notif.Position = UDim2.new(1, 320, 0, 20)
-        notif.BackgroundColor3 = window.Theme["Color Hub 2"]
+        notif.BackgroundColor3 = self.Theme["Color Hub 2"]
         notif.ClipsDescendants = true
         notif.ZIndex = 10000
-        notif.Parent = window.ScreenGui
-        window:CreateCorner(notif, UDim.new(0,8))
-        window:CreateStroke(notif, accent, 1.5, 0.3)
+        notif.Parent = self.ScreenGui
+        self:CreateCorner(notif, UDim.new(0,8))
+        self:CreateStroke(notif, accent, 1.5, 0.3)
         
         local titleLabel = Instance.new("TextLabel")
         titleLabel.Size = UDim2.new(1, -20, 0, 20)
@@ -1047,17 +1227,17 @@ function GenesisV2:CreateWindow(config)
         msgLabel.BackgroundTransparency = 1
         msgLabel.Font = Enum.Font.Gotham
         msgLabel.Text = message
-        msgLabel.TextColor3 = window.Theme["Color Dark Text"]
+        msgLabel.TextColor3 = self.Theme["Color Dark Text"]
         msgLabel.TextSize = 10
         msgLabel.TextXAlignment = Enum.TextXAlignment.Left
         msgLabel.Parent = notif
         
         local function dismiss()
-            window:Tween(notif, {Position = UDim2.new(1, 320, 0, notif.Position.Y.Offset)}, 0.3)
+            self:Tween(notif, {Position = UDim2.new(1, 320, 0, notif.Position.Y.Offset)}, 0.3)
             task.delay(0.35, function() notif:Destroy() end)
         end
         
-        window:Tween(notif, {Position = UDim2.new(1, -320, 0, 20)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        self:Tween(notif, {Position = UDim2.new(1, -320, 0, 20)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
         task.delay(duration, function() if notif.Parent then dismiss() end end)
         
         notif.InputBegan:Connect(function(input)
@@ -1086,10 +1266,10 @@ function GenesisV2:CreateWindow(config)
         local dialogFrame = Instance.new("Frame")
         dialogFrame.Size = UDim2.new(0, 250, 0, 150)
         dialogFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
-        dialogFrame.BackgroundColor3 = window.Theme["Color Hub 2"]
+        dialogFrame.BackgroundColor3 = self.Theme["Color Hub 2"]
         dialogFrame.Parent = overlay
-        window:CreateCorner(dialogFrame, UDim.new(0,12))
-        window:CreateStroke(dialogFrame, window.Theme["Color Theme"], 1.5, 0.3)
+        self:CreateCorner(dialogFrame, UDim.new(0,12))
+        self:CreateStroke(dialogFrame, self.Theme["Color Theme"], 1.5, 0.3)
         
         local titleLabel = Instance.new("TextLabel")
         titleLabel.Size = UDim2.new(1, -20, 0, 30)
@@ -1097,7 +1277,7 @@ function GenesisV2:CreateWindow(config)
         titleLabel.BackgroundTransparency = 1
         titleLabel.Font = Enum.Font.GothamBold
         titleLabel.Text = title
-        titleLabel.TextColor3 = window.Theme["Color Theme"]
+        titleLabel.TextColor3 = self.Theme["Color Theme"]
         titleLabel.TextSize = 14
         titleLabel.TextXAlignment = Enum.TextXAlignment.Left
         titleLabel.Parent = dialogFrame
@@ -1108,7 +1288,7 @@ function GenesisV2:CreateWindow(config)
         textLabel.BackgroundTransparency = 1
         textLabel.Font = Enum.Font.Gotham
         textLabel.Text = text
-        textLabel.TextColor3 = window.Theme["Color Dark Text"]
+        textLabel.TextColor3 = self.Theme["Color Dark Text"]
         textLabel.TextSize = 12
         textLabel.TextWrapped = true
         textLabel.Parent = dialogFrame
@@ -1126,8 +1306,8 @@ function GenesisV2:CreateWindow(config)
         btnLayout.Parent = btnHolder
         
         local function close()
-            window:Tween(overlay, {BackgroundTransparency = 1}, 0.2)
-            window:Tween(dialogFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+            self:Tween(overlay, {BackgroundTransparency = 1}, 0.2)
+            self:Tween(dialogFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
             task.delay(0.25, function() overlay:Destroy() end)
         end
         
@@ -1138,10 +1318,10 @@ function GenesisV2:CreateWindow(config)
             btn.Font = Enum.Font.GothamBold
             btn.TextSize = 12
             btn.TextColor3 = Color3.new(1,1,1)
-            btn.BackgroundColor3 = window.Theme["Color Theme"]
+            btn.BackgroundColor3 = self.Theme["Color Theme"]
             btn.AutoButtonColor = false
             btn.Parent = btnHolder
-            window:CreateCorner(btn, UDim.new(0,6))
+            self:CreateCorner(btn, UDim.new(0,6))
             btn.MouseButton1Click:Connect(function()
                 if opt[2] then opt[2]() end
                 close()
@@ -1151,6 +1331,9 @@ function GenesisV2:CreateWindow(config)
         return { Close = close }
     end
     
+    -- ==============================
+    --        MÉTODOS EXTRAS
+    -- ==============================
     function window:Destroy()
         self.ScreenGui:Destroy()
     end
@@ -1163,6 +1346,14 @@ function GenesisV2:CreateWindow(config)
         self.MainFrame.Visible = not self.MainFrame.Visible
     end
     
+    function window:SetTheme(themeName)
+        local newTheme = self.Themes[themeName] or self.Themes.Purple
+        self.Theme = newTheme
+        -- Nota: para uma atualização completa, seria necessário recriar a UI.
+        -- Por simplicidade, apenas alteramos o tema da janela atual.
+        self.MainFrame.BackgroundColor3 = self.Theme["Color Hub 2"]
+    end
+    
     return window
 end
 
@@ -1171,7 +1362,7 @@ end
 -- ==============================
 local env = getgenv and getgenv() or _G
 env.GenesisV2 = GenesisV2
-env.GenesisX = GenesisV2
-env.SpectrumX = GenesisV2
+env.GenesisX = GenesisV2   -- alias
+env.SpectrumX = GenesisV2  -- alias
 
 return GenesisV2
