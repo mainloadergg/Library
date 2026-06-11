@@ -573,6 +573,7 @@ local ScreenGui = Create("ScreenGui", CoreGui, {
     Name = "GenesisV2",
 }, {
     Create("UIScale", { Scale = UIScale, Name = "Scale" })
+GenesisV2.ScreenGui = ScreenGui
 })
 
 local ScreenFind = CoreGui:FindFirstChild(ScreenGui.Name)
@@ -1512,7 +1513,7 @@ function GenesisV2:CreateDropdown(parent, config)
 
     local function CalculatePos()
         local FramePos = SelectedFrame.AbsolutePosition
-        local ScreenSize = ScreenGui.AbsoluteSize
+        local ScreenSize = GenesisV2.ScreenGui.AbsoluteSize
         local ClampX = math.clamp((FramePos.X / UIScale), 0, ScreenSize.X / UIScale - DropFrame.Size.X.Offset)
         local ClampY = math.clamp((FramePos.Y / UIScale), 0, ScreenSize.Y / UIScale)
         local NewPos = UDim2.fromOffset(ClampX, ClampY)
@@ -1656,7 +1657,7 @@ function GenesisV2:CreateDropdown(parent, config)
     Button.Activated:Connect(Minimize)
     NoClickFrame.MouseButton1Down:Connect(Disable)
     NoClickFrame.MouseButton1Click:Connect(Disable)
-    MainFrame:GetPropertyChangedSignal("Visible"):Connect(Disable)
+    GenesisV2.MainFrame:GetPropertyChangedSignal("Visible"):Connect(Disable)
     SelectedFrame:GetPropertyChangedSignal("AbsolutePosition"):Connect(CalculatePos)
     Button.Activated:Connect(CalculateSize)
     ScrollFrame.ChildAdded:Connect(CalculateSize)
