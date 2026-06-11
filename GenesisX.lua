@@ -36,7 +36,11 @@ local GenesisV2 = {
             ["Color Stroke"] = Color3.fromRGB(40, 40, 40),
             ["Color Theme"] = Color3.fromRGB(88, 101, 242),
             ["Color Text"] = Color3.fromRGB(243, 243, 243),
-            ["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
+            ["Color Dark Text"] = Color3.fromRGB(180, 180, 180),
+            ["Warning"] = Color3.fromRGB(255, 193, 7),
+            ["Success"] = Color3.fromRGB(50, 205, 50),
+            ["Error"] = Color3.fromRGB(255, 50, 50),
+            ["Info"] = Color3.fromRGB(65, 150, 255)
         },
         Dark = {
             ["Color Hub 1"] = ColorSequence.new({
@@ -48,7 +52,11 @@ local GenesisV2 = {
             ["Color Stroke"] = Color3.fromRGB(65, 65, 65),
             ["Color Theme"] = Color3.fromRGB(65, 150, 255),
             ["Color Text"] = Color3.fromRGB(245, 245, 245),
-            ["Color Dark Text"] = Color3.fromRGB(190, 190, 190)
+            ["Color Dark Text"] = Color3.fromRGB(190, 190, 190),
+            ["Warning"] = Color3.fromRGB(255, 193, 7),
+            ["Success"] = Color3.fromRGB(50, 205, 50),
+            ["Error"] = Color3.fromRGB(255, 50, 50),
+            ["Info"] = Color3.fromRGB(65, 150, 255)
         },
         Purple = {
             ["Color Hub 1"] = ColorSequence.new({
@@ -60,7 +68,11 @@ local GenesisV2 = {
             ["Color Stroke"] = Color3.fromRGB(40, 40, 40),
             ["Color Theme"] = Color3.fromRGB(150, 0, 255),
             ["Color Text"] = Color3.fromRGB(240, 240, 240),
-            ["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
+            ["Color Dark Text"] = Color3.fromRGB(180, 180, 180),
+            ["Warning"] = Color3.fromRGB(255, 193, 7),
+            ["Success"] = Color3.fromRGB(50, 205, 50),
+            ["Error"] = Color3.fromRGB(255, 50, 50),
+            ["Info"] = Color3.fromRGB(65, 150, 255)
         },
         Green = {
             ["Color Hub 1"] = ColorSequence.new({
@@ -72,7 +84,11 @@ local GenesisV2 = {
             ["Color Stroke"] = Color3.fromRGB(35, 55, 40),
             ["Color Theme"] = Color3.fromRGB(50, 205, 50),
             ["Color Text"] = Color3.fromRGB(235, 245, 235),
-            ["Color Dark Text"] = Color3.fromRGB(180, 200, 180)
+            ["Color Dark Text"] = Color3.fromRGB(180, 200, 180),
+            ["Warning"] = Color3.fromRGB(255, 193, 7),
+            ["Success"] = Color3.fromRGB(50, 205, 50),
+            ["Error"] = Color3.fromRGB(255, 50, 50),
+            ["Info"] = Color3.fromRGB(65, 150, 255)
         },
         Orange = {
             ["Color Hub 1"] = ColorSequence.new({
@@ -84,7 +100,11 @@ local GenesisV2 = {
             ["Color Stroke"] = Color3.fromRGB(60, 40, 25),
             ["Color Theme"] = Color3.fromRGB(255, 140, 0),
             ["Color Text"] = Color3.fromRGB(250, 240, 230),
-            ["Color Dark Text"] = Color3.fromRGB(200, 160, 120)
+            ["Color Dark Text"] = Color3.fromRGB(200, 160, 120),
+            ["Warning"] = Color3.fromRGB(255, 193, 7),
+            ["Success"] = Color3.fromRGB(50, 205, 50),
+            ["Error"] = Color3.fromRGB(255, 50, 50),
+            ["Info"] = Color3.fromRGB(65, 150, 255)
         }
     },
     Info = { Version = "2.0.0" },
@@ -187,6 +207,7 @@ end
 pcall(Save, "GenesisV2.json")
 
 local Theme = GenesisV2.Themes[GenesisV2.Save.Theme]
+GenesisV2.Theme = Theme
 
 local Funcs = {}
 function Funcs:InsertCallback(tab, func)
@@ -445,6 +466,7 @@ function GenesisV2:SetTheme(NewTheme)
     GenesisV2.Save.Theme = NewTheme
     SaveJson("GenesisV2.json", GenesisV2.Save)
     Theme = GenesisV2.Themes[NewTheme]
+    GenesisV2.Theme = Theme
     UpdateAllElements()
     Connection:FireConnection("ThemeChanged", NewTheme)
 end
@@ -1073,7 +1095,16 @@ end
 -- ==============================
 function GenesisV2:CreateSection(parent, text, color, icon)
     text = text or "Section"
-    color = color or Theme["Color Theme"]
+
+    -- Suporte a chamada antiga: GenesisX.Theme.Warning como cor
+    local sectionColor = Theme["Color Theme"]
+    if type(color) == "table" and color.r and color.g and color.b then
+        sectionColor = color
+    elseif type(color) == "string" and Theme[color] then
+        sectionColor = Theme[color]
+    elseif typeof(color) == "Color3" then
+        sectionColor = color
+    end
 
     local SectionFrame = Create("Frame", parent, {
         Size = UDim2.new(1, 0, 0, 20),
@@ -1084,7 +1115,7 @@ function GenesisV2:CreateSection(parent, text, color, icon)
     local SectionLabel = InsertTheme(Create("TextLabel", SectionFrame, {
         Font = Enum.Font.GothamBold,
         Text = text,
-        TextColor3 = Theme["Color Text"],
+        TextColor3 = sectionColor,
         Size = UDim2.new(1, -25, 1, 0),
         Position = UDim2.new(0, 5),
         BackgroundTransparency = 1,
@@ -1092,6 +1123,20 @@ function GenesisV2:CreateSection(parent, text, color, icon)
         TextSize = 14,
         TextXAlignment = "Left"
     }), "Text")
+
+    -- Ícone opcional (suporte a ícones lucide)
+    if icon and icon ~= "" then
+        local iconAsset = GenesisV2:GetIcon(icon)
+        if iconAsset and iconAsset ~= icon then
+            local iconLabel = Create("ImageLabel", SectionFrame, {
+                Size = UDim2.new(0, 14, 0, 14),
+                Position = UDim2.new(0, SectionLabel.TextBounds.X + 20, 0.5, -7),
+                BackgroundTransparency = 1,
+                Image = iconAsset,
+                ImageColor3 = sectionColor
+            })
+        end
+    end
 
     local Section = {}
     table.insert(GenesisV2.Options, {type = "Section", Name = text, func = Section})
