@@ -1219,6 +1219,192 @@ function GenesisV2:CreateWindow(config)
         }
     end
     
+    -- CREATE LABEL TOGGLE SUBTITLE (GenesisX style)
+    function window:CreateLabelToggleSubTitle(parent, config)
+    config = config or {}
+    local titleText = config.Title or "Title"
+    local subtitles = config.Subtitles or {}
+    local buttons = config.Buttons or {}
+    local titleColor = config.TitleColor or self.Theme["Color Theme"]
+
+    local baseHeight = self.S(46)
+    local extraHeight = (#subtitles * self.S(18)) + (#buttons * self.S(34)) + self.S(16)
+    local totalHeight = baseHeight + extraHeight
+
+    local frame = Instance.new("Frame")
+    frame.BackgroundColor3 = self.Theme["Color Hub 2"]
+    frame.Size = UDim2.new(1, 0, 0, totalHeight)
+    frame.Parent = parent
+    self:CreateCorner(frame, UDim.new(0, 8))
+    self:CreateStroke(frame, self.Theme["Color Stroke"], 1, 0.4)
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Position = UDim2.new(0, self.S(14), 0, self.S(10))
+    titleLabel.Size = UDim2.new(1, -self.S(28), 0, self.S(20))
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Text = titleText
+    titleLabel.TextColor3 = titleColor
+    titleLabel.TextSize = self.S(13)
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = frame
+
+    local contentFrame = Instance.new("Frame")
+    contentFrame.BackgroundTransparency = 1
+    contentFrame.Position = UDim2.new(0, self.S(14), 0, self.S(32))
+    contentFrame.Size = UDim2.new(1, -self.S(28), 1, -self.S(40))
+    contentFrame.Parent = frame
+
+    local contentLayout = Instance.new("UIListLayout")
+    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    contentLayout.Padding = UDim.new(0, self.S(6))
+    contentLayout.Parent = contentFrame
+
+    local subtitleLabels = {}
+    for i, subText in ipairs(subtitles) do
+        local subLabel = Instance.new("TextLabel")
+        subLabel.BackgroundTransparency = 1
+        subLabel.Size = UDim2.new(1, 0, 0, self.S(16))
+        subLabel.Font = Enum.Font.Gotham
+        subLabel.Text = subText
+        subLabel.TextColor3 = self.Theme["Color Dark Text"]
+        subLabel.TextSize = self.S(11)
+        subLabel.TextXAlignment = Enum.TextXAlignment.Left
+        subLabel.Parent = contentFrame
+        table.insert(subtitleLabels, subLabel)
+    end
+
+    local buttonObjects = {}
+    for i, btnConfig in ipairs(buttons) do
+        local btnText = btnConfig.Text or "Button"
+        local btnCallback = btnConfig.Callback or function() end
+        local btnStyle = btnConfig.Style or "default"
+
+        local btnFrame = Instance.new("Frame")
+        btnFrame.BackgroundTransparency = 1
+        btnFrame.Size = UDim2.new(1, 0, 0, self.S(32))
+        btnFrame.Parent = contentFrame
+
+        local btn = Instance.new("TextButton")
+        btn.AutoButtonColor = false
+        btn.BorderSizePixel = 0
+        btn.Size = UDim2.new(1, 0, 1, 0)
+        btn.Font = Enum.Font.GothamBold
+        btn.Text = btnText
+        btn.TextSize = self.S(12)
+        btn.Parent = btnFrame
+        self:CreateCorner(btn, UDim.new(0,6))
+
+        local bgColor, hoverColor, textColor
+        if btnStyle == "accent" then
+            bgColor = self.Theme["Color Theme"]
+            hoverColor = Color3.fromRGB(180, 100, 255)
+            textColor = Color3.new(1,1,1)
+        elseif btnStyle == "danger" then
+            bgColor = Color3.fromRGB(120, 30, 30)
+            hoverColor = Color3.fromRGB(150, 40, 40)
+            textColor = Color3.new(1,1,1)
+        elseif btnStyle == "warning" then
+            bgColor = Color3.fromRGB(120, 70, 0)
+            hoverColor = Color3.fromRGB(150, 90, 0)
+            textColor = Color3.new(1,1,1)
+        elseif btnStyle == "info" then
+            bgColor = Color3.fromRGB(30, 60, 120)
+            hoverColor = Color3.fromRGB(40, 80, 150)
+            textColor = Color3.new(1,1,1)
+        else
+            bgColor = self.Theme["Color Hub 2"]
+            hoverColor = self.Theme["Color Hub 2"]
+            textColor = self.Theme["Color Text"]
+        end
+
+        btn.BackgroundColor3 = bgColor
+        btn.TextColor3 = textColor
+
+        local btnData = {
+            Button = btn,
+            Frame = btnFrame,
+            CurrentCallback = btnCallback,
+            CurrentStyle = btnStyle,
+            CurrentBg = bgColor,
+            CurrentHover = hoverColor,
+            CurrentText = textColor,
+        }
+
+        btn.MouseEnter:Connect(function()
+            self:Tween(btn, {BackgroundColor3 = btnData.CurrentHover}, 0.15)
+        end)
+        btn.MouseLeave:Connect(function()
+            self:Tween(btn, {BackgroundColor3 = btnData.CurrentBg}, 0.15)
+        end)
+        btn.MouseButton1Click:Connect(function()
+            btnData.CurrentCallback()
+        end)
+
+        table.insert(buttonObjects, btnData)
+    end
+
+    return {
+        Frame = frame,
+        Title = titleLabel,
+        SetTitle = function(t) titleLabel.Text = t end,
+        SetTitleColor = function(c) titleLabel.TextColor3 = c end,
+        SetSubtitles = function(newSubtitles)
+            for i, subLabel in ipairs(subtitleLabels) do
+                subLabel.Text = newSubtitles[i] or ""
+            end
+        end,
+        SetSubtitle = function(index, text)
+            if subtitleLabels[index] then
+                subtitleLabels[index].Text = text or ""
+            end
+        end,
+        SetButtonText = function(index, text)
+            local bd = buttonObjects[index]
+            if bd then bd.Button.Text = text or "" end
+        end,
+        SetButtonCallback = function(index, callback)
+            local bd = buttonObjects[index]
+            if bd then bd.CurrentCallback = callback or function() end end
+        end,
+        SetButtonStyle = function(index, style)
+            local bd = buttonObjects[index]
+            if not bd then return end
+            local newBg, newHover, newText
+            if style == "accent" then
+                newBg = self.Theme["Color Theme"]
+                newHover = Color3.fromRGB(180, 100, 255)
+                newText = Color3.new(1,1,1)
+            elseif style == "danger" then
+                newBg = Color3.fromRGB(120, 30, 30)
+                newHover = Color3.fromRGB(150, 40, 40)
+                newText = Color3.new(1,1,1)
+            elseif style == "warning" then
+                newBg = Color3.fromRGB(120, 70, 0)
+                newHover = Color3.fromRGB(150, 90, 0)
+                newText = Color3.new(1,1,1)
+            elseif style == "info" then
+                newBg = Color3.fromRGB(30, 60, 120)
+                newHover = Color3.fromRGB(40, 80, 150)
+                newText = Color3.new(1,1,1)
+            else
+                newBg = self.Theme["Color Hub 2"]
+                newHover = self.Theme["Color Hub 2"]
+                newText = self.Theme["Color Text"]
+            end
+            bd.CurrentStyle = style
+            bd.CurrentBg = newBg
+            bd.CurrentHover = newHover
+            bd.CurrentText = newText
+            bd.Button.BackgroundColor3 = newBg
+            bd.Button.TextColor3 = newText
+        end,
+        SetVisible = function(visible) frame.Visible = visible end,
+        Subtitles = subtitleLabels,
+        Buttons = buttonObjects,
+        }
+    end
+    
     -- CREATE SEPARATOR
     function window:CreateSeparator(parent)
         local frame = Instance.new("Frame")
