@@ -1081,6 +1081,49 @@ function GenesisV2:CreateWindow(Configs)
         Tab.Left = LeftCol
         Tab.Right = RightCol
 
+
+        -- Métodos de elementos (API GenesisV2 - chamáveis via tab:Method)
+        function Tab:CreateSection(config_or_text, color, icon)
+            if type(config_or_text) == "string" then
+                return GenesisV2.CreateSection(GenesisV2, self.Cont, config_or_text, color, icon)
+            else
+                return GenesisV2.CreateSection(GenesisV2, self.Cont, config_or_text)
+            end
+        end
+        function Tab:CreateLabel(config)
+            return GenesisV2.CreateLabel(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateButton(config)
+            return GenesisV2.CreateButton(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateToggle(config)
+            return GenesisV2.CreateToggle(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateSlider(config)
+            return GenesisV2.CreateSlider(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateDropdown(config)
+            return GenesisV2.CreateDropdown(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateMultiDropdown(config)
+            return GenesisV2.CreateDropdown(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateInput(config)
+            return GenesisV2.CreateInput(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateNumberInput(config)
+            return GenesisV2.CreateNumberInput(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateDiscordInvite(config)
+            return GenesisV2.CreateDiscordInvite(GenesisV2, self.Cont, config)
+        end
+        function Tab:CreateSeparator()
+            return GenesisV2.CreateSeparator(GenesisV2, self.Cont)
+        end
+        function Tab:CreateLabelToggleSubTitle(config)
+            return GenesisV2.CreateLabelToggleSubTitle(GenesisV2, self.Cont, config)
+        end
+
         return Tab
     end
 
