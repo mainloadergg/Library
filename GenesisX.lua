@@ -31,6 +31,28 @@ local FontMap = {
     Arcade = Enum.Font.Arcade,
     Fantasy = Enum.Font.Fantasy,
     GothamBlack = Enum.Font.GothamBlack,
+    Code = Enum.Font.Code,
+    Bangers = Enum.Font.Bangers,
+    FredokaOne = Enum.Font.FredokaOne,
+    Garamond = Enum.Font.Garamond,
+    IndieFlower = Enum.Font.IndieFlower,
+    Jura = Enum.Font.Jura,
+    LuckiestGuy = Enum.Font.LuckiestGuy,
+    Merriweather = Enum.Font.Merriweather,
+    Michroma = Enum.Font.Michroma,
+    Nunito = Enum.Font.Nunito,
+    Oswald = Enum.Font.Oswald,
+    PermanentMarker = Enum.Font.PermanentMarker,
+    Rajdhani = Enum.Font.Rajdhani,
+    Sarpanch = Enum.Font.Sarpanch,
+    SourceSans = Enum.Font.SourceSans,
+    SourceSansBold = Enum.Font.SourceSansBold,
+    SourceSansItalic = Enum.Font.SourceSansItalic,
+    SourceSansLight = Enum.Font.SourceSansLight,
+    SourceSansSemibold = Enum.Font.SourceSansSemibold,
+    SpecialElite = Enum.Font.SpecialElite,
+    TitilliumWeb = Enum.Font.TitilliumWeb,
+    Ubuntu = Enum.Font.Ubuntu,
 }
 
 function GenesisX:GetFont()
@@ -38,15 +60,33 @@ function GenesisX:GetFont()
 end
 
 function GenesisX:GetFontBold()
-    return FontMap[self.Font] or Enum.Font.GothamBold
+    local mapped = FontMap[self.Font]
+    if mapped then return mapped end
+    -- Try to find bold variant
+    local name = self.Font or "Gotham"
+    if name == "Gotham" then return Enum.Font.GothamBold end
+    if name == "SourceSans" then return Enum.Font.SourceSansBold end
+    if name == "SourceSansLight" then return Enum.Font.SourceSansBold end
+    if name == "SourceSansItalic" then return Enum.Font.SourceSansBold end
+    if name == "SourceSansSemibold" then return Enum.Font.SourceSansBold end
+    return Enum.Font.GothamBold
 end
 
 function GenesisX:GetFontSemibold()
-    return FontMap[self.Font] or Enum.Font.GothamSemibold
+    local mapped = FontMap[self.Font]
+    if mapped then return mapped end
+    local name = self.Font or "Gotham"
+    if name == "Gotham" then return Enum.Font.GothamSemibold end
+    if name == "SourceSans" then return Enum.Font.SourceSansSemibold end
+    return Enum.Font.GothamSemibold
 end
 
 function GenesisX:GetFontBlack()
-    return FontMap[self.Font] or Enum.Font.GothamBlack
+    local mapped = FontMap[self.Font]
+    if mapped then return mapped end
+    local name = self.Font or "Gotham"
+    if name == "Gotham" then return Enum.Font.GothamBlack end
+    return Enum.Font.GothamBlack
 end
 function GenesisX:_EnsureTheme()
     if not self.Theme then
@@ -474,20 +514,31 @@ function GenesisX:CreateWindow(config)
         self.Theme = self.Themes.Dark
     end
     -- Load saved theme/font or use config defaults (and save them)
-    local configTheme = config.Theme or "Dark"
-    local configFont  = config.Font  or "Gotham"
-    local savedTheme  = self:_LoadConfigFile("theme.json", configTheme)
-    local savedFont   = self:_LoadConfigFile("font.json", configFont)
+    -- If config explicitly provides Theme/Font, it OVERRIDES saved config
+    local configTheme = config.Theme
+    local configFont  = config.Font
+    local savedTheme  = self:_LoadConfigFile("theme.json", configTheme or "Dark")
+    local savedFont   = self:_LoadConfigFile("font.json", configFont or "Gotham")
     local savedTransparency = self:_LoadConfigFile("transparency.json", config.Transparency or 0)
     self.Config.Transparency = math.clamp(savedTransparency, 0, 1)
 
+    -- Override: if config explicitly set Theme/Font, use it and save
     local themeName = savedTheme
+    if configTheme then
+        themeName = configTheme
+        self:_SaveConfigFile("theme.json", configTheme)
+    end
+    local fontName = savedFont
+    if configFont then
+        fontName = configFont
+        self:_SaveConfigFile("font.json", configFont)
+    end
+    self.Font = fontName
     if themeName == "Light" then
         self.Theme = self.Themes.Light
     else
         self.Theme = self.Themes.Dark
     end
-    self.Font = savedFont
 
 
     if PlayerGui:FindFirstChild("GenesisX") then
@@ -787,24 +838,56 @@ function GenesisX:_CreateFloatingButton(config)
     end
 
     -- FIX: Detectar asset ID para icone do botao flutuante (agora suporta nomes Lucide)
-    local floatIconRaw = config.FloatIconAssetId or config.FloatIcon or config.IconAssetId or config.Icon or "S"
-    local floatIconAsset = self:FormatAssetId(floatIconRaw)
-
-    if floatIconAsset then
-        -- Use button's own Image for full fill with circular clipping via UICorner
-        self.FloatBtn.Image = floatIconAsset
-        self.FloatBtn.ScaleType = Enum.ScaleType.Crop
+    -- Suporta icone unico ou array de icones rotativos
+    local floatIcons = {}
+    local rawFloat = config.FloatIcon or config.FloatIconAssetId or config.IconAssetId or config.Icon or "S"
+    if type(rawFloat) == "table" then
+        for _, icon in ipairs(rawFloat) do
+            local asset = self:FormatAssetId(icon)
+            if asset then table.insert(floatIcons, asset) end
+        end
     else
-        local iconLabel = Instance.new("TextLabel")
+        local asset = self:FormatAssetId(rawFloat)
+        if asset then table.insert(floatIcons, asset) end
+    end
+
+    -- Fallback text label (if no valid icons)
+    local iconLabel = nil
+    if #floatIcons == 0 then
+        iconLabel = Instance.new("TextLabel")
         iconLabel.Name = "Icon"
         iconLabel.BackgroundTransparency = 1
         iconLabel.Size = UDim2.new(1, 0, 1, 0)
         iconLabel.Font = self:GetFontBlack()
-        iconLabel.Text = tostring(floatIconRaw)
+        iconLabel.Text = tostring(rawFloat):sub(1, 2)
         iconLabel.TextColor3 = Color3.new(1, 1, 1)
         iconLabel.TextSize = self:S(22)
-        iconLabel.ZIndex = 102  -- Above the button's border/stroke
+        iconLabel.ZIndex = 102
         iconLabel.Parent = self.FloatBtn
+    elseif #floatIcons == 1 then
+        -- Single icon: apply directly
+        self.FloatBtn.Image = floatIcons[1]
+        self.FloatBtn.ScaleType = Enum.ScaleType.Crop
+    else
+        -- Multiple icons: rotate between them
+        self.FloatBtn.Image = floatIcons[1]
+        self.FloatBtn.ScaleType = Enum.ScaleType.Crop
+        local changeSpeed = math.clamp(config.FloatIconChangeSpeed or 2, 0.5, 10)
+        local currentIndex = 1
+        task.spawn(function()
+            while self.FloatBtn and self.FloatBtn.Parent do
+                task.wait(changeSpeed)
+                if not self.FloatBtn or not self.FloatBtn.Parent then break end
+                currentIndex = currentIndex + 1
+                if currentIndex > #floatIcons then currentIndex = 1 end
+                -- Smooth fade transition
+                self:Tween(self.FloatBtn, {ImageTransparency = 1}, 0.15)
+                task.wait(0.15)
+                if not self.FloatBtn or not self.FloatBtn.Parent then break end
+                self.FloatBtn.Image = floatIcons[currentIndex]
+                self:Tween(self.FloatBtn, {ImageTransparency = 0}, 0.15)
+            end
+        end)
     end
 
     self.FloatBtn.MouseEnter:Connect(function()
