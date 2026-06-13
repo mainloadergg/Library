@@ -771,18 +771,17 @@ end
 -- --- FLOATING BUTTON ----------------------------------------------------------
 function GenesisX:_CreateFloatingButton(config)
     config = config or {}
-    local btnSize = self:S(52)
+    local btnSize = self:S(64)
 
     self.FloatBtn = Instance.new("ImageButton")
     self.FloatBtn.Name = "FloatBtn"
     self.FloatBtn.BackgroundColor3 = self.Theme.Accent
     self.FloatBtn.Position = UDim2.new(0, 20, 0.5, 0)
     self.FloatBtn.Size = UDim2.new(0, btnSize, 0, btnSize)
-    self.FloatBtn.Image = ""
     self.FloatBtn.AutoButtonColor = false
     self.FloatBtn.ZIndex = 100
     self.FloatBtn.Parent = self.ScreenGui
-    self:CreateCorner(self.FloatBtn, UDim.new(0, 10))
+    self:CreateCorner(self.FloatBtn, UDim.new(1, 0))
     if self.Config.BorderEnabled then
         self:CreateStroke(self.FloatBtn, self.Theme.Accent, 2, 0.4)
     end
@@ -792,15 +791,9 @@ function GenesisX:_CreateFloatingButton(config)
     local floatIconAsset = self:FormatAssetId(floatIconRaw)
 
     if floatIconAsset then
-        local iconImg = Instance.new("ImageLabel")
-        iconImg.Name = "Icon"
-        iconImg.BackgroundTransparency = 1
-        iconImg.Size = UDim2.new(0.7, 0, 0.7, 0)
-        iconImg.Position = UDim2.new(0.15, 0, 0.15, 0)
-        iconImg.Image = floatIconAsset
-        iconImg.ScaleType = Enum.ScaleType.Stretch
-        iconImg.ZIndex = 102  -- Above the button's border/stroke
-        iconImg.Parent = self.FloatBtn
+        -- Use button's own Image for full fill with circular clipping via UICorner
+        self.FloatBtn.Image = floatIconAsset
+        self.FloatBtn.ScaleType = Enum.ScaleType.Crop
     else
         local iconLabel = Instance.new("TextLabel")
         iconLabel.Name = "Icon"
@@ -3365,9 +3358,40 @@ function GenesisX:SetFont(fontName)
     end
 end
 
+-- --- RESET CONFIG COMMAND -----------------------------------------------------
+local env = (getgenv and getgenv()) or _G or {}
+
+env.G = env.G or {}
+env.G.reset = function()
+    local filesToDelete = {
+        "GenesisX/Config/theme.json",
+        "GenesisX/Config/font.json",
+        "GenesisX/Config/transparency.json"
+    }
+    for _, path in ipairs(filesToDelete) do
+        pcall(function()
+            if delfile and isfile then
+                if isfile(path) then
+                    delfile(path)
+                end
+            end
+        end)
+    end
+    -- Notify user
+    if GenesisX.ScreenGui then
+        GenesisX:Notify({
+            Title = "Config Reset",
+            Text = "Configuracoes resetadas com sucesso!",
+            Subtitle = "Theme, Font e Transparency foram restaurados.",
+            Type = "success",
+            Duration = 4
+        })
+    end
+    return true
+end
+
 -- --- ALIASES / COMPATIBILIDADE ------------------------------------------------
 -- Permite usar GenesisX:Notify, SpectrumX:Notify, ou Notify() diretamente
-local env = (getgenv and getgenv()) or _G or {}
 env.SpectrumX = GenesisX
 env.Notify = function(...) return GenesisX:Notify(...) end
 
