@@ -24,6 +24,21 @@ pcall(function()
 end)
 GenesisX.Icons = LucideAssets
 
+-- Fallback custom icons (embedded in case HttpGet fails or returns old version)
+local CustomIcons = {
+    ["lucide-dog-nerd"] = "rbxassetid://137941939602314",
+    ["lucide-dog-dente"] = "rbxassetid://86545657821911",
+    ["lucide-dog-chupetao"] = "rbxassetid://111009574293053",
+    ["lucide-discord"] = "rbxassetid://18913863763",
+    ["lucide-spectrumx"] = "rbxassetid://132158481306586",
+    ["lucide-genesis-hub"] = "rbxassetid://134769377797538",
+}
+for name, assetId in pairs(CustomIcons) do
+    if not LucideAssets[name] then
+        LucideAssets[name] = assetId
+    end
+end
+
 -- --- FONT SYSTEM --------------------------------------------------------------
 GenesisX.Font = "Gotham"
 
@@ -31,28 +46,7 @@ local FontMap = {
     Arcade = Enum.Font.Arcade,
     Fantasy = Enum.Font.Fantasy,
     GothamBlack = Enum.Font.GothamBlack,
-    Code = Enum.Font.Code,
-    Bangers = Enum.Font.Bangers,
-    FredokaOne = Enum.Font.FredokaOne,
-    Garamond = Enum.Font.Garamond,
-    IndieFlower = Enum.Font.IndieFlower,
-    Jura = Enum.Font.Jura,
     LuckiestGuy = Enum.Font.LuckiestGuy,
-    Merriweather = Enum.Font.Merriweather,
-    Michroma = Enum.Font.Michroma,
-    Nunito = Enum.Font.Nunito,
-    Oswald = Enum.Font.Oswald,
-    PermanentMarker = Enum.Font.PermanentMarker,
-    Rajdhani = Enum.Font.Rajdhani,
-    Sarpanch = Enum.Font.Sarpanch,
-    SourceSans = Enum.Font.SourceSans,
-    SourceSansBold = Enum.Font.SourceSansBold,
-    SourceSansItalic = Enum.Font.SourceSansItalic,
-    SourceSansLight = Enum.Font.SourceSansLight,
-    SourceSansSemibold = Enum.Font.SourceSansSemibold,
-    SpecialElite = Enum.Font.SpecialElite,
-    TitilliumWeb = Enum.Font.TitilliumWeb,
-    Ubuntu = Enum.Font.Ubuntu,
 }
 
 function GenesisX:GetFont()
@@ -62,30 +56,21 @@ end
 function GenesisX:GetFontBold()
     local mapped = FontMap[self.Font]
     if mapped then return mapped end
-    -- Try to find bold variant
-    local name = self.Font or "Gotham"
-    if name == "Gotham" then return Enum.Font.GothamBold end
-    if name == "SourceSans" then return Enum.Font.SourceSansBold end
-    if name == "SourceSansLight" then return Enum.Font.SourceSansBold end
-    if name == "SourceSansItalic" then return Enum.Font.SourceSansBold end
-    if name == "SourceSansSemibold" then return Enum.Font.SourceSansBold end
+    if (self.Font or "Gotham") == "Gotham" then return Enum.Font.GothamBold end
     return Enum.Font.GothamBold
 end
 
 function GenesisX:GetFontSemibold()
     local mapped = FontMap[self.Font]
     if mapped then return mapped end
-    local name = self.Font or "Gotham"
-    if name == "Gotham" then return Enum.Font.GothamSemibold end
-    if name == "SourceSans" then return Enum.Font.SourceSansSemibold end
+    if (self.Font or "Gotham") == "Gotham" then return Enum.Font.GothamSemibold end
     return Enum.Font.GothamSemibold
 end
 
 function GenesisX:GetFontBlack()
     local mapped = FontMap[self.Font]
     if mapped then return mapped end
-    local name = self.Font or "Gotham"
-    if name == "Gotham" then return Enum.Font.GothamBlack end
+    if (self.Font or "Gotham") == "Gotham" then return Enum.Font.GothamBlack end
     return Enum.Font.GothamBlack
 end
 function GenesisX:_EnsureTheme()
@@ -859,7 +844,14 @@ function GenesisX:_CreateFloatingButton(config)
         iconLabel.BackgroundTransparency = 1
         iconLabel.Size = UDim2.new(1, 0, 1, 0)
         iconLabel.Font = self:GetFontBlack()
-        iconLabel.Text = tostring(rawFloat):sub(1, 2)
+        -- If rawFloat is a table, show first char of first element or default "G"
+        local fallbackText = "G"
+        if type(rawFloat) == "table" and rawFloat[1] then
+            fallbackText = tostring(rawFloat[1]):sub(1, 1)
+        elseif type(rawFloat) == "string" then
+            fallbackText = rawFloat:sub(1, 1)
+        end
+        iconLabel.Text = fallbackText
         iconLabel.TextColor3 = Color3.new(1, 1, 1)
         iconLabel.TextSize = self:S(22)
         iconLabel.ZIndex = 102
