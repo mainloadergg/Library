@@ -145,9 +145,11 @@ GenesisX.Theme = GenesisX.Themes.Dark
 -- --- CONFIGURACOES ------------------------------------------------------------
 GenesisX.Config = {
     AnimationSpeed = 0.2,
-    CornerRadius = 8,
+    CornerRadius = 6,
     ShadowEnabled = true,
     ShadowIntensity = 0.7,
+    Transparency = 0,
+    BorderEnabled = false,
 }
 
 -- --- INTERNAL SAVE/LOAD FOR THEME & FONT ------------------------------------
@@ -461,6 +463,8 @@ function GenesisX:CreateWindow(config)
     local configFont  = config.Font  or "Gotham"
     local savedTheme  = self:_LoadConfigFile("theme.json", configTheme)
     local savedFont   = self:_LoadConfigFile("font.json", configFont)
+    local savedTransparency = self:_LoadConfigFile("transparency.json", config.Transparency or 0)
+    self.Config.Transparency = math.clamp(savedTransparency, 0, 1)
 
     local themeName = savedTheme
     if themeName == "Light" then
@@ -514,8 +518,11 @@ function GenesisX:CreateWindow(config)
     self.MainFrame.Visible = true
     self.MainFrame.ZIndex = 10
     self.MainFrame.Parent = self.ScreenGui
-    self:CreateCorner(self.MainFrame, UDim.new(0, 12))
-    self:CreateStroke(self.MainFrame, self.Theme.Accent, 1.5, 0)
+    self:CreateCorner(self.MainFrame, UDim.new(0, 10))
+    if self.Config.BorderEnabled then
+        self:CreateStroke(self.MainFrame, self.Theme.Accent, 1.5, 0)
+    end
+    self.MainFrame.BackgroundTransparency = self.Config.Transparency
 
     -- --- HEADER -----------------------------------------------------------------
     local headerHeight = self:S(56)
@@ -527,7 +534,8 @@ function GenesisX:CreateWindow(config)
     self.Header.Size = UDim2.new(1, 0, 0, headerHeight)
     self.Header.ZIndex = 12
     self.Header.Parent = self.MainFrame
-    self:CreateCorner(self.Header, UDim.new(0, 10))
+    self.Header.BackgroundTransparency = self.Config.Transparency
+    self:CreateCorner(self.Header, UDim.new(0, 8))
 
     local iconX = self:S(16)
     -- FIX: Detectar asset ID corretamente para o icone do header (agora inclui nomes Lucide)
@@ -673,7 +681,8 @@ function GenesisX:CreateWindow(config)
     sidebarWrap.ClipsDescendants = true
     sidebarWrap.ZIndex = 11
     sidebarWrap.Parent = self.MainFrame
-    self:CreateCorner(sidebarWrap, UDim.new(0, 10))
+    sidebarWrap.BackgroundTransparency = self.Config.Transparency
+    self:CreateCorner(sidebarWrap, UDim.new(0, 8))
 
     local sidebarLine = Instance.new("Frame")
     sidebarLine.Name = "SidebarLine"
@@ -759,8 +768,10 @@ function GenesisX:_CreateFloatingButton(config)
     self.FloatBtn.AutoButtonColor = false
     self.FloatBtn.ZIndex = 100
     self.FloatBtn.Parent = self.ScreenGui
-    self:CreateCorner(self.FloatBtn, UDim.new(0, 14))
-    self:CreateStroke(self.FloatBtn, self.Theme.Accent, 2, 0.4)
+    self:CreateCorner(self.FloatBtn, UDim.new(0, 10))
+    if self.Config.BorderEnabled then
+        self:CreateStroke(self.FloatBtn, self.Theme.Accent, 2, 0.4)
+    end
 
     -- FIX: Detectar asset ID para icone do botao flutuante (agora suporta nomes Lucide)
     local floatIconRaw = config.FloatIconAssetId or config.FloatIcon or config.IconAssetId or config.Icon or "S"
@@ -857,7 +868,7 @@ function GenesisX:CreateTab(config)
     tabBtn.AutoButtonColor = false
     tabBtn.ZIndex = 13
     tabBtn.Parent = self.Sidebar
-    self:CreateCorner(tabBtn, UDim.new(0, 10))
+    self:CreateCorner(tabBtn, UDim.new(0, 8))
 
     -- FIX: Detectar corretamente se Icon e asset ID ou nome Lucide
     local iconRaw = config.Icon or config.IconAssetId
@@ -906,7 +917,7 @@ function GenesisX:CreateTab(config)
     tooltip.Visible = false
     tooltip.ZIndex = 1000
     tooltip.Parent = tabBtn
-    self:CreateCorner(tooltip, UDim.new(0, 5))
+    self:CreateCorner(tooltip, UDim.new(0, 4))
     self:CreateStroke(tooltip, self.Theme.Border, 1, 0.3)
 
     tabBtn.MouseEnter:Connect(function()
@@ -938,7 +949,8 @@ function GenesisX:CreateTab(config)
     bgCard.Size = UDim2.new(1, 0, 1, 0)
     bgCard.ZIndex = 10
     bgCard.Parent = page
-    self:CreateCorner(bgCard, UDim.new(0, 8))
+    bgCard.BackgroundTransparency = self.Config.Transparency
+    self:CreateCorner(bgCard, UDim.new(0, 6))
 
     local divider = Instance.new("Frame")
     divider.Name = "Divider"
@@ -1166,6 +1178,7 @@ function GenesisX:CreateToggle(parent, config)
     frame.Size = UDim2.new(1, 0, 0, height)
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.5)
 
@@ -1373,6 +1386,7 @@ function GenesisX:CreateInput(parent, config)
     frame.ClipsDescendants = true
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     local stroke = self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
@@ -1406,7 +1420,7 @@ function GenesisX:CreateInput(parent, config)
     textBox.ClipsDescendants = true
     textBox.ZIndex = 14
     textBox.Parent = frame
-    self:CreateCorner(textBox, UDim.new(0, 6))
+    self:CreateCorner(textBox, UDim.new(0, 5))
 
     local textPad = Instance.new("UIPadding")
     textPad.PaddingLeft = UDim.new(0, self:S(8))
@@ -1448,6 +1462,7 @@ function GenesisX:CreateNumberInput(parent, config)
     frame.ClipsDescendants = true
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     local stroke = self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
@@ -1479,7 +1494,7 @@ function GenesisX:CreateNumberInput(parent, config)
     textBox.ClipsDescendants = true
     textBox.ZIndex = 14
     textBox.Parent = frame
-    self:CreateCorner(textBox, UDim.new(0, 6))
+    self:CreateCorner(textBox, UDim.new(0, 5))
 
     local textPad = Instance.new("UIPadding")
     textPad.PaddingLeft = UDim.new(0, self:S(8))
@@ -1531,6 +1546,7 @@ function GenesisX:CreateSlider(parent, config)
     frame.Size = UDim2.new(1, 0, 0, height)
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
@@ -1555,7 +1571,7 @@ function GenesisX:CreateSlider(parent, config)
     valueBg.Size = UDim2.new(0, self:S(36), 0, self:S(22))
     valueBg.ZIndex = 14
     valueBg.Parent = frame
-    self:CreateCorner(valueBg, UDim.new(0, 5))
+    self:CreateCorner(valueBg, UDim.new(0, 4))
 
     -- Label de display (visivel normalmente)
     local valueLabel = Instance.new("TextButton")
@@ -1715,419 +1731,424 @@ local function getDropdownPosition(button, layout, maxHeight)
     return UDim2.fromOffset(btnPos.X, targetY), targetHeight, contentHeight
 end
 
-
--- --- CREATE DROPDOWN (REDZ STYLE) ----------------------------------------------------------
+-- --- CREATE DROPDOWN ----------------------------------------------------------
 function GenesisX:CreateDropdown(parent, config)
     config = config or {}
     local labelText = config.Label or "Dropdown"
     local options = config.Options or {}
     local default = config.Default
     local callback = config.Callback or function() end
-    local height = self:S(46)
+    local height = self:S(62)
 
-    -- Main frame (redz style - cleaner, no card background)
     local frame = Instance.new("Frame")
     frame.Name = "Dropdown_" .. labelText
-    frame.BackgroundTransparency = 1
+    frame.BackgroundColor3 = self.Theme.Card
     frame.Size = UDim2.new(1, 0, 0, height)
+    frame.ClipsDescendants = false
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
+    self:CreateCorner(frame)
+    self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
-    -- Label (title) - left side
     local label = Instance.new("TextLabel")
     label.Name = "Label"
     label.BackgroundTransparency = 1
-    label.Position = UDim2.new(0, self:S(10), 0, 0)
-    label.Size = UDim2.new(0.5, 0, 1, 0)
+    label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
+    label.Size = UDim2.new(1, -self:S(28), 0, self:S(14))
     label.Font = self:GetFontSemibold()
     label.Text = labelText
-    label.TextColor3 = self.Theme.Text
-    label.TextSize = self:S(12)
+    label.TextColor3 = self.Theme.TextMuted
+    label.TextSize = self:S(10)
     label.TextXAlignment = Enum.TextXAlignment.Left
-    label.TextTruncate = Enum.TextTruncate.AtEnd
     label.ZIndex = 13
     label.Parent = frame
 
-    -- Selected frame (small box on right - redz style)
-    local selectedFrame = Instance.new("Frame")
-    selectedFrame.Name = "SelectedFrame"
-    selectedFrame.BackgroundColor3 = self.Theme.Input
-    selectedFrame.BorderSizePixel = 0
-    selectedFrame.Position = UDim2.new(1, -self:S(10), 0.5, -self:S(9))
-    selectedFrame.Size = UDim2.new(0, self:S(150), 0, self:S(18))
-    selectedFrame.AnchorPoint = Vector2.new(1, 0.5)
-    selectedFrame.ZIndex = 14
-    selectedFrame.Parent = frame
-    self:CreateCorner(selectedFrame, UDim.new(0, 4))
-    self:CreateStroke(selectedFrame, self.Theme.Border, 1, 0.5)
+    local dropBtn = Instance.new("TextButton")
+    dropBtn.Name = "DropBtn"
+    dropBtn.BackgroundColor3 = self.Theme.Input
+    dropBtn.AutoButtonColor = false
+    dropBtn.Position = UDim2.new(0, self:S(12), 0, self:S(26))
+    dropBtn.Size = UDim2.new(1, -self:S(24), 0, self:S(28))
+    dropBtn.Font = self:GetFontSemibold()
+    dropBtn.Text = "  " .. (default or "Selecionar...")
+    dropBtn.TextColor3 = default and self.Theme.Text or self.Theme.TextMuted
+    dropBtn.TextSize = self:S(12)
+    dropBtn.TextXAlignment = Enum.TextXAlignment.Left
+    dropBtn.ZIndex = 14
+    dropBtn.Parent = frame
+    self:CreateCorner(dropBtn, UDim.new(0, 6))
+    local dropStroke = self:CreateStroke(dropBtn, self.Theme.Border, 1, 0.4)
 
-    -- Active label (shows selected value)
-    local activeLabel = Instance.new("TextLabel")
-    activeLabel.Name = "ActiveLabel"
-    activeLabel.BackgroundTransparency = 1
-    activeLabel.Size = UDim2.new(0.85, 0, 0.85, 0)
-    activeLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    activeLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    activeLabel.Font = self:GetFontBold()
-    activeLabel.Text = default or "..."
-    activeLabel.TextColor3 = self.Theme.Text
-    activeLabel.TextSize = self:S(11)
-    activeLabel.TextScaled = true
-    activeLabel.ZIndex = 15
-    activeLabel.Parent = selectedFrame
-
-    -- Arrow (chevron)
+    -- SETA LUCIDE (chevron-down)
     local arrow = Instance.new("ImageLabel")
     arrow.Name = "Arrow"
     arrow.BackgroundTransparency = 1
-    arrow.Size = UDim2.new(0, self:S(15), 0, self:S(15))
-    arrow.Position = UDim2.new(0, -self:S(5), 0.5, 0)
-    arrow.AnchorPoint = Vector2.new(1, 0.5)
+    arrow.Position = UDim2.new(1, -self:S(28), 0, 0)
+    arrow.Size = UDim2.new(0, self:S(26), 1, 0)
     arrow.Image = self:FormatAssetId("lucide-chevron-down") or ""
-    arrow.ImageColor3 = self.Theme.Text
+    arrow.ImageColor3 = self.Theme.Accent
     arrow.ZIndex = 15
-    arrow.Parent = selectedFrame
+    arrow.Parent = dropBtn
 
     local selected = default
     local isOpen = false
 
-    -- Dropdown overlay (anti-click)
-    local noClickFrame = Instance.new("TextButton")
-    noClickFrame.Name = "AntiClick"
-    noClickFrame.Size = UDim2.new(1, 0, 1, 0)
-    noClickFrame.BackgroundTransparency = 1
-    noClickFrame.Visible = false
-    noClickFrame.Text = ""
-    noClickFrame.ZIndex = 500
-    noClickFrame.Parent = self.ScreenGui
+    local overlay = Instance.new("Frame")
+    overlay.Name = "DropdownOverlay"
+    overlay.BackgroundColor3 = Color3.new(0, 0, 0)
+    overlay.BackgroundTransparency = 1
+    overlay.BorderSizePixel = 0
+    overlay.Size = UDim2.new(1, 0, 1, 0)
+    overlay.ZIndex = 500
+    overlay.Visible = false
+    overlay.Parent = self.ScreenGui
 
-    -- Drop frame (opens below)
-    local dropFrame = Instance.new("Frame")
-    dropFrame.Name = "DropFrame"
-    dropFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    dropFrame.BackgroundTransparency = 0.1
-    dropFrame.BorderSizePixel = 0
-    dropFrame.Size = UDim2.new(0, self:S(152), 0, 0)
-    dropFrame.AnchorPoint = Vector2.new(0, 1)
-    dropFrame.ClipsDescendants = true
-    dropFrame.ZIndex = 501
-    dropFrame.Parent = noClickFrame
-    dropFrame.Visible = false
-    self:CreateCorner(dropFrame, UDim.new(0, 6))
-    self:CreateStroke(dropFrame, self.Theme.Border, 1, 0.3)
-    self:CreateGradient(dropFrame, self.Theme.Card, self.Theme.Background, 60)
+    local listContainer = Instance.new("Frame")
+    listContainer.Name = "ListContainer"
+    listContainer.BackgroundColor3 = self.Theme.Card
+    listContainer.BorderSizePixel = 0
+    listContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    listContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+    listContainer.Size = UDim2.new(0, 0, 0, 0)
+    listContainer.ZIndex = 501
+    listContainer.Visible = false
+    listContainer.Parent = overlay
+    self:CreateCorner(listContainer, UDim.new(0, 10))
+    self:CreateStroke(listContainer, self.Theme.Accent, 1.5, 0.3)
 
-    -- Scroll frame
-    local scrollFrame = Instance.new("ScrollingFrame")
-    scrollFrame.Name = "ScrollFrame"
-    scrollFrame.BackgroundTransparency = 1
-    scrollFrame.BorderSizePixel = 0
-    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
-    scrollFrame.ScrollBarThickness = 2
-    scrollFrame.ScrollBarImageColor3 = self.Theme.Accent
-    scrollFrame.ScrollBarImageTransparency = 0.5
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    scrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-    scrollFrame.ZIndex = 502
-    scrollFrame.Parent = dropFrame
+    local listTitle = Instance.new("TextLabel")
+    listTitle.Name = "Title"
+    listTitle.BackgroundTransparency = 1
+    listTitle.Position = UDim2.new(0, self:S(16), 0, self:S(12))
+    listTitle.Size = UDim2.new(1, -self:S(32), 0, self:S(22))
+    listTitle.Font = self:GetFontBold()
+    listTitle.Text = labelText
+    listTitle.TextColor3 = self.Theme.Text
+    listTitle.TextSize = self:S(14)
+    listTitle.TextXAlignment = Enum.TextXAlignment.Left
+    listTitle.ZIndex = 502
+    listTitle.Parent = listContainer
 
-    local scrollPadding = Instance.new("UIPadding")
-    scrollPadding.PaddingLeft = UDim.new(0, self:S(8))
-    scrollPadding.PaddingRight = UDim.new(0, self:S(8))
-    scrollPadding.PaddingTop = UDim.new(0, self:S(5))
-    scrollPadding.PaddingBottom = UDim.new(0, self:S(5))
-    scrollPadding.Parent = scrollFrame
+    local dropList = Instance.new("ScrollingFrame")
+    dropList.Name = "DropList"
+    dropList.BackgroundTransparency = 1
+    dropList.BorderSizePixel = 0
+    dropList.Position = UDim2.new(0, self:S(12), 0, self:S(40))
+    dropList.Size = UDim2.new(1, -self:S(24), 1, -self:S(52))
+    dropList.ScrollBarThickness = 4
+    dropList.ScrollBarImageColor3 = self.Theme.Accent
+    dropList.ScrollBarImageTransparency = 0.4
+    dropList.ZIndex = 502
+    dropList.Parent = listContainer
 
-    local scrollLayout = Instance.new("UIListLayout")
-    scrollLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    scrollLayout.Padding = UDim.new(0, self:S(4))
-    scrollLayout.Parent = scrollFrame
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    listLayout.Padding = UDim.new(0, self:S(4))
+    listLayout.Parent = dropList
 
-    local optionButtons = {}
-
-    local function calculateSize()
-        local count = 0
-        for _, child in ipairs(scrollFrame:GetChildren()) do
-            if child:IsA("Frame") or child.Name == "Option" then
-                count = count + 1
-            end
-        end
-        local targetHeight = math.min((count * self:S(25)) + self:S(10), self:S(250))
-        return targetHeight
-    end
-
-    local function calculatePos()
-        local framePos = selectedFrame.AbsolutePosition
-        local screenSize = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1366, 768)
-        local scale = ScaleData.ScaleFactor or 1
-
-        local clampX = math.clamp(framePos.X / scale, 0, screenSize.X / scale - dropFrame.Size.X.Offset)
-        local clampY = math.clamp(framePos.Y / scale, 0, screenSize.Y / scale)
-
-        local anchorY = framePos.Y > screenSize.Y / 1.4 and 1 or 0
-        dropFrame.AnchorPoint = Vector2.new(0, anchorY)
-        return UDim2.fromOffset(clampX, clampY)
-    end
+    local listPadding = Instance.new("UIPadding")
+    listPadding.PaddingTop    = UDim.new(0, self:S(4))
+    listPadding.PaddingBottom = UDim.new(0, self:S(4))
+    listPadding.PaddingLeft   = UDim.new(0, self:S(4))
+    listPadding.PaddingRight  = UDim.new(0, self:S(4))
+    listPadding.Parent = dropList
 
     local function closeDropdown()
         if not isOpen then return end
         isOpen = false
-
+        self:Tween(overlay, {BackgroundTransparency = 1}, 0.2)
+        self:Tween(listContainer, {Size = UDim2.new(0, self:S(320), 0, 0)}, 0.2)
         self:Tween(arrow, {Rotation = 0}, 0.2)
-        self:Tween(arrow, {ImageColor3 = self.Theme.Text}, 0.2)
-        self:Tween(dropFrame, {Size = UDim2.new(0, self:S(152), 0, 0)}, 0.2)
-
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2)
+        end
         task.wait(0.2)
-        noClickFrame.Visible = false
-        dropFrame.Visible = false
-    end
-
-    local function openDropdown()
-        if isOpen then closeDropdown(); return end
-
-        populate()
-        local targetHeight = calculateSize()
-
-        noClickFrame.Visible = true
-        dropFrame.Visible = true
-        dropFrame.Size = UDim2.new(0, self:S(152), 0, 0)
-
-        local pos = calculatePos()
-        dropFrame.Position = pos
-
-        self:Tween(arrow, {Rotation = 180}, 0.2)
-        self:Tween(arrow, {ImageColor3 = self.Theme.Accent}, 0.2)
-        self:Tween(dropFrame, {Size = UDim2.new(0, self:S(152), 0, targetHeight)}, 0.2)
-
-        scrollFrame.CanvasSize = UDim2.new(0, 0, 0, scrollLayout.AbsoluteContentSize.Y + self:S(10))
-        isOpen = true
+        overlay.Visible = false
+        listContainer.Visible = false
     end
 
     local function populate()
-        -- Clear existing
-        for _, child in ipairs(scrollFrame:GetChildren()) do
+        for _, child in ipairs(dropList:GetChildren()) do
             if child:IsA("Frame") then child:Destroy() end
         end
-        optionButtons = {}
 
         for _, option in ipairs(options) do
-            local isSel = option == selected
+            local isSelected = option == selected
 
-            local btn = Instance.new("TextButton")
-            btn.Name = "Option"
-            btn.BackgroundColor3 = self.Theme.Card
-            btn.BackgroundTransparency = 1
-            btn.Size = UDim2.new(1, 0, 0, self:S(21))
-            btn.Text = ""
-            btn.AutoButtonColor = false
-            btn.ZIndex = 503
-            btn.Parent = scrollFrame
-            self:CreateCorner(btn, UDim.new(0, 4))
+            local row = Instance.new("Frame")
+            row.BackgroundColor3 = isSelected and self.Theme.AccentDark or self.Theme.Input
+            row.Size = UDim2.new(1, 0, 0, self:S(36))
+            row.ZIndex = 503
+            row.Parent = dropList
+            self:CreateCorner(row, UDim.new(0, 6))
 
-            -- Selected indicator (small dot/line - redz style)
-            local indicator = Instance.new("Frame")
-            indicator.Name = "Indicator"
-            indicator.BackgroundColor3 = self.Theme.Accent
-            indicator.BackgroundTransparency = isSel and 0 or 1
-            indicator.Size = isSel and UDim2.new(0, self:S(4), 0, self:S(14)) or UDim2.new(0, self:S(4), 0, self:S(4))
-            indicator.Position = UDim2.new(0, self:S(1), 0.5, 0)
-            indicator.AnchorPoint = Vector2.new(0, 0.5)
-            indicator.ZIndex = 504
-            indicator.Parent = btn
-            self:CreateCorner(indicator, UDim.new(0.5, 0))
+            if isSelected then
+                self:CreateStroke(row, self.Theme.Accent, 1, 0.2)
+                -- CHECKMARK LUCIDE (check)
+                local check = Instance.new("ImageLabel")
+                check.Name = "Check"
+                check.BackgroundTransparency = 1
+                check.Position = UDim2.new(0, self:S(10), 0.5, -self:S(8))
+                check.Size = UDim2.new(0, self:S(16), 0, self:S(16))
+                check.Image = self:FormatAssetId("lucide-check") or ""
+                check.ImageColor3 = Color3.new(1, 1, 1)
+                check.ZIndex = 504
+                check.Parent = row
+            end
 
-            -- Option text
-            local optLabel = Instance.new("TextLabel")
-            optLabel.Name = "OptionLabel"
-            optLabel.BackgroundTransparency = 1
-            optLabel.Size = UDim2.new(1, 0, 1, 0)
-            optLabel.Position = UDim2.new(0, self:S(10), 0, 0)
-            optLabel.Font = self:GetFontBold()
-            optLabel.Text = option
-            optLabel.TextColor3 = self.Theme.Text
-            optLabel.TextSize = self:S(11)
-            optLabel.TextXAlignment = Enum.TextXAlignment.Left
-            optLabel.TextTransparency = isSel and 0 or 0.4
-            optLabel.ZIndex = 504
-            optLabel.Parent = btn
+            local rowBtn = Instance.new("TextButton")
+            rowBtn.BackgroundTransparency = 1
+            rowBtn.Size = UDim2.new(1, 0, 1, 0)
+            rowBtn.Font = self:GetFontSemibold()
+            rowBtn.Text = (isSelected and "    " or "  ") .. option
+            rowBtn.TextColor3 = isSelected and Color3.new(1, 1, 1) or self.Theme.TextSecondary
+            rowBtn.TextSize = self:S(12)
+            rowBtn.TextXAlignment = Enum.TextXAlignment.Left
+            rowBtn.ZIndex = 504
+            rowBtn.Parent = row
 
-            btn.MouseEnter:Connect(function()
-                if not isSel then
-                    self:Tween(btn, {BackgroundTransparency = 0.9}, 0.1)
-                end
-            end)
-            btn.MouseLeave:Connect(function()
-                self:Tween(btn, {BackgroundTransparency = 1}, 0.1)
-            end)
-            btn.MouseButton1Click:Connect(function()
+            local rowPad = Instance.new("UIPadding")
+            rowPad.PaddingLeft = UDim.new(0, isSelected and self:S(32) or self:S(12))
+            rowPad.Parent = rowBtn
+
+            rowBtn.MouseButton1Click:Connect(function()
                 selected = option
-                activeLabel.Text = option
+                dropBtn.Text = "  " .. option
+                dropBtn.TextColor3 = self.Theme.Text
                 callback(option)
                 closeDropdown()
             end)
-
-            table.insert(optionButtons, {Button = btn, Indicator = indicator, Label = optLabel, Value = option})
+            rowBtn.MouseEnter:Connect(function()
+                if not isSelected then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.CardHover}, 0.1)
+                end
+            end)
+            rowBtn.MouseLeave:Connect(function()
+                if not isSelected then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.Input}, 0.1)
+                end
+            end)
         end
     end
 
-    -- Click handlers
-    selectedFrame.InputBegan:Connect(function(input)
+    dropBtn.MouseEnter:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.InputHover}, 0.15)
+    end)
+    dropBtn.MouseLeave:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.Input}, 0.15)
+    end)
+
+    dropBtn.MouseButton1Click:Connect(function()
+        if isOpen then closeDropdown(); return end
+        populate()
+        local contentHeight = listLayout.AbsoluteContentSize.Y + self:S(60)
+        local targetHeight = math.min(contentHeight, self:S(360))
+        local targetWidth = self:S(320)
+        overlay.Visible = true
+        listContainer.Visible = true
+        overlay.BackgroundTransparency = 1
+        listContainer.Size = UDim2.new(0, targetWidth, 0, 0)
+        self:Tween(overlay, {BackgroundTransparency = 0.45}, 0.25)
+        self:Tween(listContainer, {
+            Size = UDim2.new(0, targetWidth, 0, targetHeight)
+        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        self:Tween(arrow, {Rotation = 180}, 0.2)
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2)
+        end
+        dropList.CanvasSize = UDim2.new(0, 0, 0,
+            listLayout.AbsoluteContentSize.Y + self:S(16))
+        isOpen = true
+    end)
+
+    overlay.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or
            input.UserInputType == Enum.UserInputType.Touch then
-            openDropdown()
+            local pos = input.Position
+            local listPos = listContainer.AbsolutePosition
+            local listSize = listContainer.AbsoluteSize
+            local inList = pos.X >= listPos.X and pos.X <= listPos.X + listSize.X
+                       and pos.Y >= listPos.Y and pos.Y <= listPos.Y + listSize.Y
+            if not inList then closeDropdown() end
         end
     end)
 
-    noClickFrame.MouseButton1Down:Connect(closeDropdown)
-    noClickFrame.MouseButton1Click:Connect(closeDropdown)
-
-    -- Close when main frame hidden
-    if self.MainFrame then
-        self.MainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
-            if not self.MainFrame.Visible then closeDropdown() end
-        end)
-    end
-
     return {
-        Frame = frame,
+        Frame    = frame,
         GetValue = function() return selected end,
         SetValue = function(v)
             selected = v
-            activeLabel.Text = v or "..."
+            dropBtn.Text = "  " .. (v or "Selecionar...")
+            dropBtn.TextColor3 = v and self.Theme.Text or self.Theme.TextMuted
         end,
         SetOptions = function(newOptions) options = newOptions end,
     }
 end
 
--- --- CREATE MULTI DROPDOWN (REDZ STYLE) ----------------------------------------------------------
 function GenesisX:CreateMultiDropdown(parent, config)
     config = config or {}
     local labelText = config.Label or "Multi Select"
     local options = config.Options or {}
     local default = config.Default or {}
     local callback = config.Callback or function() end
-    local height = self:S(46)
+    local height = self:S(62)
 
-    -- Main frame
     local frame = Instance.new("Frame")
     frame.Name = "MultiDropdown_" .. labelText
-    frame.BackgroundTransparency = 1
+    frame.BackgroundColor3 = self.Theme.Card
     frame.Size = UDim2.new(1, 0, 0, height)
+    frame.ClipsDescendants = false
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
+    self:CreateCorner(frame)
+    self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
-    -- Label
     local label = Instance.new("TextLabel")
     label.Name = "Label"
     label.BackgroundTransparency = 1
-    label.Position = UDim2.new(0, self:S(10), 0, 0)
-    label.Size = UDim2.new(0.5, 0, 1, 0)
+    label.Position = UDim2.new(0, self:S(14), 0, self:S(10))
+    label.Size = UDim2.new(1, -self:S(28), 0, self:S(14))
     label.Font = self:GetFontSemibold()
     label.Text = labelText
-    label.TextColor3 = self.Theme.Text
-    label.TextSize = self:S(12)
+    label.TextColor3 = self.Theme.TextMuted
+    label.TextSize = self:S(10)
     label.TextXAlignment = Enum.TextXAlignment.Left
-    label.TextTruncate = Enum.TextTruncate.AtEnd
     label.ZIndex = 13
     label.Parent = frame
 
-    -- Selected frame
-    local selectedFrame = Instance.new("Frame")
-    selectedFrame.Name = "SelectedFrame"
-    selectedFrame.BackgroundColor3 = self.Theme.Input
-    selectedFrame.BorderSizePixel = 0
-    selectedFrame.Position = UDim2.new(1, -self:S(10), 0.5, -self:S(9))
-    selectedFrame.Size = UDim2.new(0, self:S(150), 0, self:S(18))
-    selectedFrame.AnchorPoint = Vector2.new(1, 0.5)
-    selectedFrame.ZIndex = 14
-    selectedFrame.Parent = frame
-    self:CreateCorner(selectedFrame, UDim.new(0, 4))
-    self:CreateStroke(selectedFrame, self.Theme.Border, 1, 0.5)
+    local dropBtn = Instance.new("TextButton")
+    dropBtn.Name = "DropBtn"
+    dropBtn.BackgroundColor3 = self.Theme.Input
+    dropBtn.AutoButtonColor = false
+    dropBtn.Position = UDim2.new(0, self:S(12), 0, self:S(26))
+    dropBtn.Size = UDim2.new(1, -self:S(24), 0, self:S(28))
+    dropBtn.Font = self:GetFontSemibold()
+    dropBtn.Text = "  Selecionar..."
+    dropBtn.TextColor3 = self.Theme.TextMuted
+    dropBtn.TextSize = self:S(12)
+    dropBtn.TextXAlignment = Enum.TextXAlignment.Left
+    dropBtn.ZIndex = 14
+    dropBtn.Parent = frame
+    self:CreateCorner(dropBtn, UDim.new(0, 6))
+    local dropStroke = self:CreateStroke(dropBtn, self.Theme.Border, 1, 0.4)
 
-    -- Active label
-    local activeLabel = Instance.new("TextLabel")
-    activeLabel.Name = "ActiveLabel"
-    activeLabel.BackgroundTransparency = 1
-    activeLabel.Size = UDim2.new(0.85, 0, 0.85, 0)
-    activeLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    activeLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    activeLabel.Font = self:GetFontBold()
-    activeLabel.Text = "..."
-    activeLabel.TextColor3 = self.Theme.Text
-    activeLabel.TextSize = self:S(11)
-    activeLabel.TextScaled = true
-    activeLabel.ZIndex = 15
-    activeLabel.Parent = selectedFrame
-
-    -- Arrow
+    -- SETA LUCIDE (chevron-down)
     local arrow = Instance.new("ImageLabel")
     arrow.Name = "Arrow"
     arrow.BackgroundTransparency = 1
-    arrow.Size = UDim2.new(0, self:S(15), 0, self:S(15))
-    arrow.Position = UDim2.new(0, -self:S(5), 0.5, 0)
-    arrow.AnchorPoint = Vector2.new(1, 0.5)
+    arrow.Position = UDim2.new(1, -self:S(28), 0, 0)
+    arrow.Size = UDim2.new(0, self:S(26), 1, 0)
     arrow.Image = self:FormatAssetId("lucide-chevron-down") or ""
-    arrow.ImageColor3 = self.Theme.Text
+    arrow.ImageColor3 = self.Theme.Accent
     arrow.ZIndex = 15
-    arrow.Parent = selectedFrame
+    arrow.Parent = dropBtn
 
     local selected = {}
     for _, v in ipairs(default) do table.insert(selected, v) end
     local isOpen = false
 
-    -- No click frame
-    local noClickFrame = Instance.new("TextButton")
-    noClickFrame.Name = "AntiClick"
-    noClickFrame.Size = UDim2.new(1, 0, 1, 0)
-    noClickFrame.BackgroundTransparency = 1
-    noClickFrame.Visible = false
-    noClickFrame.Text = ""
-    noClickFrame.ZIndex = 500
-    noClickFrame.Parent = self.ScreenGui
+    local overlay = Instance.new("Frame")
+    overlay.Name = "MultiDropdownOverlay"
+    overlay.BackgroundColor3 = Color3.new(0, 0, 0)
+    overlay.BackgroundTransparency = 1
+    overlay.BorderSizePixel = 0
+    overlay.Size = UDim2.new(1, 0, 1, 0)
+    overlay.ZIndex = 500
+    overlay.Visible = false
+    overlay.Parent = self.ScreenGui
 
-    -- Drop frame
-    local dropFrame = Instance.new("Frame")
-    dropFrame.Name = "DropFrame"
-    dropFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    dropFrame.BackgroundTransparency = 0.1
-    dropFrame.BorderSizePixel = 0
-    dropFrame.Size = UDim2.new(0, self:S(152), 0, 0)
-    dropFrame.AnchorPoint = Vector2.new(0, 1)
-    dropFrame.ClipsDescendants = true
-    dropFrame.ZIndex = 501
-    dropFrame.Parent = noClickFrame
-    dropFrame.Visible = false
-    self:CreateCorner(dropFrame, UDim.new(0, 6))
-    self:CreateStroke(dropFrame, self.Theme.Border, 1, 0.3)
-    self:CreateGradient(dropFrame, self.Theme.Card, self.Theme.Background, 60)
+    local listContainer = Instance.new("Frame")
+    listContainer.Name = "ListContainer"
+    listContainer.BackgroundColor3 = self.Theme.Card
+    listContainer.BorderSizePixel = 0
+    listContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    listContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+    listContainer.Size = UDim2.new(0, 0, 0, 0)
+    listContainer.ZIndex = 501
+    listContainer.Visible = false
+    listContainer.Parent = overlay
+    self:CreateCorner(listContainer, UDim.new(0, 10))
+    self:CreateStroke(listContainer, self.Theme.Accent, 1.5, 0.3)
 
-    -- Scroll frame
-    local scrollFrame = Instance.new("ScrollingFrame")
-    scrollFrame.Name = "ScrollFrame"
-    scrollFrame.BackgroundTransparency = 1
-    scrollFrame.BorderSizePixel = 0
-    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
-    scrollFrame.ScrollBarThickness = 2
-    scrollFrame.ScrollBarImageColor3 = self.Theme.Accent
-    scrollFrame.ScrollBarImageTransparency = 0.5
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    scrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-    scrollFrame.ZIndex = 502
-    scrollFrame.Parent = dropFrame
+    local listTitle = Instance.new("TextLabel")
+    listTitle.Name = "Title"
+    listTitle.BackgroundTransparency = 1
+    listTitle.Position = UDim2.new(0, self:S(16), 0, self:S(12))
+    listTitle.Size = UDim2.new(0.6, 0, 0, self:S(22))
+    listTitle.Font = self:GetFontBold()
+    listTitle.Text = labelText
+    listTitle.TextColor3 = self.Theme.Text
+    listTitle.TextSize = self:S(14)
+    listTitle.TextXAlignment = Enum.TextXAlignment.Left
+    listTitle.ZIndex = 502
+    listTitle.Parent = listContainer
 
-    local scrollPadding = Instance.new("UIPadding")
-    scrollPadding.PaddingLeft = UDim.new(0, self:S(8))
-    scrollPadding.PaddingRight = UDim.new(0, self:S(8))
-    scrollPadding.PaddingTop = UDim.new(0, self:S(5))
-    scrollPadding.PaddingBottom = UDim.new(0, self:S(5))
-    scrollPadding.Parent = scrollFrame
+    local countBadge = Instance.new("TextLabel")
+    countBadge.Name = "CountBadge"
+    countBadge.BackgroundColor3 = self.Theme.Accent
+    countBadge.Position = UDim2.new(1, -self:S(48), 0, self:S(10))
+    countBadge.Size = UDim2.new(0, self:S(36), 0, self:S(22))
+    countBadge.Font = self:GetFontBold()
+    countBadge.Text = "0"
+    countBadge.TextColor3 = Color3.new(1, 1, 1)
+    countBadge.TextSize = self:S(11)
+    countBadge.ZIndex = 502
+    countBadge.Parent = listContainer
+    self:CreateCorner(countBadge, UDim.new(0, 4))
 
-    local scrollLayout = Instance.new("UIListLayout")
-    scrollLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    scrollLayout.Padding = UDim.new(0, self:S(4))
-    scrollLayout.Parent = scrollFrame
+    local dropList = Instance.new("ScrollingFrame")
+    dropList.Name = "DropList"
+    dropList.BackgroundTransparency = 1
+    dropList.BorderSizePixel = 0
+    dropList.Position = UDim2.new(0, self:S(12), 0, self:S(42))
+    dropList.Size = UDim2.new(1, -self:S(24), 1, -self:S(56))
+    dropList.ScrollBarThickness = 4
+    dropList.ScrollBarImageColor3 = self.Theme.Accent
+    dropList.ScrollBarImageTransparency = 0.4
+    dropList.ZIndex = 502
+    dropList.Parent = listContainer
 
-    local optionButtons = {}
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    listLayout.Padding = UDim.new(0, self:S(4))
+    listLayout.Parent = dropList
+
+    local listPadding = Instance.new("UIPadding")
+    listPadding.PaddingTop    = UDim.new(0, self:S(4))
+    listPadding.PaddingBottom = UDim.new(0, self:S(4))
+    listPadding.PaddingLeft   = UDim.new(0, self:S(4))
+    listPadding.PaddingRight  = UDim.new(0, self:S(4))
+    listPadding.Parent = dropList
+
+    local function updateText()
+        if #selected == 0 then
+            dropBtn.Text = "  Selecionar..."
+            dropBtn.TextColor3 = self.Theme.TextMuted
+        elseif #selected == 1 then
+            dropBtn.Text = "  " .. selected[1]
+            dropBtn.TextColor3 = self.Theme.Text
+        else
+            dropBtn.Text = "  " .. #selected .. " selecionados"
+            dropBtn.TextColor3 = self.Theme.Text
+        end
+        countBadge.Text = tostring(#selected)
+    end
+
+    local function closeDropdown()
+        if not isOpen then return end
+        isOpen = false
+        self:Tween(overlay, {BackgroundTransparency = 1}, 0.2)
+        self:Tween(listContainer, {Size = UDim2.new(0, self:S(320), 0, 0)}, 0.2)
+        self:Tween(arrow, {Rotation = 0}, 0.2)
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Border, Transparency = 0.4}, 0.2)
+        end
+        task.wait(0.2)
+        overlay.Visible = false
+        listContainer.Visible = false
+    end
 
     local function isSelectedFn(name)
         for _, v in ipairs(selected) do
@@ -2147,172 +2168,138 @@ function GenesisX:CreateMultiDropdown(parent, config)
         return true
     end
 
-    local function updateText()
-        if #selected == 0 then
-            activeLabel.Text = "..."
-        elseif #selected == 1 then
-            activeLabel.Text = selected[1]
-        else
-            activeLabel.Text = #selected .. " selected"
-        end
-    end
-
-    local function calculateSize()
-        local count = 0
-        for _, child in ipairs(scrollFrame:GetChildren()) do
-            if child:IsA("Frame") then count = count + 1 end
-        end
-        return math.min((count * self:S(25)) + self:S(10), self:S(250))
-    end
-
-    local function calculatePos()
-        local framePos = selectedFrame.AbsolutePosition
-        local screenSize = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1366, 768)
-        local scale = ScaleData.ScaleFactor or 1
-
-        local clampX = math.clamp(framePos.X / scale, 0, screenSize.X / scale - dropFrame.Size.X.Offset)
-        local clampY = math.clamp(framePos.Y / scale, 0, screenSize.Y / scale)
-
-        local anchorY = framePos.Y > screenSize.Y / 1.4 and 1 or 0
-        dropFrame.AnchorPoint = Vector2.new(0, anchorY)
-        return UDim2.fromOffset(clampX, clampY)
-    end
-
-    local function closeDropdown()
-        if not isOpen then return end
-        isOpen = false
-
-        self:Tween(arrow, {Rotation = 0}, 0.2)
-        self:Tween(arrow, {ImageColor3 = self.Theme.Text}, 0.2)
-        self:Tween(dropFrame, {Size = UDim2.new(0, self:S(152), 0, 0)}, 0.2)
-
-        task.wait(0.2)
-        noClickFrame.Visible = false
-        dropFrame.Visible = false
-    end
-
-    local function openDropdown()
-        if isOpen then closeDropdown(); return end
-
-        populate()
-        local targetHeight = calculateSize()
-
-        noClickFrame.Visible = true
-        dropFrame.Visible = true
-        dropFrame.Size = UDim2.new(0, self:S(152), 0, 0)
-
-        local pos = calculatePos()
-        dropFrame.Position = pos
-
-        self:Tween(arrow, {Rotation = 180}, 0.2)
-        self:Tween(arrow, {ImageColor3 = self.Theme.Accent}, 0.2)
-        self:Tween(dropFrame, {Size = UDim2.new(0, self:S(152), 0, targetHeight)}, 0.2)
-
-        scrollFrame.CanvasSize = UDim2.new(0, 0, 0, scrollLayout.AbsoluteContentSize.Y + self:S(10))
-        isOpen = true
-    end
-
     local function populate()
-        for _, child in ipairs(scrollFrame:GetChildren()) do
+        for _, child in ipairs(dropList:GetChildren()) do
             if child:IsA("Frame") then child:Destroy() end
         end
-        optionButtons = {}
 
         for _, option in ipairs(options) do
             local sel = isSelectedFn(option)
 
-            local btn = Instance.new("TextButton")
-            btn.Name = "Option"
-            btn.BackgroundColor3 = self.Theme.Card
-            btn.BackgroundTransparency = 1
-            btn.Size = UDim2.new(1, 0, 0, self:S(21))
-            btn.Text = ""
-            btn.AutoButtonColor = false
-            btn.ZIndex = 503
-            btn.Parent = scrollFrame
-            self:CreateCorner(btn, UDim.new(0, 4))
+            local row = Instance.new("Frame")
+            row.BackgroundColor3 = sel and self.Theme.AccentDark or self.Theme.Input
+            row.Size = UDim2.new(1, 0, 0, self:S(38))
+            row.ZIndex = 503
+            row.Parent = dropList
+            self:CreateCorner(row, UDim.new(0, 6))
 
-            -- Multi-select indicator (small dot that changes size)
-            local indicator = Instance.new("Frame")
-            indicator.Name = "Indicator"
-            indicator.BackgroundColor3 = self.Theme.Accent
-            indicator.BackgroundTransparency = sel and 0 or 0.8
-            indicator.Size = sel and UDim2.new(0, self:S(4), 0, self:S(12)) or UDim2.new(0, self:S(4), 0, self:S(4))
-            indicator.Position = UDim2.new(0, self:S(1), 0.5, 0)
-            indicator.AnchorPoint = Vector2.new(0, 0.5)
-            indicator.ZIndex = 504
-            indicator.Parent = btn
-            self:CreateCorner(indicator, UDim.new(0.5, 0))
+            local cbSize = self:S(18)
+            local checkbox = Instance.new("Frame")
+            checkbox.Name = "Checkbox"
+            checkbox.BackgroundColor3 = sel and self.Theme.Accent or self.Theme.Border
+            checkbox.Position = UDim2.new(0, self:S(10), 0.5, -cbSize/2)
+            checkbox.Size = UDim2.new(0, cbSize, 0, cbSize)
+            checkbox.ZIndex = 504
+            checkbox.Parent = row
+            self:CreateCorner(checkbox, UDim.new(0, 4))
 
-            -- Option text
-            local optLabel = Instance.new("TextLabel")
-            optLabel.Name = "OptionLabel"
-            optLabel.BackgroundTransparency = 1
-            optLabel.Size = UDim2.new(1, 0, 1, 0)
-            optLabel.Position = UDim2.new(0, self:S(10), 0, 0)
-            optLabel.Font = self:GetFontBold()
-            optLabel.Text = option
-            optLabel.TextColor3 = self.Theme.Text
-            optLabel.TextSize = self:S(11)
-            optLabel.TextXAlignment = Enum.TextXAlignment.Left
-            optLabel.TextTransparency = sel and 0 or 0.4
-            optLabel.ZIndex = 504
-            optLabel.Parent = btn
+            if sel then
+                -- CHECKMARK LUCIDE (check)
+                local check = Instance.new("ImageLabel")
+                check.Name = "Check"
+                check.BackgroundTransparency = 1
+                check.Size = UDim2.new(1, 0, 1, 0)
+                check.Image = self:FormatAssetId("lucide-check") or ""
+                check.ImageColor3 = Color3.new(1, 1, 1)
+                check.ZIndex = 505
+                check.Parent = checkbox
+            end
 
-            btn.MouseEnter:Connect(function()
-                if not sel then
-                    self:Tween(btn, {BackgroundTransparency = 0.9}, 0.1)
-                end
-            end)
-            btn.MouseLeave:Connect(function()
-                self:Tween(btn, {BackgroundTransparency = 1}, 0.1)
-            end)
-            btn.MouseButton1Click:Connect(function()
-                local newSel = toggle(option)
+            local rowBtn = Instance.new("TextButton")
+            rowBtn.BackgroundTransparency = 1
+            rowBtn.Size = UDim2.new(1, 0, 1, 0)
+            rowBtn.Font = self:GetFontSemibold()
+            rowBtn.Text = "      " .. option
+            rowBtn.TextColor3 = sel and Color3.new(1, 1, 1) or self.Theme.TextSecondary
+            rowBtn.TextSize = self:S(12)
+            rowBtn.TextXAlignment = Enum.TextXAlignment.Left
+            rowBtn.ZIndex = 504
+            rowBtn.Parent = row
+
+            local rowPad = Instance.new("UIPadding")
+            rowPad.PaddingLeft = UDim.new(0, self:S(12))
+            rowPad.Parent = rowBtn
+
+            rowBtn.MouseButton1Click:Connect(function()
+                toggle(option)
                 callback(selected)
                 updateText()
-
-                -- Update visual
-                self:Tween(indicator, {BackgroundTransparency = newSel and 0 or 0.8}, 0.35)
-                self:Tween(indicator, {Size = newSel and UDim2.new(0, self:S(4), 0, self:S(12)) or UDim2.new(0, self:S(4), 0, self:S(4))}, 0.35)
-                self:Tween(optLabel, {TextTransparency = newSel and 0 or 0.4}, 0.35)
+                populate()
             end)
-
-            table.insert(optionButtons, {Button = btn, Indicator = indicator, Label = optLabel, Value = option})
+            rowBtn.MouseEnter:Connect(function()
+                if not sel then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.CardHover}, 0.1)
+                end
+            end)
+            rowBtn.MouseLeave:Connect(function()
+                if not sel then
+                    self:Tween(row, {BackgroundColor3 = self.Theme.Input}, 0.1)
+                end
+            end)
         end
     end
 
-    selectedFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or
-           input.UserInputType == Enum.UserInputType.Touch then
-            openDropdown()
-        end
+    dropBtn.MouseEnter:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.InputHover}, 0.15)
+    end)
+    dropBtn.MouseLeave:Connect(function()
+        self:Tween(dropBtn, {BackgroundColor3 = self.Theme.Input}, 0.15)
     end)
 
-    noClickFrame.MouseButton1Down:Connect(closeDropdown)
-    noClickFrame.MouseButton1Click:Connect(closeDropdown)
+    dropBtn.MouseButton1Click:Connect(function()
+        if isOpen then closeDropdown(); return end
+        populate()
+        local contentHeight = listLayout.AbsoluteContentSize.Y + self:S(64)
+        local targetHeight = math.min(contentHeight, self:S(360))
+        local targetWidth = self:S(320)
+        overlay.Visible = true
+        listContainer.Visible = true
+        overlay.BackgroundTransparency = 1
+        listContainer.Size = UDim2.new(0, targetWidth, 0, 0)
+        self:Tween(overlay, {BackgroundTransparency = 0.45}, 0.25)
+        self:Tween(listContainer, {
+            Size = UDim2.new(0, targetWidth, 0, targetHeight)
+        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        self:Tween(arrow, {Rotation = 180}, 0.2)
+        if dropStroke then
+            self:Tween(dropStroke, {Color = self.Theme.Accent, Transparency = 0.2}, 0.2)
+        end
+        dropList.CanvasSize = UDim2.new(0, 0, 0,
+            listLayout.AbsoluteContentSize.Y + self:S(16))
+        isOpen = true
+    end)
 
-    if self.MainFrame then
-        self.MainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
-            if not self.MainFrame.Visible then closeDropdown() end
-        end)
-    end
+    overlay.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or
+           input.UserInputType == Enum.UserInputType.Touch then
+            local pos = input.Position
+            local listPos = listContainer.AbsolutePosition
+            local listSize = listContainer.AbsoluteSize
+            local inList = pos.X >= listPos.X and pos.X <= listPos.X + listSize.X
+                       and pos.Y >= listPos.Y and pos.Y <= listPos.Y + listSize.Y
+            if not inList then closeDropdown() end
+        end
+    end)
 
     updateText()
 
     return {
-        Frame = frame,
+        Frame     = frame,
         GetValues = function() return selected end,
         SetValues = function(v)
             selected = {}
             for _, val in ipairs(v) do table.insert(selected, val) end
             updateText()
+            -- Refresh UI if dropdown is open
+            if isOpen then
+                populate()
+            end
         end,
         SetOptions = function(newOptions) options = newOptions end,
     }
 end
 
-
+-- --- CREATE CHECKBOX ----------------------------------------------------------
 function GenesisX:CreateCheckbox(parent, config)
     config = config or {}
     local text = config.Text or "Checkbox"
@@ -2326,6 +2313,7 @@ function GenesisX:CreateCheckbox(parent, config)
     frame.Size = UDim2.new(1, 0, 0, height)
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
@@ -2340,7 +2328,7 @@ function GenesisX:CreateCheckbox(parent, config)
     checkbox.ImageColor3 = Color3.new(1, 1, 1)
     checkbox.ZIndex = 14
     checkbox.Parent = frame
-    self:CreateCorner(checkbox, UDim.new(0, 5))
+    self:CreateCorner(checkbox, UDim.new(0, 4))
     self:CreateStroke(checkbox, default and self.Theme.Accent or self.Theme.Border, 1.5, default and 0.2 or 0.4)
 
     local cbStroke = checkbox:FindFirstChildOfClass("UIStroke")
@@ -2413,6 +2401,7 @@ function GenesisX:CreateLabel(parent, config)
     frame.ClipsDescendants = false   -- nao corta o conteudo
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.5)
 
@@ -2481,6 +2470,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
     frame.Size = UDim2.new(1, 0, 0, totalHeight)
     frame.ZIndex = 12
     frame.Parent = parent
+    frame.BackgroundTransparency = self.Config.Transparency
     self:CreateCorner(frame)
     self:CreateStroke(frame, self.Theme.Border, 1, 0.4)
 
@@ -2586,7 +2576,7 @@ function GenesisX:CreateLabelToggleSubTitle(parent, config)
         rippleHolder.ClipsDescendants = true
         rippleHolder.ZIndex = btn.ZIndex + 1
         rippleHolder.Parent = btn
-        self:CreateCorner(rippleHolder, UDim.new(0, 6))
+        self:CreateCorner(rippleHolder, UDim.new(0, 5))
 
         local btnData = {
             Button          = btn,
@@ -2722,7 +2712,8 @@ function GenesisX:CreateStatusCard(parent, config)
     frame.Active = true
     frame.ZIndex = 12
     frame.Parent = parent
-    self:CreateCorner(frame, UDim.new(0, 10))
+    frame.BackgroundTransparency = self.Config.Transparency
+    self:CreateCorner(frame, UDim.new(0, 8))
 
     local stroke = self:CreateStroke(frame, self.Theme.Accent, 1.5, 0)
     spawn(function()
@@ -2920,7 +2911,7 @@ function GenesisX:Notify(config)
     notif.ClipsDescendants   = true
     notif.ZIndex             = 5000
     notif.Parent             = self.ScreenGui
-    self:CreateCorner(notif, UDim.new(0, self:S(14)))
+    self:CreateCorner(notif, UDim.new(0, self:S(10)))
     self:CreateStroke(notif, accentColor, 1.5, 0.3)
 
     -- -- Area do icone (esquerda) ----------------------------------------------
@@ -3179,6 +3170,25 @@ function GenesisX:Notify(config)
             end
         end,
     }
+end
+
+-- --- TRANSPARENCY -----------------------------------------------------------
+function GenesisX:SetTransparency(value)
+    value = math.clamp(value, 0, 1)
+    self.Config.Transparency = value
+    self:_SaveConfigFile("transparency.json", value)
+    if self.ScreenGui then
+        for _, obj in ipairs(self.ScreenGui:GetDescendants()) do
+            if obj:IsA("Frame") and obj.Name ~= "Ripple" and obj.Name ~= "Knob" and obj.Name ~= "Fill" and obj.Name ~= "Bar" and obj.Name ~= "BarBg" and obj.Name ~= "Shadow" and obj.Name ~= "SimpleShadow" and obj.Name ~= "IconGlow" and obj.Name ~= "IconBg" and obj.Name ~= "Checkbox" and obj.Name ~= "ValueBg" and obj.Name ~= "CountBadge" and obj.Name ~= "LeftBar" and obj.Name ~= "Track" then
+                if obj.BackgroundTransparency < 1 and obj.BackgroundTransparency ~= value then
+                    -- Don't make textboxes transparent
+                    if not obj:IsA("TextBox") then
+                        obj.BackgroundTransparency = value
+                    end
+                end
+            end
+        end
+    end
 end
 
 -- --- DESTROY ------------------------------------------------------------------
