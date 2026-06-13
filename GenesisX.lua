@@ -232,10 +232,25 @@ function GenesisX:CreateCorner(parent, radius)
     local corner = Instance.new("UICorner")
     corner.CornerRadius = radius or UDim.new(0, self.Config.CornerRadius)
     corner.Parent = parent
+    -- Apply transparency to the parent if it's a frame with background
+    if parent and parent:IsA("GuiObject") and parent.BackgroundTransparency < 1 and self.Config.Transparency > 0 then
+        local skipNames = {
+            Ripple = true, Knob = true, Fill = true, Bar = true, BarBg = true,
+            Shadow = true, SimpleShadow = true, IconGlow = true, IconBg = true,
+            Checkbox = true, ValueBg = true, CountBadge = true, LeftBar = true,
+            Track = true, RippleHolder = true, HoverFill = true, IconArea = true,
+            Separator = true, Line = true, SidebarLine = true, Divider = true,
+            HeaderCover = true, BgCard = true
+        }
+        if not skipNames[parent.Name] and not parent:IsA("TextBox") then
+            parent.BackgroundTransparency = self.Config.Transparency
+        end
+    end
     return corner
 end
 
 function GenesisX:CreateStroke(parent, color, thickness, transparency)
+    if self.Config.BorderEnabled == false then return nil end
     local stroke = Instance.new("UIStroke")
     stroke.Color = color or self.Theme.Border
     stroke.Thickness = thickness or 1
@@ -656,7 +671,6 @@ function GenesisX:CreateWindow(config)
         btn.ZIndex = 14
         btn.Parent = self.Header
         self:CreateCorner(btn, UDim.new(0, 6))
-        self:CreateStroke(btn, self.Theme.Accent, 1, 0.25)
 
         btn.MouseEnter:Connect(function()
             self:Tween(btn, {BackgroundColor3 = self.Theme.Accent, ImageColor3 = Color3.new(1,1,1)}, 0.15)
@@ -3179,13 +3193,32 @@ function GenesisX:SetTransparency(value)
     self:_SaveConfigFile("transparency.json", value)
     if self.ScreenGui then
         for _, obj in ipairs(self.ScreenGui:GetDescendants()) do
-            if obj:IsA("Frame") and obj.Name ~= "Ripple" and obj.Name ~= "Knob" and obj.Name ~= "Fill" and obj.Name ~= "Bar" and obj.Name ~= "BarBg" and obj.Name ~= "Shadow" and obj.Name ~= "SimpleShadow" and obj.Name ~= "IconGlow" and obj.Name ~= "IconBg" and obj.Name ~= "Checkbox" and obj.Name ~= "ValueBg" and obj.Name ~= "CountBadge" and obj.Name ~= "LeftBar" and obj.Name ~= "Track" then
-                if obj.BackgroundTransparency < 1 and obj.BackgroundTransparency ~= value then
+            -- Skip internal/effect elements that should stay opaque or have their own transparency
+            local skipNames = {
+                Ripple = true, Knob = true, Fill = true, Bar = true, BarBg = true,
+                Shadow = true, SimpleShadow = true, IconGlow = true, IconBg = true,
+                Checkbox = true, ValueBg = true, CountBadge = true, LeftBar = true,
+                Track = true, RippleHolder = true, HoverFill = true, IconArea = true,
+                Separator = true, Line = true, SidebarLine = true, Divider = true,
+                HeaderCover = true, BgCard = true
+            }
+            if obj:IsA("Frame") and not skipNames[obj.Name] then
+                if obj.BackgroundTransparency < 1 then
                     -- Don't make textboxes transparent
                     if not obj:IsA("TextBox") then
                         obj.BackgroundTransparency = value
                     end
                 end
+            end
+            -- Also apply to ImageLabels and ImageButtons that have backgrounds
+            if (obj:IsA("ImageLabel") or obj:IsA("ImageButton")) and not skipNames[obj.Name] then
+                if obj.BackgroundTransparency < 1 then
+                    obj.BackgroundTransparency = value
+                end
+            end
+            -- Apply to TextLabels that have backgrounds (rare but possible)
+            if obj:IsA("TextLabel") and obj.BackgroundTransparency < 1 and not skipNames[obj.Name] then
+                obj.BackgroundTransparency = value
             end
         end
     end
