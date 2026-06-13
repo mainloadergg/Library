@@ -1,5 +1,6 @@
 return {
 	assets = {
+	    -- método de uso sem "lucide-" no nome.
 	    ["accessibility"] = "rbxassetid://10709751939",
 			["activity"] = "rbxassetid://10709752035",
 			["airvent"] = "rbxassetid://10709752131",
@@ -818,6 +819,7 @@ return {
 			["xsquare"] = "rbxassetid://10747384217",
 			["zoomin"] = "rbxassetid://10747384552",
 			["zoomout"] = "rbxassetid://10747384679",
+	    -- método de uso com "lucide-" no nome:
 		["lucide-accessibility"] = "rbxassetid://10709751939",
 		["lucide-activity"] = "rbxassetid://10709752035",
 		["lucide-air-vent"] = "rbxassetid://10709752131",
@@ -1636,7 +1638,6 @@ return {
 		["lucide-x-square"] = "rbxassetid://10747384217",
 		["lucide-zoom-in"] = "rbxassetid://10747384552",
 		["lucide-zoom-out"] = "rbxassetid://10747384679",
-		["lucide-dog-nerd"] = "rbxassetid://137941939602314",
 		["lucide-dog-nerd"] = "rbxassetid://137941939602314",
 		["lucide-dog-dente"] = "rbxassetid://86545657821911",
 		["lucide-dog-chupetao"] = "rbxassetid://111009574293053",
