@@ -97,7 +97,7 @@ local Themes = {
 local LucideAssets = {}
 pcall(function()
     local raw = loadstring(game:HttpGet(
-        "https://www.genesis-loader.xyz/raw/icons"
+        "https://raw.githubusercontent.com/mainloadergg/Library/refs/heads/main/Icons.lua"
     ))()
     if raw and raw.assets then
         LucideAssets = raw.assets
